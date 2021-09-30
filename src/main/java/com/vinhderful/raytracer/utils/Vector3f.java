@@ -1,7 +1,9 @@
 package com.vinhderful.raytracer.utils;
 
 public class Vector3f {
-    private final float x,y,z;
+    private float x;
+    private float y;
+    private float z;
 
     public Vector3f(float x, float y, float z) {
         if (Float.isNaN(x) || Float.isNaN(y) || Float.isNaN(z))
@@ -14,6 +16,12 @@ public class Vector3f {
 
     public Vector3f add(Vector3f vec) {
         return new Vector3f(x + vec.x, y + vec.y, z + vec.z);
+    }
+
+    public void translate(Vector3f vec) {
+        x += vec.x;
+        y += vec.y;
+        z += vec.z;
     }
 
     public Vector3f subtract(Vector3f vec) {
@@ -33,7 +41,7 @@ public class Vector3f {
         return new Vector3f(x / length, y / length, z / length);
     }
 
-    public static float dot(Vector3f a, Vector3f b) {
+    public static float getDotProduct(Vector3f a, Vector3f b) {
         return a.x * b.x + a.y * b.y + a.z * b.z;
     }
 

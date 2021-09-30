@@ -16,7 +16,7 @@ public class Sphere extends Shape {
 
     @Override
     public Vector3f calculateIntersection(Ray ray) {
-        float t = Vector3f.dot(position.subtract(ray.getOrigin()), ray.getDirection());
+        float t = Vector3f.getDotProduct(position.subtract(ray.getOrigin()), ray.getDirection());
         Vector3f p = ray.getOrigin().add(ray.getDirection().multiply(t));
 
         float y = position.subtract(p).length();
