@@ -1,5 +1,6 @@
 package com.vinhderful.raytracer;
 
+import com.vinhderful.raytracer.renderer.Camera;
 import com.vinhderful.raytracer.renderer.Renderer;
 import com.vinhderful.raytracer.renderer.World;
 import com.vinhderful.raytracer.shapes.Sphere;
@@ -21,7 +22,8 @@ public class Controller {
     @FXML
     public void initialize() {
         Renderer renderer = new Renderer(canvas.getGraphicsContext2D());
-        World world = new World();
+        World world = new World(Color.BLACK);
+        Camera camera = new Camera();
 
         Sphere sphere3 = new Sphere(new Vector3f(-1F, 0, 0.5F), 0.4f, Color.RED);
         Sphere sphere1 = new Sphere(new Vector3f(0, 0, 1), 0.4f, Color.GREEN);
@@ -30,6 +32,6 @@ public class Controller {
         world.addShape(sphere2);
         world.addShape(sphere3);
 
-        renderer.render(world);
+        renderer.render(world, camera);
     }
 }

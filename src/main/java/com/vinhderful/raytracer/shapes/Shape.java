@@ -16,6 +16,8 @@ public abstract class Shape {
 
     public abstract Vector3f calculateIntersection(Ray ray);
 
+    public abstract Vector3f getNormalVectorAt(Vector3f point);
+
     public Color getColor() {
         return color;
     }

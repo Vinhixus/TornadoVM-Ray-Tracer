@@ -36,9 +36,29 @@ public class Vector3f {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }
 
+    public static float distance(Vector3f a, Vector3f b) {
+        return (float) Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
+    }
+
     public Vector3f normalize() {
         float length = length();
         return new Vector3f(x / length, y / length, z / length);
+    }
+
+    public Vector3f rotateYP(float yaw, float pitch) {
+        // Convert to radians
+        double yawRads = Math.toRadians(yaw);
+        double pitchRads = Math.toRadians(pitch);
+
+        // Step one: Rotate around X axis (pitch)
+        float _y = (float) (y * Math.cos(pitchRads) - z * Math.sin(pitchRads));
+        float _z = (float) (y * Math.sin(pitchRads) + z * Math.cos(pitchRads));
+
+        // Step two: Rotate around the Y axis (yaw)
+        float _x = (float) (x * Math.cos(yawRads) + _z * Math.sin(yawRads));
+        _z = (float) (-x * Math.sin(yawRads) + _z * Math.cos(yawRads));
+
+        return new Vector3f(_x, _y, _z);
     }
 
     public static float getDotProduct(Vector3f a, Vector3f b) {

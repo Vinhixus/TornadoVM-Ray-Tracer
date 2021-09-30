@@ -6,7 +6,6 @@ import com.vinhderful.raytracer.utils.Vector3f;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelWriter;
-import javafx.scene.paint.Color;
 
 public class Renderer {
 
@@ -35,23 +34,39 @@ public class Renderer {
         return new float[] { u, v };
     }
 
-    public void render(World world) {
+    public void render(World world, Camera camera) {
 
-        g.setFill(Color.BLACK);
+        g.setFill(world.getBackgroundColor());
         g.fillRect(0, 0, width, height);
 
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++) {
 
                 float[] nsc = getNormalizedScreenCoordinates(x, y, width, height);
-                Ray ray = new Ray(new Vector3f(nsc[0], nsc[1], 0), new Vector3f(0, 0, 1));
 
-                for (Shape shape : world.getShapes()) {
-                    Vector3f intersection = shape.calculateIntersection(ray);
+                Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
+                Vector3f rayDir = new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos).normalize().rotateYP(camera.getYaw(), camera.getPitch());
+                Ray ray = new Ray(eyePos.add(camera.getPosition()), rayDir);
 
-                    if (intersection != null)
-                        pixelWriter.setColor(x, y, shape.getColor());
-                }
+                Hit closestHit = getClosestHit(ray, world);
+                if (closestHit != null)
+                    pixelWriter.setColor(x, y, closestHit.getShape().getColor());
             }
     }
+
+    public Hit getClosestHit(Ray ray, World world) {
+        Hit closestHit = null;
+
+        for (Shape shape : world.getShapes()) {
+            if (shape == null)
+                continue;
+
+            Vector3f hitPos = shape.calculateIntersection(ray);
+            if (hitPos != null && (closestHit == null || Vector3f.distance(closestHit.getPosition(), ray.getOrigin()) > Vector3f.distance(hitPos, ray.getOrigin())))
+                closestHit = new Hit(ray, shape, hitPos);
+        }
+
+        return closestHit;
+    }
+
 }
