@@ -1,4 +1,4 @@
-package com.vinhphamvan.raytracer.utils;
+package com.vinhderful.raytracer.utils;
 
 public class Vector3f {
     private final float x,y,z;

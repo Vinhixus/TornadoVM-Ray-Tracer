@@ -1,7 +1,7 @@
-package com.vinhphamvan.raytracer.shapes;
+package com.vinhderful.raytracer.shapes;
 
-import com.vinhphamvan.raytracer.utils.Ray;
-import com.vinhphamvan.raytracer.utils.Vector3f;
+import com.vinhderful.raytracer.utils.Ray;
+import com.vinhderful.raytracer.utils.Vector3f;
 
 import javafx.scene.paint.Color;
 

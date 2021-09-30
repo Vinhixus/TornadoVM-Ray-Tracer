@@ -1,4 +1,4 @@
-package com.vinhphamvan.raytracer;
+package com.vinhderful.raytracer;
 
 import java.io.IOException;
 import java.util.Objects;

@@ -1,4 +1,4 @@
-package com.vinhphamvan.raytracer.utils;
+package com.vinhderful.raytracer.utils;
 
 public class Ray {
     private final Vector3f origin;
