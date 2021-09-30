@@ -1,4 +1,4 @@
-package com.vinhphamvan;
+package com.vinhphamvan.raytracer;
 
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;

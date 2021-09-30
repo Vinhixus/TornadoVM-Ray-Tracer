@@ -1,4 +1,4 @@
-package com.vinhphamvan;
+package com.vinhphamvan.raytracer;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

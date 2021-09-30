@@ -1,4 +1,4 @@
-package com.vinhphamvan;
+package com.vinhphamvan.raytracer;
 
 import javafx.geometry.Point2D;
 import javafx.scene.effect.BlendMode;
