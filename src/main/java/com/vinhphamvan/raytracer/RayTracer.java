@@ -1,13 +1,13 @@
 package com.vinhphamvan.raytracer;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.*;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.util.Objects;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 public class RayTracer extends Application {
 
@@ -26,6 +26,7 @@ public class RayTracer extends Application {
             scene = new Scene(root);
 
         stage.setTitle("TornadoVM Ray Tracer");
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
