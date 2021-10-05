@@ -38,10 +38,6 @@ public class Renderer {
     }
 
     public void render(World world, Camera camera) {
-
-        g.setFill(Color.BLACK.toPaint());
-        g.fillRect(0, 0, width, height);
-
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++) {
 
@@ -87,7 +83,7 @@ public class Renderer {
             Color lightColor = light.getColor();
             Color shapeColor = hit.getShape().getColor();
 
-            float diffuseBrightness = Math.max(0F, Math.min(1F, Vector3f.dotProduct(hit.getNormal(), light.getPosition().subtract(hit.getPosition()))));
+            float diffuseBrightness = Math.max(0F, Vector3f.dotProduct(hit.getNormal(), light.getPosition().subtract(hit.getPosition())));
             return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
         }
 

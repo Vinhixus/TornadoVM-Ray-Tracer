@@ -35,8 +35,7 @@ public class Color {
     }
 
     public Color multiply(float f) {
-        f = Math.min(1F, f);
-        return new Color(this.red * f, this.green * f, this.blue * f);
+        return new Color(Math.min(1F, this.red * f), Math.min(1F, this.green * f), Math.min(1F, this.blue * f));
     }
 
     public Color multiply(Color other) {
