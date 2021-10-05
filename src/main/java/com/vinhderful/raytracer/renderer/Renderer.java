@@ -1,5 +1,7 @@
 package com.vinhderful.raytracer.renderer;
 
+import java.nio.IntBuffer;
+
 import com.vinhderful.raytracer.shapes.Shape;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Ray;
@@ -7,21 +9,26 @@ import com.vinhderful.raytracer.utils.Vector3f;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritablePixelFormat;
 
 public class Renderer {
 
     private static final float AMBIENT_STRENGTH = 0.1F;
 
-    private final GraphicsContext g;
     private final PixelWriter pixelWriter;
     private final int width;
     private final int height;
 
+    private final int[] pixels;
+    private final WritablePixelFormat<IntBuffer> format;
+
     public Renderer(GraphicsContext g) {
-        this.g = g;
         this.pixelWriter = g.getPixelWriter();
         this.width = (int) g.getCanvas().getWidth();
         this.height = (int) g.getCanvas().getHeight();
+
+        this.format = WritablePixelFormat.getIntArgbInstance();
+        this.pixels = new int[width * height];
     }
 
     public static float[] getNormalizedCoordinates(int x, int y, int width, int height) {
@@ -48,8 +55,13 @@ public class Renderer {
                 Ray ray = new Ray(eyePos.add(camera.getPosition()), rayDir);
 
                 Hit hit = getClosestHit(ray, world);
-                pixelWriter.setColor(x, y, getAmbient(hit, world).add(getDiffuse(hit, world)).toPaint());
+                if (hit != null && (hit.getShape().equals(world.getLight()) || hit.getShape().equals(world.getPlane())))
+                    pixels[x + y * width] = hit.getColor().toARGB();
+                else
+                    pixels[x + y * width] = getAmbient(hit, world).add(getDiffuse(hit, world)).toARGB();
             }
+
+        pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
     }
 
     public static Hit getClosestHit(Ray ray, World world) {
@@ -59,9 +71,9 @@ public class Renderer {
             if (shape == null)
                 continue;
 
-            Vector3f hitPos = shape.getIntersection(ray);
-            if (hitPos != null && (closestHit == null || Vector3f.distance(closestHit.getPosition(), ray.getOrigin()) > Vector3f.distance(hitPos, ray.getOrigin())))
-                closestHit = new Hit(ray, shape, hitPos);
+            Vector3f intersection = shape.getIntersection(ray);
+            if (intersection != null && (closestHit == null || Vector3f.distance(closestHit.getPosition(), ray.getOrigin()) > Vector3f.distance(intersection, ray.getOrigin())))
+                closestHit = new Hit(ray, shape, intersection);
         }
 
         return closestHit;
@@ -69,7 +81,7 @@ public class Renderer {
 
     public static Color getAmbient(Hit hit, World world) {
         if (hit != null) {
-            Color shapeColor = hit.getShape().getColor();
+            Color shapeColor = hit.getColor();
             Color lightColor = world.getLight().getColor();
             return shapeColor.multiply(lightColor).multiply(AMBIENT_STRENGTH);
         }
@@ -81,7 +93,7 @@ public class Renderer {
         if (hit != null) {
             Light light = world.getLight();
             Color lightColor = light.getColor();
-            Color shapeColor = hit.getShape().getColor();
+            Color shapeColor = hit.getColor();
 
             float diffuseBrightness = Math.max(0F, Vector3f.dotProduct(hit.getNormal(), light.getPosition().subtract(hit.getPosition())));
             return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
