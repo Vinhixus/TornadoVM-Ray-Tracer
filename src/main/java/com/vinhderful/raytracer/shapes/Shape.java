@@ -1,9 +1,8 @@
 package com.vinhderful.raytracer.shapes;
 
+import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Ray;
 import com.vinhderful.raytracer.utils.Vector3f;
-
-import javafx.scene.paint.Color;
 
 public abstract class Shape {
     protected Vector3f position;

@@ -27,4 +27,8 @@ public class Hit {
     public Vector3f getPosition() {
         return position;
     }
+
+    public Vector3f getNormal() {
+        return shape.getNormalVectorAt(position);
+    }
 }

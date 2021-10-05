@@ -1,6 +1,7 @@
 package com.vinhderful.raytracer.renderer;
 
 import com.vinhderful.raytracer.shapes.Shape;
+import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Ray;
 import com.vinhderful.raytracer.utils.Vector3f;
 
@@ -8,6 +9,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelWriter;
 
 public class Renderer {
+
+    private static final float AMBIENT_STRENGTH = 0.1F;
 
     private final GraphicsContext g;
     private final PixelWriter pixelWriter;
@@ -36,7 +39,7 @@ public class Renderer {
 
     public void render(World world, Camera camera) {
 
-        g.setFill(world.getBackgroundColor());
+        g.setFill(Color.BLACK.toPaint());
         g.fillRect(0, 0, width, height);
 
         for (int x = 0; x < width; x++)
@@ -48,13 +51,11 @@ public class Renderer {
                 Vector3f rayDir = Vector3f.rotate(Vector3f.normalize(new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos)), camera.getYaw(), camera.getPitch());
                 Ray ray = new Ray(eyePos.add(camera.getPosition()), rayDir);
 
-                Hit closestHit = getClosestHit(ray, world);
-                if (closestHit != null)
-                    pixelWriter.setColor(x, y, closestHit.getShape().getColor());
+                pixelWriter.setColor(x, y, getAmbient(ray, world).toPaint());
             }
     }
 
-    public Hit getClosestHit(Ray ray, World world) {
+    public static Hit getClosestHit(Ray ray, World world) {
         Hit closestHit = null;
 
         for (Shape shape : world.getShapes()) {
@@ -69,4 +70,11 @@ public class Renderer {
         return closestHit;
     }
 
+    public static Color getAmbient(Ray ray, World world) {
+        Hit hit = getClosestHit(ray, world);
+        if (hit != null)
+            return hit.getShape().getColor().multiply(AMBIENT_STRENGTH);
+
+        return world.getBackgroundColor();
+    }
 }
