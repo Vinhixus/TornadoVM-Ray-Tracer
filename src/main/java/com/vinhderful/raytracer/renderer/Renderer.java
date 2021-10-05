@@ -21,7 +21,7 @@ public class Renderer {
         this.height = (int) g.getCanvas().getHeight();
     }
 
-    public static float[] getNormalizedScreenCoordinates(int x, int y, int width, int height) {
+    public static float[] getNormalizedCoordinates(int x, int y, int width, int height) {
         float u,v;
         if (width > height) {
             u = (float) (x - width / 2 + height / 2) / height * 2 - 1;
@@ -42,10 +42,10 @@ public class Renderer {
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++) {
 
-                float[] nsc = getNormalizedScreenCoordinates(x, y, width, height);
+                float[] nsc = getNormalizedCoordinates(x, y, width, height);
 
                 Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
-                Vector3f rayDir = new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos).normalize().rotateYP(camera.getYaw(), camera.getPitch());
+                Vector3f rayDir = Vector3f.rotate(Vector3f.normalize(new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos)), camera.getYaw(), camera.getPitch());
                 Ray ray = new Ray(eyePos.add(camera.getPosition()), rayDir);
 
                 Hit closestHit = getClosestHit(ray, world);
@@ -61,7 +61,7 @@ public class Renderer {
             if (shape == null)
                 continue;
 
-            Vector3f hitPos = shape.calculateIntersection(ray);
+            Vector3f hitPos = shape.getIntersection(ray);
             if (hitPos != null && (closestHit == null || Vector3f.distance(closestHit.getPosition(), ray.getOrigin()) > Vector3f.distance(hitPos, ray.getOrigin())))
                 closestHit = new Hit(ray, shape, hitPos);
         }

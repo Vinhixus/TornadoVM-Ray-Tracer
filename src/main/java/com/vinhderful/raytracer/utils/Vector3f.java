@@ -5,6 +5,33 @@ public class Vector3f {
     private float y;
     private float z;
 
+    public static Vector3f normalize(Vector3f v) {
+        float length = v.length();
+        return new Vector3f(v.x / length, v.y / length, v.z / length);
+    }
+
+    public static float dotProduct(Vector3f a, Vector3f b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+
+    public static float distance(Vector3f a, Vector3f b) {
+        return (float) Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
+    }
+
+    public static Vector3f rotate(Vector3f v, float yaw, float pitch) {
+
+        double _yaw = Math.toRadians(yaw);
+        double _pitch = Math.toRadians(pitch);
+
+        float _y = (float) (v.y * Math.cos(_pitch) - v.z * Math.sin(_pitch));
+        float _z = (float) (v.y * Math.sin(_pitch) + v.z * Math.cos(_pitch));
+
+        float _x = (float) (v.x * Math.cos(_yaw) + _z * Math.sin(_yaw));
+        _z = (float) (-v.x * Math.sin(_yaw) + _z * Math.cos(_yaw));
+
+        return new Vector3f(_x, _y, _z);
+    }
+
     public Vector3f(float x, float y, float z) {
         if (Float.isNaN(x) || Float.isNaN(y) || Float.isNaN(z))
             throw new IllegalArgumentException("One or more parameters are NaN!");
@@ -36,33 +63,11 @@ public class Vector3f {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }
 
-    public static float distance(Vector3f a, Vector3f b) {
-        return (float) Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
-    }
-
-    public Vector3f normalize() {
+    public void normalize() {
         float length = length();
-        return new Vector3f(x / length, y / length, z / length);
-    }
-
-    public Vector3f rotateYP(float yaw, float pitch) {
-        // Convert to radians
-        double yawRads = Math.toRadians(yaw);
-        double pitchRads = Math.toRadians(pitch);
-
-        // Step one: Rotate around X axis (pitch)
-        float _y = (float) (y * Math.cos(pitchRads) - z * Math.sin(pitchRads));
-        float _z = (float) (y * Math.sin(pitchRads) + z * Math.cos(pitchRads));
-
-        // Step two: Rotate around the Y axis (yaw)
-        float _x = (float) (x * Math.cos(yawRads) + _z * Math.sin(yawRads));
-        _z = (float) (-x * Math.sin(yawRads) + _z * Math.cos(yawRads));
-
-        return new Vector3f(_x, _y, _z);
-    }
-
-    public static float getDotProduct(Vector3f a, Vector3f b) {
-        return a.x * b.x + a.y * b.y + a.z * b.z;
+        x = x / length;
+        y = y / length;
+        z = z / length;
     }
 
     @Override
