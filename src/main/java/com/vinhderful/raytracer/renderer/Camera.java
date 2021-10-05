@@ -23,6 +23,18 @@ public class Camera {
         this.position = position;
     }
 
+    public void setX(float x) {
+        position.setX(x);
+    }
+
+    public void setY(float y) {
+        position.setY(y);
+    }
+
+    public void setZ(float z) {
+        position.setZ(z);
+    }
+
     public float getYaw() {
         return yaw;
     }
