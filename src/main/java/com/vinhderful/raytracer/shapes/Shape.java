@@ -34,10 +34,6 @@ public abstract class Shape {
         position.setX(x);
     }
 
-    public void setY(float y) {
-        position.setY(y);
-    }
-
     public void setZ(float z) {
         position.setZ(z);
     }

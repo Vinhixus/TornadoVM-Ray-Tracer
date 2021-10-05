@@ -28,14 +28,14 @@ public class Plane extends Shape {
     public Color getColor(Vector3f point) {
         if ((point.getX() > 0 & point.getZ() > 0) || (point.getX() < 0 & point.getZ() < 0)) {
             if ((int) point.getX() % 2 == 0 ^ (int) point.getZ() % 2 != 0)
-                return Color.BLACK;
+                return Color.GRAY;
             else
-                return Color.MAGENTA;
+                return Color.DARK_GRAY;
         } else {
             if ((int) point.getX() % 2 == 0 ^ (int) point.getZ() % 2 != 0)
-                return Color.MAGENTA;
+                return Color.DARK_GRAY;
             else
-                return Color.BLACK;
+                return Color.GRAY;
         }
     }
 }

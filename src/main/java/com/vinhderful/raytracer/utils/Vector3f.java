@@ -63,13 +63,6 @@ public class Vector3f {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }
 
-    public void normalize() {
-        float length = length();
-        x = x / length;
-        y = y / length;
-        z = z / length;
-    }
-
     @Override
     public String toString() {
         return "Vector3f {" + "x: " + x + ", y: " + y + ", z: " + z + '}';

@@ -43,10 +43,6 @@ public class World {
         light.setX(x);
     }
 
-    public void setLightY(float y) {
-        light.setY(y);
-    }
-
     public void setLightZ(float z) {
         light.setZ(z);
     }
