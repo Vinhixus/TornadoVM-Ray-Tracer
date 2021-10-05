@@ -52,7 +52,7 @@ public class Renderer {
                 Ray ray = new Ray(eyePos.add(camera.getPosition()), rayDir);
 
                 Hit hit = getClosestHit(ray, world);
-                pixelWriter.setColor(x, y, getPhong(hit, world).toPaint());
+                pixelWriter.setColor(x, y, getAmbient(hit, world).add(getDiffuse(hit, world)).toPaint());
             }
     }
 
@@ -71,23 +71,24 @@ public class Renderer {
         return closestHit;
     }
 
-    public static Color getPhong(Hit hit, World world) {
-        return getAmbient(hit, world).add(getDiffuse(hit, world));
-    }
-
     public static Color getAmbient(Hit hit, World world) {
-        if (hit != null)
-            return hit.getShape().getColor().multiply(AMBIENT_STRENGTH);
+        if (hit != null) {
+            Color shapeColor = hit.getShape().getColor();
+            Color lightColor = world.getLight().getColor();
+            return shapeColor.multiply(lightColor).multiply(AMBIENT_STRENGTH);
+        }
 
         return world.getBackgroundColor();
     }
 
     public static Color getDiffuse(Hit hit, World world) {
-        Light light = world.getLight();
-
         if (hit != null) {
+            Light light = world.getLight();
+            Color lightColor = light.getColor();
+            Color shapeColor = hit.getShape().getColor();
+
             float diffuseBrightness = Math.max(0F, Math.min(1F, Vector3f.dotProduct(hit.getNormal(), light.getPosition().subtract(hit.getPosition()))));
-            return hit.getShape().getColor().multiply(diffuseBrightness);
+            return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
         }
 
         return world.getBackgroundColor();
