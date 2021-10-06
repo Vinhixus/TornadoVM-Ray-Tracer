@@ -13,6 +13,11 @@ public class Sphere extends Shape {
         this.radius = radius;
     }
 
+    public Sphere(Vector3f position, float radius, Color color, float reflectivity) {
+        super(position, color, reflectivity);
+        this.radius = radius;
+    }
+
     @Override
     public Vector3f getIntersection(Ray ray) {
         float t = Vector3f.dotProduct(position.subtract(ray.getOrigin()), ray.getDirection());

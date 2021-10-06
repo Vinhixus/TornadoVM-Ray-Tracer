@@ -30,9 +30,9 @@ public class Controller {
         World world = new World(Color.BLACK);
         Camera camera = new Camera();
 
-        Sphere sphere3 = new Sphere(new Vector3f(-1.5F, 0, 1F), 0.5f, Color.RED);
-        Sphere sphere1 = new Sphere(new Vector3f(0, 0, 1F), 0.5f, Color.GREEN);
-        Sphere sphere2 = new Sphere(new Vector3f(1.5F, 0, 1F), 0.5f, Color.BLUE);
+        Sphere sphere3 = new Sphere(new Vector3f(-1.5F, 0, 1F), 0.5f, Color.RED, 8F);
+        Sphere sphere1 = new Sphere(new Vector3f(0, 0, 1F), 0.5f, Color.GREEN, 16F);
+        Sphere sphere2 = new Sphere(new Vector3f(1.5F, 0, 1F), 0.5f, Color.BLUE, 32F);
         world.addShape(sphere1);
         world.addShape(sphere2);
         world.addShape(sphere3);
