@@ -20,7 +20,7 @@ public class Sphere extends Shape {
 
     @Override
     public Vector3f getIntersection(Ray ray) {
-        float t = Vector3f.dotProduct(position.subtract(ray.getOrigin()), ray.getDirection());
+        float t = position.subtract(ray.getOrigin()).dotProduct(ray.getDirection());
         Vector3f p = ray.getOrigin().add(ray.getDirection().multiply(t));
 
         float y = position.subtract(p).length();
@@ -38,6 +38,6 @@ public class Sphere extends Shape {
 
     @Override
     public Vector3f getNormalAt(Vector3f point) {
-        return Vector3f.normalize(point.subtract(position));
+        return point.subtract(position).normalize();
     }
 }

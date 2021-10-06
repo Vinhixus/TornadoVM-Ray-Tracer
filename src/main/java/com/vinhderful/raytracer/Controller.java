@@ -26,6 +26,7 @@ public class Controller {
     public Slider camZ;
     public Slider camYaw;
     public Slider camPitch;
+    public Slider camFOV;
     public Button button;
 
     private float time;
@@ -34,8 +35,8 @@ public class Controller {
     @FXML
     public void initialize() {
         Renderer renderer = new Renderer(canvas.getGraphicsContext2D());
-        World world = new World(Color.BLACK);
-        Camera camera = new Camera();
+        World world = new World();
+        Camera camera = world.getCamera();
 
         Sphere sphere3 = new Sphere(new Vector3f(-1.5F, 0, 1F), 0.5f, Color.RED, 8F);
         Sphere sphere1 = new Sphere(new Vector3f(0, 0, 1F), 0.5f, Color.GREEN, 16F);
@@ -49,6 +50,7 @@ public class Controller {
         camZ.valueProperty().addListener((observable, oldValue, newValue) -> camera.setZ(newValue.floatValue()));
         camYaw.valueProperty().addListener((observable, oldValue, newValue) -> camera.setYaw(newValue.floatValue()));
         camPitch.valueProperty().addListener((observable, oldValue, newValue) -> camera.setPitch(newValue.floatValue()));
+        camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera.setFOV(newValue.floatValue()));
 
         time = 0;
         world.setLightX(2F);

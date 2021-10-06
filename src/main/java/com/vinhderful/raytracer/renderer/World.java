@@ -10,25 +10,27 @@ import com.vinhderful.raytracer.utils.Vector3f;
 public class World {
 
     private final CopyOnWriteArrayList<Shape> shapes;
+    private final Camera camera;
     private final Light light;
     private final Plane plane;
     private final Color backgroundColor;
 
-    public World(Color backgroundColor) {
+    public World() {
         this.shapes = new CopyOnWriteArrayList<>();
+        this.camera = new Camera();
         this.plane = new Plane(-1F);
         this.light = new Light(new Vector3f(-1F, 0.8F, -1F), Color.WHITE);
         this.shapes.add(light);
         this.shapes.add(plane);
-        this.backgroundColor = backgroundColor;
-    }
-
-    public Color getBackgroundColor() {
-        return backgroundColor;
+        this.backgroundColor = Color.BLACK;
     }
 
     public CopyOnWriteArrayList<Shape> getShapes() {
         return shapes;
+    }
+
+    public Camera getCamera() {
+        return camera;
     }
 
     public Plane getPlane() {
@@ -45,6 +47,10 @@ public class World {
 
     public void setLightZ(float z) {
         light.setZ(z);
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
     }
 
     public void addShape(Shape shape) {

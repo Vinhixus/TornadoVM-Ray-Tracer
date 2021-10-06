@@ -27,20 +27,8 @@ public abstract class Shape {
         this.reflectivity = reflectivity;
     }
 
-    public abstract Vector3f getIntersection(Ray ray);
-
-    public abstract Vector3f getNormalAt(Vector3f point);
-
-    public Color getColor(Vector3f point) {
-        return color;
-    }
-
     public Vector3f getPosition() {
         return position;
-    }
-
-    public float getReflectivity() {
-        return reflectivity;
     }
 
     public void setX(float x) {
@@ -50,4 +38,16 @@ public abstract class Shape {
     public void setZ(float z) {
         position.setZ(z);
     }
+
+    public Color getColor(Vector3f point) {
+        return color;
+    }
+
+    public float getReflectivity() {
+        return reflectivity;
+    }
+
+    public abstract Vector3f getIntersection(Ray ray);
+
+    public abstract Vector3f getNormalAt(Vector3f point);
 }

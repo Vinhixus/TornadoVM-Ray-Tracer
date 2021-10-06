@@ -1,62 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="360" minWidth="360" stylesheets="@GUI.css"
-            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.vinhderful.raytracer.Controller">
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="360" minWidth="360" stylesheets="@GUI.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vinhderful.raytracer.Controller">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="File">
-                <MenuItem mnemonicParsing="false" text="Close"/>
+                <MenuItem mnemonicParsing="false" text="Close" />
             </Menu>
             <Menu mnemonicParsing="false" text="Edit">
-                <MenuItem mnemonicParsing="false" text="Delete"/>
+                <MenuItem mnemonicParsing="false" text="Delete" />
             </Menu>
             <Menu mnemonicParsing="false" text="Help">
-                <MenuItem mnemonicParsing="false" text="About"/>
+                <MenuItem mnemonicParsing="false" text="About" />
             </Menu>
         </MenuBar>
     </top>
     <center>
         <Pane fx:id="pane" BorderPane.alignment="CENTER">
-            <Canvas fx:id="canvas" height="720" width="1280"/>
+            <Canvas fx:id="canvas" height="720" width="1280" />
         </Pane>
     </center>
     <right>
         <VBox prefWidth="150.0" BorderPane.alignment="CENTER">
             <padding>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Camera X">
                 <VBox.margin>
-                    <Insets/>
+                    <Insets />
                 </VBox.margin>
             </Label>
-            <Slider id="camPosX" fx:id="camX" max="4.0" min="-4.0"/>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Y"/>
-            <Slider id="camPosY" fx:id="camY" max="4.0" min="-4.0"/>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Z"/>
-            <Slider id="camPosZ" fx:id="camZ" max="4.0" min="-4.0"/>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Yaw "/>
-            <Slider id="camYaw" fx:id="camYaw" max="90.0" min="-90.0"/>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Pitch"/>
-            <Slider id="camPitch" fx:id="camPitch" max="70.0" min="-70.0"/>
+            <Slider id="camX" fx:id="camX" max="4.0" min="-4.0" />
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Y" />
+            <Slider id="camY" fx:id="camY" max="4.0" min="-4.0" />
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Z" />
+            <Slider id="camZ" fx:id="camZ" max="4.0" min="-4.0" />
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Yaw " />
+            <Slider id="camYaw" fx:id="camYaw" max="90.0" min="-90.0" />
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Pitch" />
+            <Slider id="camPitch" fx:id="camPitch" max="70.0" min="-70.0" />
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera FOV" />
+            <Slider id="camFOV" fx:id="camFOV" max="90.0" min="30.0" value="60.0" />
             <Separator prefWidth="200.0">
                 <VBox.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Separator>
-            <Button fx:id="button" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                    onAction="#playPauseAnimation" text="Play">
+            <Button fx:id="button" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playPauseAnimation" text="Play">
                 <VBox.margin>
-                    <Insets left="10.0"/>
+                    <Insets left="10.0" />
                 </VBox.margin>
             </Button>
             <BorderPane.margin>
-                <Insets/>
+                <Insets />
             </BorderPane.margin>
         </VBox>
     </right>

@@ -52,14 +52,18 @@ public class Renderer {
                 float[] nsc = getNormalizedCoordinates(x, y, width, height);
 
                 Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
-                Vector3f rayDir = Vector3f.rotate(Vector3f.normalize(new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos)), camera.getYaw(), camera.getPitch());
+                Vector3f rayDir = Vector3f.rotate(new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos).normalize(), camera.getYaw(), camera.getPitch());
                 Ray ray = new Ray(eyePos.add(camera.getPosition()), rayDir);
 
                 Hit hit = getClosestHit(ray, world);
-                if (hit != null && (hit.getShape().equals(world.getLight()) || hit.getShape().equals(world.getPlane())))
-                    pixels[x + y * width] = hit.getColor().toARGB();
-                else
-                    pixels[x + y * width] = getAmbient(hit, world).add(getDiffuse(hit, world)).add(getSpecular(hit, world, camera)).toARGB();
+                if (hit != null) {
+                    if (hit.getShape().equals(world.getLight()) || hit.getShape().equals(world.getPlane()))
+                        pixels[x + y * width] = hit.getColor().toARGB();
+                    else
+                        pixels[x + y * width] = getPhong(hit, world).toARGB();
+                } else {
+                    pixels[x + y * width] = world.getBackgroundColor().toARGB();
+                }
             }
 
         pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
@@ -73,51 +77,43 @@ public class Renderer {
                 continue;
 
             Vector3f intersection = shape.getIntersection(ray);
-            if (intersection != null && (closestHit == null || Vector3f.distance(closestHit.getPosition(), ray.getOrigin()) > Vector3f.distance(intersection, ray.getOrigin())))
-                closestHit = new Hit(ray, shape, intersection);
+            if (intersection != null && (closestHit == null || closestHit.getPosition().distanceFrom(ray.getOrigin()) > intersection.distanceFrom(ray.getOrigin())))
+                closestHit = new Hit(shape, intersection);
         }
 
         return closestHit;
     }
 
-    public static Color getAmbient(Hit hit, World world) {
-        if (hit != null) {
-            Color shapeColor = hit.getColor();
-            Color lightColor = world.getLight().getColor();
-            return shapeColor.multiply(lightColor).multiply(AMBIENT_STRENGTH);
-        }
+    public static Color getPhong(Hit hit, World world) {
+        return getAmbient(hit, world).add(getDiffuse(hit, world)).add(getSpecular(hit, world));
+    }
 
-        return world.getBackgroundColor();
+    public static Color getAmbient(Hit hit, World world) {
+        Color shapeColor = hit.getColor();
+        Color lightColor = world.getLight().getColor();
+        return shapeColor.multiply(lightColor).multiply(AMBIENT_STRENGTH);
     }
 
     public static Color getDiffuse(Hit hit, World world) {
-        if (hit != null) {
-            Light light = world.getLight();
-            Color lightColor = light.getColor();
-            Color shapeColor = hit.getColor();
+        Light light = world.getLight();
+        Color lightColor = light.getColor();
+        Color shapeColor = hit.getColor();
 
-            float diffuseBrightness = Math.max(0F, Vector3f.dotProduct(hit.getNormal(), light.getPosition().subtract(hit.getPosition())));
-            return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
-        }
-
-        return world.getBackgroundColor();
+        float diffuseBrightness = Math.max(0F, hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition())));
+        return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
     }
 
-    private static Color getSpecular(Hit hit, World world, Camera camera) {
+    private static Color getSpecular(Hit hit, World world) {
+        Camera camera = world.getCamera();
+        Light light = world.getLight();
+        Color lightColor = light.getColor();
+        Vector3f hitPos = hit.getPosition();
+        Vector3f cameraDirection = camera.getPosition().subtract(hitPos).normalize();
+        Vector3f lightDirection = hitPos.subtract(light.getPosition()).normalize();
+        Vector3f reflectionVector = lightDirection.subtract(hit.getNormal().multiply(2 * lightDirection.dotProduct(hit.getNormal())));
 
-        if (hit != null) {
-            Light light = world.getLight();
-            Color lightColor = light.getColor();
-            Vector3f hitPos = hit.getPosition();
-            Vector3f cameraDirection = Vector3f.normalize(camera.getPosition().subtract(hitPos));
-            Vector3f lightDirection = Vector3f.normalize(hitPos.subtract(light.getPosition()));
-            Vector3f reflectionVector = lightDirection.subtract(hit.getNormal().multiply(2 * Vector3f.dotProduct(lightDirection, hit.getNormal())));
-
-            float specularFactor = Math.max(0F, Math.min(1F, Vector3f.dotProduct(reflectionVector, cameraDirection)));
-            float specularBrightness = (float) Math.pow(specularFactor, hit.getShape().getReflectivity());
-            return lightColor.multiply(specularBrightness).multiply(SPECULAR_STRENGTH);
-        }
-
-        return world.getBackgroundColor();
+        float specularFactor = Math.max(0F, Math.min(1F, reflectionVector.dotProduct(cameraDirection)));
+        float specularBrightness = (float) Math.pow(specularFactor, hit.getShape().getReflectivity());
+        return lightColor.multiply(specularBrightness).multiply(SPECULAR_STRENGTH);
     }
 }

@@ -3,7 +3,7 @@ package com.vinhderful.raytracer.renderer;
 import com.vinhderful.raytracer.utils.Vector3f;
 
 public class Camera {
-    private Vector3f position;
+    private final Vector3f position;
     private float yaw;
     private float pitch;
     private float fieldOfVision;
@@ -13,10 +13,6 @@ public class Camera {
         this.yaw = 0;
         this.pitch = 0;
         this.fieldOfVision = 60;
-    }
-
-    public Vector3f getPosition() {
-        return position;
     }
 
     public void setX(float x) {
@@ -29,6 +25,10 @@ public class Camera {
 
     public void setZ(float z) {
         position.setZ(z);
+    }
+
+    public Vector3f getPosition() {
+        return position;
     }
 
     public float getYaw() {
