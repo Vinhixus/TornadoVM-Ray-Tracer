@@ -52,10 +52,10 @@ public class Controller {
         camPitch.valueProperty().addListener((observable, oldValue, newValue) -> camera.setPitch(newValue.floatValue()));
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera.setFOV(newValue.floatValue()));
 
-        time = 0;
         world.setLightX(2F);
         world.setLightZ(0F);
         renderer.render(world, camera);
+        disableSliders(true);
 
         timer = new AnimationTimer() {
 
@@ -75,10 +75,21 @@ public class Controller {
             isPlaying = false;
             timer.stop();
             button.setText("Play");
+            disableSliders(true);
         } else {
             isPlaying = true;
             timer.start();
             button.setText("Pause");
+            disableSliders(false);
         }
+    }
+
+    public void disableSliders(boolean state) {
+        camX.setDisable(state);
+        camY.setDisable(state);
+        camZ.setDisable(state);
+        camYaw.setDisable(state);
+        camPitch.setDisable(state);
+        camFOV.setDisable(state);
     }
 }
