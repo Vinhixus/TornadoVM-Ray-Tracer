@@ -13,7 +13,7 @@ import javafx.scene.image.WritablePixelFormat;
 
 public class Renderer {
 
-    private static final float AMBIENT_STRENGTH = 0.1F;
+    private static final float AMBIENT_STRENGTH = 0.05F;
     private static final float SPECULAR_STRENGTH = 0.5F;
 
     private final PixelWriter pixelWriter;

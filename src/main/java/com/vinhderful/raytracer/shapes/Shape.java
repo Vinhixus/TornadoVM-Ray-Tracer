@@ -12,13 +12,13 @@ public abstract class Shape {
     public Shape(Vector3f position) {
         this.position = position;
         this.color = Color.BLACK;
-        this.reflectivity = 32F;
+        this.reflectivity = 16F;
     }
 
     public Shape(Vector3f position, Color color) {
         this.position = position;
         this.color = color;
-        this.reflectivity = 32F;
+        this.reflectivity = 16F;
     }
 
     public Shape(Vector3f position, Color color, float reflectivity) {

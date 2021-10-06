@@ -51,8 +51,8 @@ public class Controller {
             @Override
             public void handle(long now) {
                 time = (time + 0.2F) % 360;
-                world.setLightX((float) Math.cos(time) * 1.5F);
-                world.setLightZ((float) Math.sin(time) * 1.5F);
+                world.setLightX((float) Math.cos(time) * 2F);
+                world.setLightZ((float) Math.sin(time) * 2F);
 
                 renderer.render(world, camera);
             }
