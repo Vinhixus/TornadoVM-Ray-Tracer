@@ -32,7 +32,7 @@ public class Sphere extends Shape {
     }
 
     @Override
-    public Vector3f getNormalVectorAt(Vector3f point) {
+    public Vector3f getNormalAt(Vector3f point) {
         return Vector3f.normalize(point.subtract(position));
     }
 }

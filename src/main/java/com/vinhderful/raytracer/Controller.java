@@ -43,17 +43,18 @@ public class Controller {
         camYaw.valueProperty().addListener((observable, oldValue, newValue) -> camera.setYaw(newValue.floatValue()));
         camPitch.valueProperty().addListener((observable, oldValue, newValue) -> camera.setPitch(newValue.floatValue()));
 
-        AnimationTimer timer = new AnimationTimer() {
+        // renderer.render(world, camera);
 
+        AnimationTimer timer = new AnimationTimer() {
             float time = 0;
 
             @Override
             public void handle(long now) {
-                renderer.render(world, camera);
-
                 time = (time + 0.2F) % 360;
                 world.setLightX((float) Math.cos(time) * 1.5F);
                 world.setLightZ((float) Math.sin(time) * 1.5F);
+
+                renderer.render(world, camera);
             }
         };
         timer.start();

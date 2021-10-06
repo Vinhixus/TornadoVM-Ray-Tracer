@@ -7,20 +7,29 @@ import com.vinhderful.raytracer.utils.Vector3f;
 public abstract class Shape {
     protected Vector3f position;
     protected Color color;
+    protected float reflectivity;
 
     public Shape(Vector3f position) {
         this.position = position;
         this.color = Color.BLACK;
+        this.reflectivity = 32F;
     }
 
     public Shape(Vector3f position, Color color) {
         this.position = position;
         this.color = color;
+        this.reflectivity = 32F;
+    }
+
+    public Shape(Vector3f position, Color color, float reflectivity) {
+        this.position = position;
+        this.color = color;
+        this.reflectivity = reflectivity;
     }
 
     public abstract Vector3f getIntersection(Ray ray);
 
-    public abstract Vector3f getNormalVectorAt(Vector3f point);
+    public abstract Vector3f getNormalAt(Vector3f point);
 
     public Color getColor(Vector3f point) {
         return color;
@@ -28,6 +37,10 @@ public abstract class Shape {
 
     public Vector3f getPosition() {
         return position;
+    }
+
+    public float getReflectivity() {
+        return reflectivity;
     }
 
     public void setX(float x) {

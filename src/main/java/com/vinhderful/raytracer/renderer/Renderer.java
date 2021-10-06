@@ -14,6 +14,7 @@ import javafx.scene.image.WritablePixelFormat;
 public class Renderer {
 
     private static final float AMBIENT_STRENGTH = 0.1F;
+    private static final float SPECULAR_STRENGTH = 0.5F;
 
     private final PixelWriter pixelWriter;
     private final int width;
@@ -58,7 +59,7 @@ public class Renderer {
                 if (hit != null && (hit.getShape().equals(world.getLight()) || hit.getShape().equals(world.getPlane())))
                     pixels[x + y * width] = hit.getColor().toARGB();
                 else
-                    pixels[x + y * width] = getAmbient(hit, world).add(getDiffuse(hit, world)).toARGB();
+                    pixels[x + y * width] = getAmbient(hit, world).add(getDiffuse(hit, world)).add(getSpecular(hit, world, camera)).toARGB();
             }
 
         pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
@@ -97,6 +98,24 @@ public class Renderer {
 
             float diffuseBrightness = Math.max(0F, Vector3f.dotProduct(hit.getNormal(), light.getPosition().subtract(hit.getPosition())));
             return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
+        }
+
+        return world.getBackgroundColor();
+    }
+
+    private static Color getSpecular(Hit hit, World world, Camera camera) {
+
+        if (hit != null) {
+            Light light = world.getLight();
+            Color lightColor = light.getColor();
+            Vector3f hitPos = hit.getPosition();
+            Vector3f cameraDirection = Vector3f.normalize(camera.getPosition().subtract(hitPos));
+            Vector3f lightDirection = Vector3f.normalize(hitPos.subtract(light.getPosition()));
+            Vector3f reflectionVector = lightDirection.subtract(hit.getNormal().multiply(2 * Vector3f.dotProduct(lightDirection, hit.getNormal())));
+
+            float specularFactor = Math.max(0F, Math.min(1F, Vector3f.dotProduct(reflectionVector, cameraDirection)));
+            float specularBrightness = (float) Math.pow(specularFactor, hit.getShape().getReflectivity());
+            return lightColor.multiply(specularBrightness).multiply(SPECULAR_STRENGTH);
         }
 
         return world.getBackgroundColor();

@@ -34,6 +34,6 @@ public class Hit {
     }
 
     public Vector3f getNormal() {
-        return shape.getNormalVectorAt(position);
+        return shape.getNormalAt(position);
     }
 }

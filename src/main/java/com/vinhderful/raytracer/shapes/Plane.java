@@ -20,7 +20,7 @@ public class Plane extends Shape {
     }
 
     @Override
-    public Vector3f getNormalVectorAt(Vector3f point) {
+    public Vector3f getNormalAt(Vector3f point) {
         return new Vector3f(0F, 1F, 0F);
     }
 
