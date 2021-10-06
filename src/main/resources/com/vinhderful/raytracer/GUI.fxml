@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -30,7 +30,11 @@
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
             </padding>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera X"/>
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera X">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+            </Label>
             <Slider id="camPosX" fx:id="camX" max="4.0" min="-4.0"/>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Y"/>
             <Slider id="camPosY" fx:id="camY" max="4.0" min="-4.0"/>
@@ -40,6 +44,20 @@
             <Slider id="camYaw" fx:id="camYaw" max="90.0" min="-90.0"/>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Pitch"/>
             <Slider id="camPitch" fx:id="camPitch" max="70.0" min="-70.0"/>
+            <Separator prefWidth="200.0">
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </VBox.margin>
+            </Separator>
+            <Button fx:id="button" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
+                    onAction="#playPauseAnimation" text="Play">
+                <VBox.margin>
+                    <Insets left="10.0"/>
+                </VBox.margin>
+            </Button>
+            <BorderPane.margin>
+                <Insets/>
+            </BorderPane.margin>
         </VBox>
     </right>
 </BorderPane>

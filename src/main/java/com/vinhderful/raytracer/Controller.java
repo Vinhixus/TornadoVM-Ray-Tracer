@@ -10,10 +10,13 @@ import com.vinhderful.raytracer.utils.Vector3f;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 
 public class Controller {
+
+    private AnimationTimer timer;
 
     @FXML
     public Pane pane;
@@ -23,6 +26,10 @@ public class Controller {
     public Slider camZ;
     public Slider camYaw;
     public Slider camPitch;
+    public Button button;
+
+    private float time;
+    private boolean isPlaying = false;
 
     @FXML
     public void initialize() {
@@ -43,10 +50,12 @@ public class Controller {
         camYaw.valueProperty().addListener((observable, oldValue, newValue) -> camera.setYaw(newValue.floatValue()));
         camPitch.valueProperty().addListener((observable, oldValue, newValue) -> camera.setPitch(newValue.floatValue()));
 
-        // renderer.render(world, camera);
+        time = 0;
+        world.setLightX(2F);
+        world.setLightZ(0F);
+        renderer.render(world, camera);
 
-        AnimationTimer timer = new AnimationTimer() {
-            float time = 0;
+        timer = new AnimationTimer() {
 
             @Override
             public void handle(long now) {
@@ -57,6 +66,17 @@ public class Controller {
                 renderer.render(world, camera);
             }
         };
-        timer.start();
+    }
+
+    public void playPauseAnimation() {
+        if (isPlaying) {
+            isPlaying = false;
+            timer.stop();
+            button.setText("Play");
+        } else {
+            isPlaying = true;
+            timer.start();
+            button.setText("Pause");
+        }
     }
 }
