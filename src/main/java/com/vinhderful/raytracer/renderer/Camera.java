@@ -19,8 +19,16 @@ public class Camera {
         return position;
     }
 
-    public void setPosition(Vector3f position) {
-        this.position = position;
+    public void setX(float x) {
+        position.setX(x);
+    }
+
+    public void setY(float y) {
+        position.setY(y);
+    }
+
+    public void setZ(float z) {
+        position.setZ(z);
     }
 
     public float getYaw() {
@@ -37,10 +45,6 @@ public class Camera {
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
-    }
-
-    public void translate(Vector3f vec) {
-        this.position.translate(vec);
     }
 
     public float getFOV() {

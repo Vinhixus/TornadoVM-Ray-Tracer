@@ -63,15 +63,32 @@ public class Vector3f {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }
 
-    public void normalize() {
-        float length = length();
-        x = x / length;
-        y = y / length;
-        z = z / length;
-    }
-
     @Override
     public String toString() {
         return "Vector3f {" + "x: " + x + ", y: " + y + ", z: " + z + '}';
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getZ() {
+        return z;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
     }
 }

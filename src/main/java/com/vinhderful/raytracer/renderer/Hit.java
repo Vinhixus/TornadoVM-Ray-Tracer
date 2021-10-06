@@ -1,6 +1,7 @@
 package com.vinhderful.raytracer.renderer;
 
 import com.vinhderful.raytracer.shapes.Shape;
+import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Ray;
 import com.vinhderful.raytracer.utils.Vector3f;
 
@@ -24,7 +25,15 @@ public class Hit {
         return shape;
     }
 
+    public Color getColor() {
+        return shape.getColor(position);
+    }
+
     public Vector3f getPosition() {
         return position;
+    }
+
+    public Vector3f getNormal() {
+        return shape.getNormalAt(position);
     }
 }

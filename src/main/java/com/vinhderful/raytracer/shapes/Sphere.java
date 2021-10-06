@@ -1,9 +1,8 @@
 package com.vinhderful.raytracer.shapes;
 
+import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Ray;
 import com.vinhderful.raytracer.utils.Vector3f;
-
-import javafx.scene.paint.Color;
 
 public class Sphere extends Shape {
 
@@ -11,6 +10,11 @@ public class Sphere extends Shape {
 
     public Sphere(Vector3f position, float radius, Color color) {
         super(position, color);
+        this.radius = radius;
+    }
+
+    public Sphere(Vector3f position, float radius, Color color, float reflectivity) {
+        super(position, color, reflectivity);
         this.radius = radius;
     }
 
@@ -33,7 +37,7 @@ public class Sphere extends Shape {
     }
 
     @Override
-    public Vector3f getNormalVectorAt(Vector3f point) {
+    public Vector3f getNormalAt(Vector3f point) {
         return Vector3f.normalize(point.subtract(position));
     }
 }
