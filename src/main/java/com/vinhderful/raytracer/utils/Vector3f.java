@@ -5,16 +5,16 @@ public class Vector3f {
     private float y;
     private float z;
 
-    public static Vector3f rotate(Vector3f v, float yaw, float pitch) {
+    public Vector3f rotate(float yaw, float pitch) {
 
         double _yaw = Math.toRadians(yaw);
         double _pitch = Math.toRadians(pitch);
 
-        float _y = (float) (v.y * Math.cos(_pitch) - v.z * Math.sin(_pitch));
-        float _z = (float) (v.y * Math.sin(_pitch) + v.z * Math.cos(_pitch));
+        float _y = (float) (y * Math.cos(_pitch) - z * Math.sin(_pitch));
+        float _z = (float) (y * Math.sin(_pitch) + z * Math.cos(_pitch));
 
-        float _x = (float) (v.x * Math.cos(_yaw) + _z * Math.sin(_yaw));
-        _z = (float) (-v.x * Math.sin(_yaw) + _z * Math.cos(_yaw));
+        float _x = (float) (x * Math.cos(_yaw) + _z * Math.sin(_yaw));
+        _z = (float) (-x * Math.sin(_yaw) + _z * Math.cos(_yaw));
 
         return new Vector3f(_x, _y, _z);
     }
@@ -52,7 +52,7 @@ public class Vector3f {
         this.z = z;
     }
 
-    public float length() {
+    public float magnitude() {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }
 
@@ -69,8 +69,8 @@ public class Vector3f {
     }
 
     public Vector3f normalize() {
-        float length = length();
-        return new Vector3f(x / length, y / length, z / length);
+        float magnitude = magnitude();
+        return new Vector3f(x / magnitude, y / magnitude, z / magnitude);
     }
 
     public float dotProduct(Vector3f v) {

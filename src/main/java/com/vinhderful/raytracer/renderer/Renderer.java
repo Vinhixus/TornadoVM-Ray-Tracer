@@ -52,7 +52,7 @@ public class Renderer {
                 float[] nsc = getNormalizedCoordinates(x, y, width, height);
 
                 Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
-                Vector3f rayDir = Vector3f.rotate(new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos).normalize(), camera.getYaw(), camera.getPitch());
+                Vector3f rayDir = new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos).normalize().rotate(camera.getYaw(), camera.getPitch());
                 Ray ray = new Ray(eyePos.add(camera.getPosition()), rayDir);
 
                 Hit hit = getClosestHit(ray, world);
@@ -108,11 +108,11 @@ public class Renderer {
         Light light = world.getLight();
         Color lightColor = light.getColor();
         Vector3f hitPos = hit.getPosition();
-        Vector3f cameraDirection = camera.getPosition().subtract(hitPos).normalize();
-        Vector3f lightDirection = hitPos.subtract(light.getPosition()).normalize();
+        Vector3f cameraDirection = hitPos.subtract(camera.getPosition()).normalize();
+        Vector3f lightDirection = light.getPosition().subtract(hitPos).normalize();
         Vector3f reflectionVector = lightDirection.subtract(hit.getNormal().multiply(2 * lightDirection.dotProduct(hit.getNormal())));
 
-        float specularFactor = Math.max(0F, Math.min(1F, reflectionVector.dotProduct(cameraDirection)));
+        float specularFactor = Math.max(0F, reflectionVector.dotProduct(cameraDirection));
         float specularBrightness = (float) Math.pow(specularFactor, hit.getShape().getReflectivity());
         return lightColor.multiply(specularBrightness).multiply(SPECULAR_STRENGTH);
     }

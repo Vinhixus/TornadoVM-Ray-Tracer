@@ -23,7 +23,7 @@ public class Sphere extends Shape {
         float t = position.subtract(ray.getOrigin()).dotProduct(ray.getDirection());
         Vector3f p = ray.getOrigin().add(ray.getDirection().multiply(t));
 
-        float y = position.subtract(p).length();
+        float y = position.subtract(p).magnitude();
         if (y < radius) {
             float x = (float) Math.sqrt(radius * radius - y * y);
             float t1 = t - x;

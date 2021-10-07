@@ -7,7 +7,7 @@ public class Ray {
     public Ray(Vector3f origin, Vector3f direction) {
         this.origin = origin;
 
-        if (direction.length() != 1)
+        if (direction.magnitude() != 1)
             direction = direction.normalize();
 
         this.direction = direction;
