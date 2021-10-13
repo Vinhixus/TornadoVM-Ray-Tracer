@@ -3,7 +3,6 @@ package com.vinhderful.raytracer.renderer;
 import java.nio.IntBuffer;
 
 import com.vinhderful.raytracer.shapes.Shape;
-import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Ray;
 import com.vinhderful.raytracer.utils.Vector3f;
 
@@ -12,9 +11,6 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
 
 public class Renderer {
-
-    private static final float AMBIENT_STRENGTH = 0.05F;
-    private static final float SPECULAR_STRENGTH = 0.5F;
 
     private final PixelWriter pixelWriter;
     private final int width;
@@ -53,14 +49,14 @@ public class Renderer {
 
                 Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
                 Vector3f rayDir = new Vector3f(nsc[0], nsc[1], 0).subtract(eyePos).normalize().rotate(camera.getYaw(), camera.getPitch());
-                Ray ray = new Ray(eyePos.add(camera.getPosition()), rayDir);
+                Ray ray = new Ray(camera.getPosition(), rayDir);
 
                 Hit hit = getClosestHit(ray, world);
                 if (hit != null) {
                     if (hit.getShape().equals(world.getLight()) || hit.getShape().equals(world.getPlane()))
                         pixels[x + y * width] = hit.getColor().toARGB();
                     else
-                        pixels[x + y * width] = getPhong(hit, world).toARGB();
+                        pixels[x + y * width] = Shader.getPhong(hit, world).toARGB();
                 } else {
                     pixels[x + y * width] = world.getBackgroundColor().toARGB();
                 }
@@ -82,38 +78,5 @@ public class Renderer {
         }
 
         return closestHit;
-    }
-
-    public static Color getPhong(Hit hit, World world) {
-        return getAmbient(hit, world).add(getDiffuse(hit, world)).add(getSpecular(hit, world));
-    }
-
-    public static Color getAmbient(Hit hit, World world) {
-        Color shapeColor = hit.getColor();
-        Color lightColor = world.getLight().getColor();
-        return shapeColor.multiply(lightColor).multiply(AMBIENT_STRENGTH);
-    }
-
-    public static Color getDiffuse(Hit hit, World world) {
-        Light light = world.getLight();
-        Color lightColor = light.getColor();
-        Color shapeColor = hit.getColor();
-
-        float diffuseBrightness = Math.max(0F, hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition())));
-        return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
-    }
-
-    private static Color getSpecular(Hit hit, World world) {
-        Camera camera = world.getCamera();
-        Light light = world.getLight();
-        Color lightColor = light.getColor();
-        Vector3f hitPos = hit.getPosition();
-        Vector3f cameraDirection = hitPos.subtract(camera.getPosition()).normalize();
-        Vector3f lightDirection = light.getPosition().subtract(hitPos).normalize();
-        Vector3f reflectionVector = lightDirection.subtract(hit.getNormal().multiply(2 * lightDirection.dotProduct(hit.getNormal())));
-
-        float specularFactor = Math.max(0F, reflectionVector.dotProduct(cameraDirection));
-        float specularBrightness = (float) Math.pow(specularFactor, hit.getShape().getReflectivity());
-        return lightColor.multiply(specularBrightness).multiply(SPECULAR_STRENGTH);
     }
 }

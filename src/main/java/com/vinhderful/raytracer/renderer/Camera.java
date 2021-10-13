@@ -9,7 +9,7 @@ public class Camera {
     private float fieldOfVision;
 
     public Camera() {
-        this.position = new Vector3f(0, 0, 0);
+        this.position = new Vector3f(0, 0, -4F);
         this.yaw = 0;
         this.pitch = 0;
         this.fieldOfVision = 60;
