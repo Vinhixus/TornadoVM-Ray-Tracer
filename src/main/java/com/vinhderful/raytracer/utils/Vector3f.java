@@ -1,10 +1,23 @@
 package com.vinhderful.raytracer.utils;
 
+/**
+ * Represents a vector in 3d space using x, y, z values
+ */
 public class Vector3f {
+
     private float x;
     private float y;
     private float z;
 
+    /**
+     * Rotate a vector with given yaw and pitch
+     * 
+     * @param yaw
+     *            yaw of the camera
+     * @param pitch
+     *            pitch of the camera
+     * @return the resulting vector
+     */
     public Vector3f rotate(float yaw, float pitch) {
 
         double _yaw = Math.toRadians(yaw);
@@ -19,6 +32,16 @@ public class Vector3f {
         return new Vector3f(_x, _y, _z);
     }
 
+    /**
+     * Construct a Vector3f object given x, y, z
+     * 
+     * @param x
+     *            x coordinate
+     * @param y
+     *            y coordinate
+     * @param z
+     *            z coordinate
+     */
     public Vector3f(float x, float y, float z) {
         if (Float.isNaN(x) || Float.isNaN(y) || Float.isNaN(z))
             throw new IllegalArgumentException("One or more parameters are NaN!");
@@ -28,59 +51,142 @@ public class Vector3f {
         this.z = z;
     }
 
+    /**
+     * Get x attribute
+     * 
+     * @return x attribute of Vector3f
+     */
     public float getX() {
         return x;
     }
 
+    /**
+     * Set x attribute
+     * 
+     * @param x
+     *            x value to set x attribute to
+     */
     public void setX(float x) {
         this.x = x;
     }
 
+    /**
+     * Get y attribute
+     *
+     * @return y attribute of Vector3f
+     */
     public float getY() {
         return y;
     }
 
+    /**
+     * Set y attribute
+     *
+     * @param y
+     *            y value to set y attribute to
+     */
     public void setY(float y) {
         this.y = y;
     }
 
+    /**
+     * Get z attribute
+     *
+     * @return z attribute of Vector3f
+     */
     public float getZ() {
         return z;
     }
 
+    /**
+     * Set z attribute
+     *
+     * @param z
+     *            z value to set z attribute to
+     */
     public void setZ(float z) {
         this.z = z;
     }
 
+    /**
+     * Return the length of the vector
+     *
+     * @return the length of vector
+     */
     public float magnitude() {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }
 
+    /**
+     * Add this vector to another given vector
+     * 
+     * @param vec
+     *            the other vector
+     * @return the resulting vector
+     */
     public Vector3f add(Vector3f vec) {
         return new Vector3f(x + vec.x, y + vec.y, z + vec.z);
     }
 
+    /**
+     * Subtract another given vector from this vector
+     *
+     * @param vec
+     *            the other vector
+     * @return the resulting vector
+     */
     public Vector3f subtract(Vector3f vec) {
         return new Vector3f(x - vec.x, y - vec.y, z - vec.z);
     }
 
+    /**
+     * Multiply this vector with a given scalar
+     *
+     * @param scalar
+     *            the scalar
+     * @return the resulting vector
+     */
     public Vector3f multiply(float scalar) {
         return new Vector3f(x * scalar, y * scalar, z * scalar);
     }
 
+    /**
+     * Normalise this vector, i.e. reduce the length of this vector to 1
+     *
+     * @return the resulting normal vector
+     */
     public Vector3f normalize() {
         float magnitude = magnitude();
         return new Vector3f(x / magnitude, y / magnitude, z / magnitude);
     }
 
-    public float dotProduct(Vector3f v) {
-        return x * v.x + y * v.y + z * v.z;
+    /**
+     * Get the dot product of this vector and another given vector
+     *
+     * @param vec
+     *            the other vector
+     * @return the resulting dot product
+     */
+    public float dotProduct(Vector3f vec) {
+        return x * vec.x + y * vec.y + z * vec.z;
     }
 
-    public float distanceFrom(Vector3f v) {
-        return (float) Math.sqrt(Math.pow(x - v.x, 2) + Math.pow(y - v.y, 2) + Math.pow(z - v.z, 2));
+    /**
+     * Get the distance between this vector and another given vector
+     *
+     * @param vec
+     *            the other vector
+     * @return the distance between the two vectors
+     */
+    public float distanceFrom(Vector3f vec) {
+        return (float) Math.sqrt(Math.pow(x - vec.x, 2) + Math.pow(y - vec.y, 2) + Math.pow(z - vec.z, 2));
     }
 
+    /**
+     * Return a stringified format of this vector
+     *
+     * @return the string format of the vector
+     */
     @Override
     public String toString() {
         return "Vector3f {" + "x: " + x + ", y: " + y + ", z: " + z + '}';

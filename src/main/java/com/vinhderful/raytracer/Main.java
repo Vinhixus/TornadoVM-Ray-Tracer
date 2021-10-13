@@ -10,8 +10,17 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+/**
+ * Java-based Ray Tracer using JavaFX
+ */
 public class Main extends Application {
 
+    /**
+     * Initialise application window
+     * 
+     * @param stage
+     *            the stage to show
+     */
     @Override
     public void start(Stage stage) {
 
@@ -33,6 +42,12 @@ public class Main extends Application {
         stage.show();
     }
 
+    /**
+     * Launch application window
+     * 
+     * @param args
+     *            program arguments
+     */
     public static void main(String[] args) {
         launch(args);
     }

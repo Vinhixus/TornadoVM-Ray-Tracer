@@ -14,10 +14,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 
+/**
+ * Initialises JavaFX FXML elements together with GUI.fxml, contains driver code
+ */
 public class Controller {
 
     private AnimationTimer timer;
 
+    /**
+     * Elements of the window
+     */
     @FXML
     public Pane pane;
     public Canvas canvas;
@@ -32,6 +38,9 @@ public class Controller {
     private float time;
     private boolean isPlaying = false;
 
+    /**
+     * Initialise renderer, world, camera and populate with objects
+     */
     @FXML
     public void initialize() {
         Renderer renderer = new Renderer(canvas.getGraphicsContext2D());
@@ -41,9 +50,9 @@ public class Controller {
         Sphere sphere3 = new Sphere(new Vector3f(-1.5F, 0, 0), 0.5f, Color.RED, 8F);
         Sphere sphere1 = new Sphere(new Vector3f(0, 0, 0), 0.5f, Color.GREEN, 16F);
         Sphere sphere2 = new Sphere(new Vector3f(1.5F, 0, 0), 0.5f, Color.BLUE, 32F);
-        world.addShape(sphere1);
-        world.addShape(sphere2);
-        world.addShape(sphere3);
+        world.addBody(sphere1);
+        world.addBody(sphere2);
+        world.addBody(sphere3);
 
         camX.valueProperty().addListener((observable, oldValue, newValue) -> camera.setX(newValue.floatValue()));
         camY.valueProperty().addListener((observable, oldValue, newValue) -> camera.setY(newValue.floatValue()));
@@ -54,7 +63,7 @@ public class Controller {
 
         world.setLightX(2F);
         world.setLightZ(0F);
-        renderer.render(world, camera);
+        renderer.render(world);
         disableSliders(true);
 
         timer = new AnimationTimer() {
@@ -65,11 +74,14 @@ public class Controller {
                 world.setLightX((float) Math.cos(time) * 2F);
                 world.setLightZ((float) Math.sin(time) * 2F);
 
-                renderer.render(world, camera);
+                renderer.render(world);
             }
         };
     }
 
+    /**
+     * Play/pause rotating light animation on button click
+     */
     public void playPauseAnimation() {
         if (isPlaying) {
             isPlaying = false;
@@ -84,6 +96,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Enable/disable sliders
+     */
     public void disableSliders(boolean state) {
         camX.setDisable(state);
         camY.setDisable(state);
