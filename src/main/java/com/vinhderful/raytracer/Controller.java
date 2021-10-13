@@ -11,6 +11,7 @@ import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 
@@ -19,6 +20,7 @@ import javafx.scene.layout.Pane;
  */
 public class Controller {
 
+    public Label fps;
     private AnimationTimer timer;
 
     /**
@@ -68,6 +70,8 @@ public class Controller {
 
         timer = new AnimationTimer() {
 
+            long lastUpdate = 0;
+
             @Override
             public void handle(long now) {
                 time = (time + 0.2F) % 360;
@@ -75,6 +79,11 @@ public class Controller {
                 world.setLightZ((float) Math.sin(time) * 2F);
 
                 renderer.render(world);
+
+                if (lastUpdate > 0)
+                    fps.setText(String.format("FPS: %.2f", 1_000_000_000.0 / (now - lastUpdate)));
+
+                lastUpdate = now;
             }
         };
     }
@@ -88,6 +97,7 @@ public class Controller {
             timer.stop();
             button.setText("Play");
             disableSliders(true);
+            fps.setText("FPS: 0.00");
         } else {
             isPlaying = true;
             timer.start();
