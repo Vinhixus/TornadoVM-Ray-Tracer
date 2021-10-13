@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer.renderer;
+package com.vinhderful.raytracer.scene;
 
 import com.vinhderful.raytracer.utils.Vector3f;
 

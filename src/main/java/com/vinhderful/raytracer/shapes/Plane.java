@@ -11,20 +11,6 @@ public class Plane extends Shape {
     }
 
     @Override
-    public Vector3f getIntersection(Ray ray) {
-        float t = -(ray.getOrigin().getY() - position.getY()) / ray.getDirection().getY();
-        if (t > 0 && Float.isFinite(t))
-            return ray.getOrigin().add(ray.getDirection().multiply(t));
-
-        return null;
-    }
-
-    @Override
-    public Vector3f getNormalAt(Vector3f point) {
-        return new Vector3f(0F, 1F, 0F);
-    }
-
-    @Override
     public Color getColor(Vector3f point) {
         if ((point.getX() > 0 & point.getZ() > 0) || (point.getX() < 0 & point.getZ() < 0)) {
             if ((int) point.getX() % 2 == 0 ^ (int) point.getZ() % 2 != 0)
@@ -37,5 +23,19 @@ public class Plane extends Shape {
             else
                 return Color.GRAY;
         }
+    }
+
+    @Override
+    public Vector3f getIntersection(Ray ray) {
+        float t = -(ray.getOrigin().getY() - position.getY()) / ray.getDirection().getY();
+        if (t > 0 && Float.isFinite(t))
+            return ray.getOrigin().add(ray.getDirection().multiply(t));
+
+        return null;
+    }
+
+    @Override
+    public Vector3f getNormalAt(Vector3f point) {
+        return new Vector3f(0F, 1F, 0F);
     }
 }

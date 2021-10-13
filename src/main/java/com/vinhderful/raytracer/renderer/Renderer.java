@@ -2,7 +2,10 @@ package com.vinhderful.raytracer.renderer;
 
 import java.nio.IntBuffer;
 
+import com.vinhderful.raytracer.scene.Camera;
+import com.vinhderful.raytracer.scene.World;
 import com.vinhderful.raytracer.shapes.Shape;
+import com.vinhderful.raytracer.utils.Hit;
 import com.vinhderful.raytracer.utils.Ray;
 import com.vinhderful.raytracer.utils.Vector3f;
 
@@ -53,7 +56,7 @@ public class Renderer {
 
                 Hit hit = getClosestHit(ray, world);
                 if (hit != null) {
-                    if (hit.getShape().equals(world.getLight()) || hit.getShape().equals(world.getPlane()))
+                    if (hit.getShape().equals(world.getLight()))
                         pixels[x + y * width] = hit.getColor().toARGB();
                     else
                         pixels[x + y * width] = Shader.getPhong(hit, world).toARGB();
@@ -74,7 +77,7 @@ public class Renderer {
 
             Vector3f intersection = shape.getIntersection(ray);
             if (intersection != null && (closestHit == null || closestHit.getPosition().distanceFrom(ray.getOrigin()) > intersection.distanceFrom(ray.getOrigin())))
-                closestHit = new Hit(shape, intersection);
+                closestHit = new Hit(shape, ray, intersection);
         }
 
         return closestHit;

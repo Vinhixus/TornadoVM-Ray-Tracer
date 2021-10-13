@@ -1,6 +1,10 @@
 package com.vinhderful.raytracer.renderer;
 
+import com.vinhderful.raytracer.scene.Camera;
+import com.vinhderful.raytracer.scene.Light;
+import com.vinhderful.raytracer.scene.World;
 import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.Hit;
 import com.vinhderful.raytracer.utils.Vector3f;
 
 public class Shader {
@@ -23,7 +27,7 @@ public class Shader {
         Color lightColor = light.getColor();
         Color shapeColor = hit.getColor();
 
-        float diffuseBrightness = Math.max(0F, hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition())));
+        float diffuseBrightness = Math.max(0F, hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition()).normalize()));
         return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
     }
 

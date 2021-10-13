@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer.renderer;
+package com.vinhderful.raytracer.scene;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -31,10 +31,6 @@ public class World {
 
     public Camera getCamera() {
         return camera;
-    }
-
-    public Plane getPlane() {
-        return plane;
     }
 
     public Light getLight() {

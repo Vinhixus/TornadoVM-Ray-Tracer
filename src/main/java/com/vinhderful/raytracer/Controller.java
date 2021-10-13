@@ -1,8 +1,8 @@
 package com.vinhderful.raytracer;
 
-import com.vinhderful.raytracer.renderer.Camera;
 import com.vinhderful.raytracer.renderer.Renderer;
-import com.vinhderful.raytracer.renderer.World;
+import com.vinhderful.raytracer.scene.Camera;
+import com.vinhderful.raytracer.scene.World;
 import com.vinhderful.raytracer.shapes.Sphere;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Vector3f;
