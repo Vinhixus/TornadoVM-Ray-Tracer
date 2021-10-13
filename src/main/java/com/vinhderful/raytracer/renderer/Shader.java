@@ -1,6 +1,5 @@
 package com.vinhderful.raytracer.renderer;
 
-import com.vinhderful.raytracer.scene.Camera;
 import com.vinhderful.raytracer.scene.Light;
 import com.vinhderful.raytracer.scene.World;
 import com.vinhderful.raytracer.utils.Color;
@@ -75,15 +74,14 @@ public class Shader {
      * @return the result of the specular highlights
      */
     public static Color getSpecular(Hit hit, World world) {
-        Camera camera = world.getCamera();
         Light light = world.getLight();
         Color lightColor = light.getColor();
         Vector3f hitPos = hit.getPosition();
-        Vector3f cameraDirection = hitPos.subtract(camera.getPosition()).normalize();
+        Vector3f rayDirection = hit.getRay().getDirection();
         Vector3f lightDirection = light.getPosition().subtract(hitPos).normalize();
         Vector3f reflectionVector = lightDirection.subtract(hit.getNormal().multiply(2 * lightDirection.dotProduct(hit.getNormal())));
 
-        float specularFactor = Math.max(0F, reflectionVector.dotProduct(cameraDirection));
+        float specularFactor = Math.max(0F, reflectionVector.dotProduct(rayDirection));
         float specularBrightness = (float) Math.pow(specularFactor, hit.getBody().getReflectivity());
         return lightColor.multiply(specularBrightness).multiply(SPECULAR_STRENGTH);
     }
