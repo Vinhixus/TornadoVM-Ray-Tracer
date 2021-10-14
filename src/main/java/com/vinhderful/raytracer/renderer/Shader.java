@@ -17,6 +17,7 @@ public class Shader {
      */
     public static final float AMBIENT_STRENGTH = 0.05F;
     public static final float SPECULAR_STRENGTH = 0.5F;
+    public static final float MAX_REFLECTIVITY = 256F;
 
     /**
      * Get the full Phong color of an object given a hit event and the world
@@ -103,19 +104,20 @@ public class Shader {
         Vector3f rayDir = hit.getRay().getDirection();
         Vector3f reflectionDir = rayDir.subtract(hit.getNormal().multiply(2 * rayDir.dotProduct(hit.getNormal())));
         Vector3f reflectionOrigin = hitPos.add(reflectionDir.multiply(0.001F));
+        float reflectivity = hit.getBody().getReflectivity() / MAX_REFLECTIVITY;
 
         Ray reflectionRay = new Ray(reflectionOrigin, reflectionDir);
         Hit closestHit = Renderer.getClosestHit(reflectionRay, world);
 
         if (closestHit != null) {
             Color finalColor;
-            finalColor = getPhong(closestHit, world).multiply(hit.getBody().getReflectivity() / 256F);
+            finalColor = getPhong(closestHit, world).multiply(reflectivity);
 
             if (recursionLimit != 0)
                 finalColor = finalColor.add(getReflection(closestHit, world, recursionLimit - 1));
 
             return finalColor;
         } else
-            return world.getBackgroundColor();
+            return world.getBackgroundColor().multiply(reflectivity);
     }
 }
