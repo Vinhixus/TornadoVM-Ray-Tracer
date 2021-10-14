@@ -6,19 +6,6 @@
 <?import javafx.scene.layout.*?>
 <BorderPane stylesheets="@GUI.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.vinhderful.raytracer.Controller">
-    <top>
-        <MenuBar BorderPane.alignment="CENTER">
-            <Menu mnemonicParsing="false" text="File">
-                <MenuItem mnemonicParsing="false" text="Close"/>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Edit">
-                <MenuItem mnemonicParsing="false" text="Delete"/>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Help">
-                <MenuItem mnemonicParsing="false" text="About"/>
-            </Menu>
-        </MenuBar>
-    </top>
     <center>
         <Pane fx:id="pane" BorderPane.alignment="CENTER">
             <Canvas fx:id="canvas" height="720" width="1280"/>
