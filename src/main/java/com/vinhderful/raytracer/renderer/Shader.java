@@ -1,10 +1,10 @@
 package com.vinhderful.raytracer.renderer;
 
-import com.vinhderful.raytracer.scene.Camera;
 import com.vinhderful.raytracer.scene.Light;
 import com.vinhderful.raytracer.scene.World;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Hit;
+import com.vinhderful.raytracer.utils.Ray;
 import com.vinhderful.raytracer.utils.Vector3f;
 
 /**
@@ -17,6 +17,7 @@ public class Shader {
      */
     public static final float AMBIENT_STRENGTH = 0.05F;
     public static final float SPECULAR_STRENGTH = 0.5F;
+    public static final float MAX_REFLECTIVITY = 256F;
 
     /**
      * Get the full Phong color of an object given a hit event and the world
@@ -74,16 +75,49 @@ public class Shader {
      * @return the result of the specular highlights
      */
     public static Color getSpecular(Hit hit, World world) {
-        Camera camera = world.getCamera();
         Light light = world.getLight();
         Color lightColor = light.getColor();
         Vector3f hitPos = hit.getPosition();
-        Vector3f cameraDirection = hitPos.subtract(camera.getPosition()).normalize();
+        Vector3f rayDirection = hit.getRay().getDirection();
         Vector3f lightDirection = light.getPosition().subtract(hitPos).normalize();
         Vector3f reflectionVector = lightDirection.subtract(hit.getNormal().multiply(2 * lightDirection.dotProduct(hit.getNormal())));
 
-        float specularFactor = Math.max(0F, reflectionVector.dotProduct(cameraDirection));
+        float specularFactor = Math.max(0F, reflectionVector.dotProduct(rayDirection));
         float specularBrightness = (float) Math.pow(specularFactor, hit.getBody().getReflectivity());
         return lightColor.multiply(specularBrightness).multiply(SPECULAR_STRENGTH);
+    }
+
+    /**
+     * Recursively bounce ray in the given world and compute colors according to the
+     * reflectivities of the hit objects until the recursion limit is reached
+     *
+     * @param hit
+     *            the hit event
+     * @param world
+     *            the world
+     * @param recursionLimit
+     *            the limit of how many times the ray is bounced
+     * @return the resulting color of the reflections
+     */
+    public static Color getReflection(Hit hit, World world, int recursionLimit) {
+        Vector3f hitPos = hit.getPosition();
+        Vector3f rayDir = hit.getRay().getDirection();
+        Vector3f reflectionDir = rayDir.subtract(hit.getNormal().multiply(2 * rayDir.dotProduct(hit.getNormal())));
+        Vector3f reflectionOrigin = hitPos.add(reflectionDir.multiply(0.001F));
+        float reflectivity = hit.getBody().getReflectivity() / MAX_REFLECTIVITY;
+
+        Ray reflectionRay = new Ray(reflectionOrigin, reflectionDir);
+        Hit closestHit = Renderer.getClosestHit(reflectionRay, world);
+
+        if (closestHit != null) {
+            Color finalColor;
+            finalColor = getPhong(closestHit, world).multiply(reflectivity);
+
+            if (recursionLimit != 0)
+                finalColor = finalColor.add(getReflection(closestHit, world, recursionLimit - 1));
+
+            return finalColor;
+        } else
+            return world.getBackgroundColor().multiply(reflectivity);
     }
 }
