@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer.shapes;
+package com.vinhderful.raytracer.bodies;
 
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Ray;
@@ -14,13 +14,10 @@ public class Sphere extends Body {
     /**
      * Constructs a Sphere object given its position, radius and color. Reflectivity
      * will be set to the default value
-     * 
-     * @param position
-     *            the position
-     * @param radius
-     *            the radius
-     * @param color
-     *            the color
+     *
+     * @param position the position
+     * @param radius   the radius
+     * @param color    the color
      */
     public Sphere(Vector3f position, float radius, Color color) {
         super(position, color);
@@ -30,14 +27,10 @@ public class Sphere extends Body {
     /**
      * Constructs a Sphere object given its position, radius, color and reflectivity
      *
-     * @param position
-     *            the position
-     * @param radius
-     *            the radius
-     * @param color
-     *            the color
-     * @param reflectivity
-     *            the reflectivity
+     * @param position     the position
+     * @param radius       the radius
+     * @param color        the color
+     * @param reflectivity the reflectivity
      */
     public Sphere(Vector3f position, float radius, Color color, float reflectivity) {
         super(position, color, reflectivity);
@@ -46,11 +39,10 @@ public class Sphere extends Body {
 
     /**
      * Given a ray, return the point where the ray first intersects with the sphere
-     * 
-     * @param ray
-     *            the ray
+     *
+     * @param ray the ray
      * @return The first point of intersection as Vector3f or null if the ray does
-     *         not intersect with this sphere
+     * not intersect with this sphere
      */
     @Override
     public Vector3f getIntersection(Ray ray) {
@@ -72,9 +64,8 @@ public class Sphere extends Body {
 
     /**
      * Get the normal vector of the sphere at a given point
-     * 
-     * @param point
-     *            the point
+     *
+     * @param point the point
      * @return the normal vector at the given point
      */
     @Override

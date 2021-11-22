@@ -22,13 +22,10 @@ public class Color {
 
     /**
      * Construct a Color object using red, green and blue values
-     * 
-     * @param red
-     *            red value
-     * @param green
-     *            green value
-     * @param blue
-     *            blue value
+     *
+     * @param red   red value
+     * @param green green value
+     * @param blue  blue value
      */
     public Color(float red, float green, float blue) {
         this.red = red;
@@ -38,9 +35,8 @@ public class Color {
 
     /**
      * Add this color to another given color
-     * 
-     * @param other
-     *            the other color
+     *
+     * @param other the other color
      * @return the resulting color
      */
     public Color add(Color other) {
@@ -50,8 +46,7 @@ public class Color {
     /**
      * Multiply this color with a given scalar
      *
-     * @param scalar
-     *            the scalar
+     * @param scalar the scalar
      * @return the resulting color
      */
     public Color multiply(float scalar) {
@@ -62,8 +57,7 @@ public class Color {
     /**
      * Multiply this color with another given color
      *
-     * @param other
-     *            the other color
+     * @param other the other color
      * @return the resulting color
      */
     public Color multiply(Color other) {
@@ -72,7 +66,7 @@ public class Color {
 
     /**
      * Return the color as an ARGB int value
-     * 
+     *
      * @return the color as an ARGB int value
      */
     public int toARGB() {

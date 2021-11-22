@@ -1,12 +1,11 @@
 package com.vinhderful.raytracer;
 
+import com.vinhderful.raytracer.bodies.Sphere;
 import com.vinhderful.raytracer.renderer.Renderer;
 import com.vinhderful.raytracer.scene.Camera;
 import com.vinhderful.raytracer.scene.World;
-import com.vinhderful.raytracer.shapes.Sphere;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Vector3f;
-
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -21,8 +20,6 @@ import javafx.scene.layout.Pane;
 public class Controller {
 
     public Label fps;
-    private AnimationTimer timer;
-
     /**
      * Elements of the window
      */
@@ -36,7 +33,7 @@ public class Controller {
     public Slider camPitch;
     public Slider camFOV;
     public Button button;
-
+    private AnimationTimer timer;
     private float time;
     private boolean isPlaying = false;
 

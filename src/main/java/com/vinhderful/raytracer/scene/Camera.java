@@ -27,8 +27,7 @@ public class Camera {
     /**
      * Set x attribute of the position to a given x value
      *
-     * @param x
-     *            x value to set position.x to
+     * @param x x value to set position.x to
      */
     public void setX(float x) {
         position.setX(x);
@@ -37,8 +36,7 @@ public class Camera {
     /**
      * Set y attribute of the position to a given y value
      *
-     * @param y
-     *            y value to set position.y to
+     * @param y y value to set position.y to
      */
     public void setY(float y) {
         position.setY(y);
@@ -47,8 +45,7 @@ public class Camera {
     /**
      * Set z attribute of the position to a given z value
      *
-     * @param z
-     *            z value to set position.z to
+     * @param z z value to set position.z to
      */
     public void setZ(float z) {
         position.setZ(z);
@@ -56,7 +53,7 @@ public class Camera {
 
     /**
      * Get the camera's position
-     * 
+     *
      * @return the camera's position
      */
     public Vector3f getPosition() {
@@ -65,7 +62,7 @@ public class Camera {
 
     /**
      * Get the camera's yaw
-     * 
+     *
      * @return the camera's yaw
      */
     public float getYaw() {
@@ -75,8 +72,7 @@ public class Camera {
     /**
      * Set the camera's yaw
      *
-     * @param yaw
-     *            the yaw value to set the camera's yaw to
+     * @param yaw the yaw value to set the camera's yaw to
      */
     public void setYaw(float yaw) {
         this.yaw = yaw;
@@ -94,8 +90,7 @@ public class Camera {
     /**
      * Set the camera's pitch
      *
-     * @param pitch
-     *            the pitch value to set the camera's pitch to
+     * @param pitch the pitch value to set the camera's pitch to
      */
     public void setPitch(float pitch) {
         this.pitch = pitch;
@@ -113,8 +108,7 @@ public class Camera {
     /**
      * Set the camera's field of vision
      *
-     * @param fieldOfVision
-     *            the FOV value to set the camera's field of vision to
+     * @param fieldOfVision the FOV value to set the camera's field of vision to
      */
     public void setFOV(float fieldOfVision) {
         this.fieldOfVision = fieldOfVision;

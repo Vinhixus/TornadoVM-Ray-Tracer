@@ -1,8 +1,5 @@
 package com.vinhderful.raytracer;
 
-import java.io.IOException;
-import java.util.Objects;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,16 +7,27 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.util.Objects;
+
 /**
  * Java-based Ray Tracer using JavaFX
  */
 public class Main extends Application {
 
     /**
+     * Launch application window
+     *
+     * @param args program arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    /**
      * Initialise application window
-     * 
-     * @param stage
-     *            the stage to show
+     *
+     * @param stage the stage to show
      */
     @Override
     public void start(Stage stage) {
@@ -40,15 +48,5 @@ public class Main extends Application {
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
-    }
-
-    /**
-     * Launch application window
-     * 
-     * @param args
-     *            program arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 }

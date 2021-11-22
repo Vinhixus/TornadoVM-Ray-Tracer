@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer.shapes;
+package com.vinhderful.raytracer.bodies;
 
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Ray;
@@ -11,9 +11,8 @@ public class Plane extends Body {
 
     /**
      * Construct a Plane object given its height
-     * 
-     * @param height
-     *            the height of the plane
+     *
+     * @param height the height of the plane
      */
     public Plane(float height) {
         super(new Vector3f(0, height, 0));
@@ -21,9 +20,8 @@ public class Plane extends Body {
 
     /**
      * Get the color of the plane at a given 3D point
-     * 
-     * @param point
-     *            the 3D point
+     *
+     * @param point the 3D point
      * @return the color of the plane at the given point
      */
     @Override
@@ -44,10 +42,9 @@ public class Plane extends Body {
     /**
      * Given a ray, return the point where the ray first intersects with the plane
      *
-     * @param ray
-     *            the ray
+     * @param ray the ray
      * @return The first point of intersection as Vector3f or null if the ray does
-     *         not intersect with this plane
+     * not intersect with this plane
      */
     @Override
     public Vector3f getIntersection(Ray ray) {
@@ -62,8 +59,7 @@ public class Plane extends Body {
      * Get the normal vector of the plane at a given point (always a normal vector
      * pointing up)
      *
-     * @param point
-     *            the point
+     * @param point the point
      * @return the normal vector at the given point
      */
     @Override

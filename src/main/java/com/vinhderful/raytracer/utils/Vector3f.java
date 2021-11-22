@@ -10,12 +10,26 @@ public class Vector3f {
     private float z;
 
     /**
+     * Construct a Vector3f object given x, y, z
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z coordinate
+     */
+    public Vector3f(float x, float y, float z) {
+        if (Float.isNaN(x) || Float.isNaN(y) || Float.isNaN(z))
+            throw new IllegalArgumentException("One or more parameters are NaN!");
+
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    /**
      * Rotate a vector with given yaw and pitch
-     * 
-     * @param yaw
-     *            yaw of the camera
-     * @param pitch
-     *            pitch of the camera
+     *
+     * @param yaw   yaw of the camera
+     * @param pitch pitch of the camera
      * @return the resulting vector
      */
     public Vector3f rotate(float yaw, float pitch) {
@@ -33,27 +47,8 @@ public class Vector3f {
     }
 
     /**
-     * Construct a Vector3f object given x, y, z
-     * 
-     * @param x
-     *            x coordinate
-     * @param y
-     *            y coordinate
-     * @param z
-     *            z coordinate
-     */
-    public Vector3f(float x, float y, float z) {
-        if (Float.isNaN(x) || Float.isNaN(y) || Float.isNaN(z))
-            throw new IllegalArgumentException("One or more parameters are NaN!");
-
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    /**
      * Get x attribute
-     * 
+     *
      * @return x attribute of Vector3f
      */
     public float getX() {
@@ -62,9 +57,8 @@ public class Vector3f {
 
     /**
      * Set x attribute
-     * 
-     * @param x
-     *            x value to set x attribute to
+     *
+     * @param x x value to set x attribute to
      */
     public void setX(float x) {
         this.x = x;
@@ -82,8 +76,7 @@ public class Vector3f {
     /**
      * Set y attribute
      *
-     * @param y
-     *            y value to set y attribute to
+     * @param y y value to set y attribute to
      */
     public void setY(float y) {
         this.y = y;
@@ -101,8 +94,7 @@ public class Vector3f {
     /**
      * Set z attribute
      *
-     * @param z
-     *            z value to set z attribute to
+     * @param z z value to set z attribute to
      */
     public void setZ(float z) {
         this.z = z;
@@ -119,9 +111,8 @@ public class Vector3f {
 
     /**
      * Add this vector to another given vector
-     * 
-     * @param vec
-     *            the other vector
+     *
+     * @param vec the other vector
      * @return the resulting vector
      */
     public Vector3f add(Vector3f vec) {
@@ -131,8 +122,7 @@ public class Vector3f {
     /**
      * Subtract another given vector from this vector
      *
-     * @param vec
-     *            the other vector
+     * @param vec the other vector
      * @return the resulting vector
      */
     public Vector3f subtract(Vector3f vec) {
@@ -142,8 +132,7 @@ public class Vector3f {
     /**
      * Multiply this vector with a given scalar
      *
-     * @param scalar
-     *            the scalar
+     * @param scalar the scalar
      * @return the resulting vector
      */
     public Vector3f multiply(float scalar) {
@@ -163,8 +152,7 @@ public class Vector3f {
     /**
      * Get the dot product of this vector and another given vector
      *
-     * @param vec
-     *            the other vector
+     * @param vec the other vector
      * @return the resulting dot product
      */
     public float dotProduct(Vector3f vec) {
@@ -174,8 +162,7 @@ public class Vector3f {
     /**
      * Get the distance between this vector and another given vector
      *
-     * @param vec
-     *            the other vector
+     * @param vec the other vector
      * @return the distance between the two vectors
      */
     public float distanceFrom(Vector3f vec) {

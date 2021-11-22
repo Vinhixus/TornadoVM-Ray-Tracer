@@ -10,11 +10,9 @@ public class Ray {
 
     /**
      * Construct a Ray object using origin and direction
-     * 
-     * @param origin
-     *            the origin point of the ray
-     * @param direction
-     *            the direction of the ray
+     *
+     * @param origin    the origin point of the ray
+     * @param direction the direction of the ray
      */
     public Ray(Vector3f origin, Vector3f direction) {
         this.origin = origin;

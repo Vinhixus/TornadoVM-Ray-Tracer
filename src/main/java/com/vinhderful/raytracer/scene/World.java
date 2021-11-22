@@ -1,11 +1,11 @@
 package com.vinhderful.raytracer.scene;
 
-import java.util.ArrayList;
-
-import com.vinhderful.raytracer.shapes.Body;
-import com.vinhderful.raytracer.shapes.Plane;
+import com.vinhderful.raytracer.bodies.Body;
+import com.vinhderful.raytracer.bodies.Plane;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Vector3f;
+
+import java.util.ArrayList;
 
 /**
  * Represents the entire scene with a list of bodies, a camera, a light source,
@@ -36,7 +36,7 @@ public class World {
 
     /**
      * Get the list of bodies in the world
-     * 
+     *
      * @return the list of bodies in the world
      */
     public ArrayList<Body> getBodies() {
@@ -45,9 +45,8 @@ public class World {
 
     /**
      * Add a body to the list of bodies in the world
-     * 
-     * @param body
-     *            the body to add to the list of bodies
+     *
+     * @param body the body to add to the list of bodies
      */
     public void addBody(Body body) {
         bodies.add(body);
@@ -55,7 +54,7 @@ public class World {
 
     /**
      * Get the camera
-     * 
+     *
      * @return the camera
      */
     public Camera getCamera() {
@@ -83,8 +82,7 @@ public class World {
     /**
      * Set the x attribute of the position of the light source to an x value
      *
-     * @param x
-     *            the x value to set the light's position.x to
+     * @param x the x value to set the light's position.x to
      */
     public void setLightX(float x) {
         light.setX(x);
@@ -93,8 +91,7 @@ public class World {
     /**
      * Set the z attribute of the position of the light source to an z value
      *
-     * @param z
-     *            the z value to set the light's position.z to
+     * @param z the z value to set the light's position.z to
      */
     public void setLightZ(float z) {
         light.setZ(z);
@@ -102,7 +99,7 @@ public class World {
 
     /**
      * Get the world's background color
-     * 
+     *
      * @return the world's background color
      */
     public Color getBackgroundColor() {

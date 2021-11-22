@@ -21,11 +21,9 @@ public class Shader {
 
     /**
      * Get the full Phong color of an object given a hit event and the world
-     * 
-     * @param hit
-     *            the hit event
-     * @param world
-     *            the world
+     *
+     * @param hit   the hit event
+     * @param world the world
      * @return the result of the Phong shading
      */
     public static Color getPhong(Hit hit, World world) {
@@ -35,10 +33,8 @@ public class Shader {
     /**
      * Get the ambient color of a body given a hit event and the world
      *
-     * @param hit
-     *            the hit event
-     * @param world
-     *            the world
+     * @param hit   the hit event
+     * @param world the world
      * @return the result of the ambient lighting
      */
     public static Color getAmbient(Hit hit, World world) {
@@ -50,10 +46,8 @@ public class Shader {
     /**
      * Get the diffuse color of a body given a hit event and the world
      *
-     * @param hit
-     *            the hit event
-     * @param world
-     *            the world
+     * @param hit   the hit event
+     * @param world the world
      * @return the result of the diffuse lighting
      */
     public static Color getDiffuse(Hit hit, World world) {
@@ -68,10 +62,8 @@ public class Shader {
     /**
      * Get the specular highlights of a body given a hit event and the world
      *
-     * @param hit
-     *            the hit event
-     * @param world
-     *            the world
+     * @param hit   the hit event
+     * @param world the world
      * @return the result of the specular highlights
      */
     public static Color getSpecular(Hit hit, World world) {
@@ -91,12 +83,9 @@ public class Shader {
      * Recursively bounce ray in the given world and compute colors according to the
      * reflectivities of the hit objects until the recursion limit is reached
      *
-     * @param hit
-     *            the hit event
-     * @param world
-     *            the world
-     * @param recursionLimit
-     *            the limit of how many times the ray is bounced
+     * @param hit            the hit event
+     * @param world          the world
+     * @param recursionLimit the limit of how many times the ray is bounced
      * @return the resulting color of the reflections
      */
     public static Color getReflection(Hit hit, World world, int recursionLimit) {

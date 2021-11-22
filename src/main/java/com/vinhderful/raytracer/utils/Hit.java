@@ -1,6 +1,6 @@
 package com.vinhderful.raytracer.utils;
 
-import com.vinhderful.raytracer.shapes.Body;
+import com.vinhderful.raytracer.bodies.Body;
 
 /**
  * Represents an event of a ray hitting a body, storing the ray, the body and
@@ -14,13 +14,10 @@ public class Hit {
 
     /**
      * Construct a hit event using a body, ray and hit position
-     * 
-     * @param body
-     *            the body being hit
-     * @param ray
-     *            the ray hitting the body
-     * @param position
-     *            the position of the hit
+     *
+     * @param body     the body being hit
+     * @param ray      the ray hitting the body
+     * @param position the position of the hit
      */
     public Hit(Body body, Ray ray, Vector3f position) {
         this.body = body;
@@ -30,7 +27,7 @@ public class Hit {
 
     /**
      * Get the body being hit
-     * 
+     *
      * @return the body being hit
      */
     public Body getBody() {
@@ -39,7 +36,7 @@ public class Hit {
 
     /**
      * Get the ray hitting the body
-     * 
+     *
      * @return the ray hitting the body
      */
     public Ray getRay() {
