@@ -9,7 +9,6 @@ import com.vinhderful.raytracer.utils.Vector3f;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
-import org.apache.commons.math3.util.Pair;
 
 import java.nio.IntBuffer;
 
@@ -65,23 +64,29 @@ public class Renderer {
     }
 
     /**
-     * Calculate the OpenGL style coordinates of the canvas
+     * Calculate the OpenGL style x coordinate of the canvas
      *
      * @param x the pixel's x coordinate
-     * @param y the pixel's y coordinate
-     * @return a pair containing the [x -> u, y -> v] normalized coordinates
+     * @return the normalized x coordinate
      */
-    public Pair<Float, Float> getNormalizedCoordinates(int x, int y) {
-        float u, v;
-        if (width > height) {
-            u = (float) (x - width / 2 + height / 2) / height * 2 - 1;
-            v = -((float) y / height * 2 - 1);
-        } else {
-            u = (float) x / width * 2 - 1;
-            v = -((float) (y - height / 2 + width / 2) / width * 2 - 1);
-        }
+    public float getNormalizedX(int x) {
+        if (width > height)
+            return (float) (x - width / 2 + height / 2) / height * 2 - 1;
+        else
+            return (float) x / width * 2 - 1;
+    }
 
-        return new Pair<>(u, v);
+    /**
+     * Calculate the OpenGL style y coordinate of the canvas
+     *
+     * @param y the pixel's y coordinate
+     * @return the normalized y coordinate
+     */
+    public float getNormalizedY(int y) {
+        if (width > height)
+            return -((float) y / height * 2 - 1);
+        else
+            return -((float) (y - height / 2 + width / 2) / width * 2 - 1);
     }
 
     /**
@@ -91,14 +96,11 @@ public class Renderer {
      */
     public void render(World world) {
         Camera camera = world.getCamera();
+        Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
 
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++) {
-
-                Pair<Float, Float> nsc = getNormalizedCoordinates(x, y);
-
-                Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
-                Vector3f rayDir = new Vector3f(nsc.getFirst(), nsc.getSecond(), 0).subtract(eyePos).normalize().rotate(camera.getYaw(), camera.getPitch());
+                Vector3f rayDir = new Vector3f(getNormalizedX(x), getNormalizedY(y), 0).subtract(eyePos).normalize().rotate(camera.getYaw(), camera.getPitch());
                 Ray ray = new Ray(camera.getPosition(), rayDir);
 
                 Hit hit = getClosestHit(ray, world);
