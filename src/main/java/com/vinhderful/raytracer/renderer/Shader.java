@@ -80,6 +80,29 @@ public class Shader {
     }
 
     /**
+     * Get the factor that defines if a spot should be in shadow
+     *
+     * @param hit   the hit event
+     * @param world the world
+     * @return the shadow factor
+     */
+    public static float getShadowFactor(Hit hit, World world) {
+        Light light = world.getLight();
+
+        Vector3f hitPos = hit.getPosition();
+        Vector3f rayDir = light.getPosition().subtract(hitPos).normalize();
+        Vector3f rayOrigin = hitPos.add(rayDir.multiply(0.001F));
+        Ray ray = new Ray(rayOrigin, rayDir);
+
+        Hit closestHit = Renderer.getClosestHit(ray, world);
+
+        if (closestHit == null || closestHit.getBody() == light)
+            return 1;
+        else
+            return 0.6F;
+    }
+
+    /**
      * Recursively bounce ray in the given world and compute colors according to the
      * reflectivities of the hit objects until the recursion limit is reached
      *
