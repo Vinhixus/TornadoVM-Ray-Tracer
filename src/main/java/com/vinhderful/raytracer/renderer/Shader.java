@@ -99,7 +99,7 @@ public class Shader {
         if (closestHit == null || closestHit.getBody() == light)
             return 1;
         else
-            return 0.4F;
+            return 0.6F;
     }
 
     /**
