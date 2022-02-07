@@ -48,7 +48,7 @@ public class Renderer {
     }
 
     public static void render(int width, int height, int[] pixels,
-                              Float4 cameraPosition, float[] cameraYaw, float[] cameraPitch, float[] cameraFOV,
+                              float[] cameraPosition, float[] cameraYaw, float[] cameraPitch, float[] cameraFOV,
                               VectorFloat4 bodyPositions, VectorFloat bodyRadii, VectorFloat4 bodyColors,
                               Float4 worldBGColor) {
 
@@ -58,9 +58,10 @@ public class Renderer {
             for (@Parallel int y = 0; y < height; y++) {
 
                 Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
+                Float4 rayOrigin = new Float4(cameraPosition[0], cameraPosition[1], cameraPosition[2], 0);
                 Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), cameraYaw[0], cameraPitch[0]);
 
-                Float4 hit = getClosestHit(bodyPositions, bodyRadii, cameraPosition, rayDirection);
+                Float4 hit = getClosestHit(bodyPositions, bodyRadii, rayOrigin, rayDirection);
                 int hitIndex = (int) hit.getW();
 
                 if (hitIndex != -1)

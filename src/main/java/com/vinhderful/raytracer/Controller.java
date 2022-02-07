@@ -33,7 +33,7 @@ public class Controller {
     public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
     // ==============================================================
-    public static Float4 cameraPosition = new Float4(0, 0, -4F, 0);
+    public static float[] cameraPosition = {0, 0, -4F};
     public static float[] cameraPitch = {0};
     public static float[] cameraFOV = {60};
     public static float[] cameraYaw = {0};
@@ -54,16 +54,7 @@ public class Controller {
     public static void render(int width, int height, int[] pixels,
                               PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
                               TaskSchedule ts) {
-
         ts.execute();
-
-        /*
-        Renderer.render(width, height, pixels,
-                cameraPosition, cameraYaw, cameraPitch, cameraFOV,
-                bodyPositions, bodyRadii, bodyColors, worldBGColor);
-
-         */
-
         pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
     }
 
@@ -103,9 +94,9 @@ public class Controller {
         ts.streamOut(pixels);
 
         // ==============================================================
-        camX.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setX(newValue.floatValue()));
-        camY.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setY(newValue.floatValue()));
-        camZ.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setZ(newValue.floatValue()));
+        camX.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition[0] = newValue.floatValue());
+        camY.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition[1] = newValue.floatValue());
+        camZ.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition[2] = newValue.floatValue());
         camYaw.valueProperty().addListener((observable, oldValue, newValue) -> cameraYaw[0] = newValue.floatValue());
         camPitch.valueProperty().addListener((observable, oldValue, newValue) -> cameraPitch[0] = newValue.floatValue());
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> cameraFOV[0] = newValue.floatValue());

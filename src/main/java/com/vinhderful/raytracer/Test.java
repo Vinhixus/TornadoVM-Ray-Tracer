@@ -19,7 +19,7 @@ public class Test {
     public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
     // ==============================================================
-    public static Float4 cameraPosition = new Float4(0, 0, -4F, 0);
+    public static float[] cameraPosition = {0, 0, -4F};
     public static float[] cameraPitch = {0};
     public static float[] cameraFOV = {60};
     public static float[] cameraYaw = {0};
