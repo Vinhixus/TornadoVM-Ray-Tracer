@@ -6,6 +6,7 @@ import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
@@ -32,17 +33,21 @@ public class Controller {
     public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
     public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
+    private static final double[] frameRates = new double[100];
     // ==============================================================
     public static float[] cameraPosition = {0, 0, -4F};
     public static float[] cameraPitch = {0};
     public static float[] cameraFOV = {60};
     public static float[] cameraYaw = {0};
     // ==============================================================
+    private static int index = 0;
+    private static long lastUpdate = 0;
+    // ==============================================================
 
     @FXML
+    public Label fps;
     public Pane pane;
     public Canvas canvas;
-
     public Slider camX;
     public Slider camY;
     public Slider camZ;
@@ -54,8 +59,23 @@ public class Controller {
     public static void render(int width, int height, int[] pixels,
                               PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
                               TaskSchedule ts) {
+
         ts.execute();
+
+        /*
+        Renderer.render(width, height, pixels,
+                cameraPosition, cameraYaw, cameraPitch, cameraFOV,
+                bodyPositions, bodyRadii, bodyColors, worldBGColor);
+
+         */
+
         pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
+    }
+
+    public static double getFPS() {
+        double total = 0.0d;
+        for (double frameRate : frameRates) total += frameRate;
+        return total / frameRates.length;
     }
 
     /**
@@ -107,6 +127,15 @@ public class Controller {
             @Override
             public void handle(long now) {
                 render(width, height, pixels, pixelWriter, format, ts);
+
+                if (lastUpdate > 0) {
+                    double frameRate = 1_000_000_000.0 / (now - lastUpdate);
+                    index %= frameRates.length;
+                    frameRates[index++] = frameRate;
+                }
+
+                lastUpdate = now;
+                fps.setText(String.format("FPS: %.2f", getFPS()));
             }
         };
 
