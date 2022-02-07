@@ -34,9 +34,9 @@ public class Controller {
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
     // ==============================================================
     public static Float4 cameraPosition = new Float4(0, 0, -4F, 0);
-    public static float cameraPitch = 0;
-    public static float cameraFOV = 60;
-    public static float cameraYaw = 0;
+    public static float[] cameraPitch = {0};
+    public static float[] cameraFOV = {60};
+    public static float[] cameraYaw = {0};
     // ==============================================================
 
     @FXML
@@ -55,11 +55,14 @@ public class Controller {
                               PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
                               TaskSchedule ts) {
 
-        //ts.execute();
+        ts.execute();
 
+        /*
         Renderer.render(width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
                 bodyPositions, bodyRadii, bodyColors, worldBGColor);
+
+         */
 
         pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
     }
@@ -79,21 +82,21 @@ public class Controller {
         int[] pixels = new int[width * height];
 
         // ==============================================================
-        bodyPositions.set(0, new Float4(-1.5F, 0, 0, 0));
-        bodyRadii.set(0, 0.5F);
+        bodyPositions.set(0, new Float4(-1F, 0, 2.5F, 0));
+        bodyRadii.set(0, 0.4F);
         bodyColors.set(0, Color.RED);
 
-        bodyPositions.set(1, new Float4(0, 0, 0, 0));
-        bodyRadii.set(1, 0.5F);
+        bodyPositions.set(1, new Float4(0, 0, 2.5F, 0));
+        bodyRadii.set(1, 0.4F);
         bodyColors.set(1, Color.GREEN);
 
-        bodyPositions.set(2, new Float4(1.5F, 0, 0, 0));
-        bodyRadii.set(2, 0.5F);
+        bodyPositions.set(2, new Float4(1F, 0, 2.5F, 0));
+        bodyRadii.set(2, 0.4F);
         bodyColors.set(2, Color.BLUE);
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(cameraPosition, bodyPositions, bodyRadii, bodyColors, worldBGColor);
+        ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV);
         ts.task("t0", Renderer::render, width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
                 bodyPositions, bodyRadii, bodyColors, worldBGColor);
@@ -103,9 +106,9 @@ public class Controller {
         camX.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setX(newValue.floatValue()));
         camY.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setY(newValue.floatValue()));
         camZ.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setZ(newValue.floatValue()));
-        camYaw.valueProperty().addListener((observable, oldValue, newValue) -> cameraYaw = newValue.floatValue());
-        camPitch.valueProperty().addListener((observable, oldValue, newValue) -> cameraPitch = newValue.floatValue());
-        camFOV.valueProperty().addListener((observable, oldValue, newValue) -> cameraFOV = newValue.floatValue());
+        camYaw.valueProperty().addListener((observable, oldValue, newValue) -> cameraYaw[0] = newValue.floatValue());
+        camPitch.valueProperty().addListener((observable, oldValue, newValue) -> cameraPitch[0] = newValue.floatValue());
+        camFOV.valueProperty().addListener((observable, oldValue, newValue) -> cameraFOV[0] = newValue.floatValue());
 
         // ==============================================================
         AnimationTimer timer = new AnimationTimer() {

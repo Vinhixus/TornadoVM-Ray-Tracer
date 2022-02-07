@@ -26,11 +26,8 @@ public class Renderer {
             Float4 intersection = Sphere.getIntersection(bodyPositions.get(i), bodyRadii.get(i), rayOrigin, rayDirection);
 
             if (intersection.getW() == 0 && (closestHit.getW() == -1F ||
-                    VectorOps.distance(bodyPositions.get((int) closestHit.getW()), rayOrigin) > VectorOps.distance(intersection, rayOrigin))) {
-
-                closestHit = intersection.duplicate();
-                closestHit.setW(i);
-            }
+                    VectorOps.distance(bodyPositions.get((int) closestHit.getW()), rayOrigin) > VectorOps.distance(intersection, rayOrigin)))
+                closestHit = new Float4(intersection.getX(), intersection.getY(), intersection.getZ(), i);
         }
 
         return closestHit;
@@ -51,19 +48,19 @@ public class Renderer {
     }
 
     public static void render(int width, int height, int[] pixels,
-                              Float4 cameraPosition, float cameraYaw, float cameraPitch, float cameraFOV,
+                              Float4 cameraPosition, float[] cameraYaw, float[] cameraPitch, float[] cameraFOV,
                               VectorFloat4 bodyPositions, VectorFloat bodyRadii, VectorFloat4 bodyColors,
                               Float4 worldBGColor) {
 
-        Float4 eyePos = new Float4(0, 0, -1 / floatTan(cameraFOV * floatPI() / 360), 0);
+        Float4 eyePos = new Float4(0, 0, -1 / floatTan(cameraFOV[0] * floatPI() / 360F), 0);
 
         for (@Parallel int x = 0; x < width; x++)
             for (@Parallel int y = 0; y < height; y++) {
 
                 Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
-                Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), cameraYaw, cameraPitch);
-                Float4 hit = getClosestHit(bodyPositions, bodyRadii, cameraPosition, rayDirection);
+                Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), cameraYaw[0], cameraPitch[0]);
 
+                Float4 hit = getClosestHit(bodyPositions, bodyRadii, cameraPosition, rayDirection);
                 int hitIndex = (int) hit.getW();
 
                 if (hitIndex != -1)

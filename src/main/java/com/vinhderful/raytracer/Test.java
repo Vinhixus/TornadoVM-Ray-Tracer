@@ -20,9 +20,9 @@ public class Test {
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
     // ==============================================================
     public static Float4 cameraPosition = new Float4(0, 0, -4F, 0);
-    public static float cameraPitch = 0;
-    public static float cameraFOV = 60;
-    public static float cameraYaw = 0;
+    public static float[] cameraPitch = {0};
+    public static float[] cameraFOV = {60};
+    public static float[] cameraYaw = {0};
     // ==============================================================
 
     // ==============================================================
@@ -46,7 +46,7 @@ public class Test {
         int[] pixels = new int[width * height];
 
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(cameraPosition, bodyPositions, bodyRadii, bodyColors, worldBGColor);
+        ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV);
         ts.task("t0", Renderer::render, width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
                 bodyPositions, bodyRadii, bodyColors, worldBGColor);

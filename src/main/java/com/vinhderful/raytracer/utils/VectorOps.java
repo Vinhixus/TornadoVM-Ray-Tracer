@@ -11,8 +11,8 @@ public class VectorOps {
 
     public static Float4 rotate(Float4 a, float yaw, float pitch) {
 
-        float _yaw = yaw * floatPI() / 180;
-        float _pitch = pitch * floatPI() / 180;
+        float _yaw = yaw * floatPI() / 180F;
+        float _pitch = pitch * floatPI() / 180F;
 
         float _y = a.getY() * floatCos(_pitch) - a.getZ() * floatSin(_pitch);
         float _z = a.getY() * floatSin(_pitch) + a.getZ() * floatCos(_pitch);
