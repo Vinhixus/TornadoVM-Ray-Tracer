@@ -60,9 +60,8 @@ public class Renderer {
         for (@Parallel int x = 0; x < width; x++)
             for (@Parallel int y = 0; y < height; y++) {
 
-                pixels[x + y * width] = Color.toARGB(worldBGColor);
-
-                Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0), eyePos)), cameraYaw, cameraPitch);
+                Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
+                Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), cameraYaw, cameraPitch);
                 Float4 hit = getClosestHit(bodyPositions, bodyRadii, cameraPosition, rayDirection);
 
                 int hitIndex = (int) hit.getW();
