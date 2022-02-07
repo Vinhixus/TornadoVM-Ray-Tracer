@@ -1,75 +1,28 @@
 package com.vinhderful.raytracer.bodies;
 
-import com.vinhderful.raytracer.utils.Color;
-import com.vinhderful.raytracer.utils.Ray;
-import com.vinhderful.raytracer.utils.Vector3f;
+import uk.ac.manchester.tornado.api.collections.types.Float4;
+
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatSqrt;
 
 /**
  * Represent a sphere in a 3D scene using its position, radius and color
  */
-public class Sphere extends Body {
+public class Sphere {
 
-    private final float radius;
+    public static Float4 getIntersection(Float4 position, float radius, Float4 rayOrigin, Float4 rayDirection) {
 
-    /**
-     * Constructs a Sphere object given its position, radius and color. Reflectivity
-     * will be set to the default value
-     *
-     * @param position the position
-     * @param radius   the radius
-     * @param color    the color
-     */
-    public Sphere(Vector3f position, float radius, Color color) {
-        super(position, color);
-        this.radius = radius;
-    }
+        final Float4 NO_INTERSECTION = new Float4(-1F, -1F, -1F, -1F);
 
-    /**
-     * Constructs a Sphere object given its position, radius, color and reflectivity
-     *
-     * @param position     the position
-     * @param radius       the radius
-     * @param color        the color
-     * @param reflectivity the reflectivity
-     */
-    public Sphere(Vector3f position, float radius, Color color, float reflectivity) {
-        super(position, color, reflectivity);
-        this.radius = radius;
-    }
+        float t = Float4.dot(Float4.sub(position, rayOrigin), rayDirection);
+        Float4 p = Float4.add(rayOrigin, Float4.mult(rayDirection, t));
 
-    /**
-     * Given a ray, return the point where the ray first intersects with the sphere
-     *
-     * @param ray the ray
-     * @return The first point of intersection as Vector3f or null if the ray does
-     * not intersect with this sphere
-     */
-    @Override
-    public Vector3f getIntersection(Ray ray) {
-        float t = position.subtract(ray.getOrigin()).dotProduct(ray.getDirection());
-        Vector3f p = ray.getOrigin().add(ray.getDirection().multiply(t));
+        float y = Float4.length(Float4.sub(position, p));
 
-        float y = position.subtract(p).magnitude();
         if (y < radius) {
-            float x = (float) Math.sqrt(radius * radius - y * y);
-            float t1 = t - x;
-            if (t1 > 0)
-                return ray.getOrigin().add(ray.getDirection().multiply(t1));
-            else
-                return null;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Get the normal vector of the sphere at a given point
-     *
-     * @param point the point
-     * @return the normal vector at the given point
-     */
-    @Override
-    public Vector3f getNormalAt(Vector3f point) {
-        return point.subtract(position).normalize();
+            float t1 = t - floatSqrt(radius * radius - y * y);
+            if (t1 > 0) return Float4.add(rayOrigin, Float4.mult(rayDirection, t1));
+            else return NO_INTERSECTION;
+        } else
+            return NO_INTERSECTION;
     }
 }

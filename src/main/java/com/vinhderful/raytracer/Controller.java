@@ -1,117 +1,78 @@
 package com.vinhderful.raytracer;
 
-import com.vinhderful.raytracer.bodies.Sphere;
 import com.vinhderful.raytracer.renderer.Renderer;
-import com.vinhderful.raytracer.scene.Camera;
-import com.vinhderful.raytracer.scene.World;
 import com.vinhderful.raytracer.utils.Color;
-import com.vinhderful.raytracer.utils.Vector3f;
-import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.Pane;
+import uk.ac.manchester.tornado.api.TaskSchedule;
+import uk.ac.manchester.tornado.api.collections.types.Float4;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+
+import java.nio.IntBuffer;
 
 /**
  * Initialises JavaFX FXML elements together with GUI.fxml, contains driver code
  */
+@SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Controller {
 
-    public Label fps;
-    /**
-     * Elements of the window
-     */
+    // ==============================================================
+    public static final int NUM_BODIES = 3;
+
+    // ==============================================================
+    public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
+    public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
+    public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
+
+    // ==============================================================
+    public static final Float4 worldBGColor = Color.BLACK;
+
+    // ==============================================================
     @FXML
     public Pane pane;
     public Canvas canvas;
-    public Slider camX;
-    public Slider camY;
-    public Slider camZ;
-    public Slider camYaw;
-    public Slider camPitch;
-    public Slider camFOV;
-    public Button button;
-    private AnimationTimer timer;
-    private float time;
-    private boolean isPlaying = false;
 
     /**
      * Initialise renderer, world, camera and populate with objects
      */
     @FXML
     public void initialize() {
-        Renderer renderer = new Renderer(canvas.getGraphicsContext2D());
-        World world = new World();
-        Camera camera = world.getCamera();
 
-        Sphere sphere3 = new Sphere(new Vector3f(-1.5F, 0, 0), 0.5f, Color.RED, 8F);
-        Sphere sphere1 = new Sphere(new Vector3f(0, 0, 0), 0.5f, Color.GREEN, 16F);
-        Sphere sphere2 = new Sphere(new Vector3f(1.5F, 0, 0), 0.5f, Color.BLUE, 32F);
-        world.addBody(sphere1);
-        world.addBody(sphere2);
-        world.addBody(sphere3);
+        GraphicsContext g = canvas.getGraphicsContext2D();
+        PixelWriter pixelWriter = g.getPixelWriter();
+        int width = (int) g.getCanvas().getWidth();
+        int height = (int) g.getCanvas().getHeight();
 
-        camX.valueProperty().addListener((observable, oldValue, newValue) -> camera.setX(newValue.floatValue()));
-        camY.valueProperty().addListener((observable, oldValue, newValue) -> camera.setY(newValue.floatValue()));
-        camZ.valueProperty().addListener((observable, oldValue, newValue) -> camera.setZ(newValue.floatValue()));
-        camYaw.valueProperty().addListener((observable, oldValue, newValue) -> camera.setYaw(newValue.floatValue()));
-        camPitch.valueProperty().addListener((observable, oldValue, newValue) -> camera.setPitch(newValue.floatValue()));
-        camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera.setFOV(newValue.floatValue()));
+        WritablePixelFormat<IntBuffer> format = WritablePixelFormat.getIntArgbInstance();
+        int[] pixels = new int[width * height];
 
-        world.setLightX(2F);
-        world.setLightZ(0F);
-        renderer.render(world);
-        disableSliders(true);
+        // ==============================================================
+        bodyPositions.set(0, new Float4(-1F, 0, 2.5F, 0));
+        bodyRadii.set(0, 0.4F);
+        bodyColors.set(0, Color.RED);
 
-        timer = new AnimationTimer() {
+        bodyPositions.set(1, new Float4(0, 0, 2.5F, 0));
+        bodyRadii.set(1, 0.4F);
+        bodyColors.set(1, Color.GREEN);
 
-            long lastUpdate = 0;
+        bodyPositions.set(2, new Float4(1F, 0, 2.5F, 0));
+        bodyRadii.set(2, 0.4F);
+        bodyColors.set(2, Color.BLUE);
 
-            @Override
-            public void handle(long now) {
-                time = (time + 0.2F) % 360;
-                world.setLightX((float) Math.cos(time) * 2F);
-                world.setLightZ((float) Math.sin(time) * 2F);
+        // ==============================================================
+        TaskSchedule ts = new TaskSchedule("s0");
+        ts.streamIn(worldBGColor, bodyPositions, bodyRadii, bodyColors);
+        ts.task("t0", Renderer::render, width, height, pixels,
+                worldBGColor, bodyPositions, bodyRadii, bodyColors);
+        ts.streamOut(pixels);
+        ts.execute();
 
-                renderer.render(world);
-
-                if (lastUpdate > 0)
-                    fps.setText(String.format("FPS: %.2f", 1_000_000_000.0 / (now - lastUpdate)));
-
-                lastUpdate = now;
-            }
-        };
-    }
-
-    /**
-     * Play/pause rotating light animation on button click
-     */
-    public void playPauseAnimation() {
-        if (isPlaying) {
-            isPlaying = false;
-            timer.stop();
-            button.setText("Play");
-            disableSliders(true);
-            fps.setText("FPS: 0.00");
-        } else {
-            isPlaying = true;
-            timer.start();
-            button.setText("Pause");
-            disableSliders(false);
-        }
-    }
-
-    /**
-     * Enable/disable sliders
-     */
-    public void disableSliders(boolean state) {
-        camX.setDisable(state);
-        camY.setDisable(state);
-        camZ.setDisable(state);
-        camYaw.setDisable(state);
-        camPitch.setDisable(state);
-        camFOV.setDisable(state);
+        // ==============================================================
+        pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
     }
 }
