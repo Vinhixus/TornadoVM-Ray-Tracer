@@ -2,9 +2,11 @@ package com.vinhderful.raytracer;
 
 import com.vinhderful.raytracer.renderer.Renderer;
 import com.vinhderful.raytracer.utils.Color;
+import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Slider;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.Pane;
@@ -21,21 +23,46 @@ import java.nio.IntBuffer;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Controller {
 
-    // ==============================================================
-    public static final int NUM_BODIES = 3;
-
-    // ==============================================================
-    public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
-    public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
-    public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
 
     // ==============================================================
     public static final Float4 worldBGColor = Color.BLACK;
-
     // ==============================================================
+    public static final int NUM_BODIES = 3;
+
+    public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
+    public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
+    public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
+    // ==============================================================
+    public static Float4 cameraPosition = new Float4(0, 0, -4F, 0);
+    public static float cameraPitch = 0;
+    public static float cameraFOV = 60;
+    public static float cameraYaw = 0;
+    // ==============================================================
+
     @FXML
     public Pane pane;
     public Canvas canvas;
+
+    public Slider camX;
+    public Slider camY;
+    public Slider camZ;
+    public Slider camYaw;
+    public Slider camPitch;
+    public Slider camFOV;
+
+    // ==============================================================
+    public static void render(int width, int height, int[] pixels,
+                              PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
+                              TaskSchedule ts) {
+
+        //ts.execute();
+
+        Renderer.render(width, height, pixels,
+                cameraPosition, cameraYaw, cameraPitch, cameraFOV,
+                bodyPositions, bodyRadii, bodyColors, worldBGColor);
+
+        pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
+    }
 
     /**
      * Initialise renderer, world, camera and populate with objects
@@ -52,27 +79,43 @@ public class Controller {
         int[] pixels = new int[width * height];
 
         // ==============================================================
-        bodyPositions.set(0, new Float4(-1F, 0, 2.5F, 0));
-        bodyRadii.set(0, 0.4F);
+        bodyPositions.set(0, new Float4(-1.5F, 0, 0, 0));
+        bodyRadii.set(0, 0.5F);
         bodyColors.set(0, Color.RED);
 
-        bodyPositions.set(1, new Float4(0, 0, 2.5F, 0));
-        bodyRadii.set(1, 0.4F);
+        bodyPositions.set(1, new Float4(0, 0, 0, 0));
+        bodyRadii.set(1, 0.5F);
         bodyColors.set(1, Color.GREEN);
 
-        bodyPositions.set(2, new Float4(1F, 0, 2.5F, 0));
-        bodyRadii.set(2, 0.4F);
+        bodyPositions.set(2, new Float4(1.5F, 0, 0, 0));
+        bodyRadii.set(2, 0.5F);
         bodyColors.set(2, Color.BLUE);
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(worldBGColor, bodyPositions, bodyRadii, bodyColors);
+        ts.streamIn(cameraPosition, bodyPositions, bodyRadii, bodyColors, worldBGColor);
         ts.task("t0", Renderer::render, width, height, pixels,
-                worldBGColor, bodyPositions, bodyRadii, bodyColors);
+                cameraPosition, cameraYaw, cameraPitch, cameraFOV,
+                bodyPositions, bodyRadii, bodyColors, worldBGColor);
         ts.streamOut(pixels);
-        ts.execute();
 
         // ==============================================================
-        pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
+        camX.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setX(newValue.floatValue()));
+        camY.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setY(newValue.floatValue()));
+        camZ.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition.setZ(newValue.floatValue()));
+        camYaw.valueProperty().addListener((observable, oldValue, newValue) -> cameraYaw = newValue.floatValue());
+        camPitch.valueProperty().addListener((observable, oldValue, newValue) -> cameraPitch = newValue.floatValue());
+        camFOV.valueProperty().addListener((observable, oldValue, newValue) -> cameraFOV = newValue.floatValue());
+
+        // ==============================================================
+        AnimationTimer timer = new AnimationTimer() {
+
+            @Override
+            public void handle(long now) {
+                render(width, height, pixels, pixelWriter, format, ts);
+            }
+        };
+
+        timer.start();
     }
 }

@@ -11,15 +11,19 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 public class Test {
 
     // ==============================================================
+    public static final Float4 worldBGColor = Color.BLACK;
+    // ==============================================================
     public static final int NUM_BODIES = 3;
 
-    // ==============================================================
     public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
     public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
-
     // ==============================================================
-    public static final Float4 worldBGColor = Color.BLACK;
+    public static Float4 cameraPosition = new Float4(0, 0, -4F, 0);
+    public static float cameraPitch = 0;
+    public static float cameraFOV = 60;
+    public static float cameraYaw = 0;
+    // ==============================================================
 
     // ==============================================================
     public static void main(String[] args) {
@@ -42,9 +46,10 @@ public class Test {
         int[] pixels = new int[width * height];
 
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(worldBGColor, bodyPositions, bodyRadii, bodyColors);
+        ts.streamIn(cameraPosition, bodyPositions, bodyRadii, bodyColors, worldBGColor);
         ts.task("t0", Renderer::render, width, height, pixels,
-                worldBGColor, bodyPositions, bodyRadii, bodyColors);
+                cameraPosition, cameraYaw, cameraPitch, cameraFOV,
+                bodyPositions, bodyRadii, bodyColors, worldBGColor);
         ts.streamOut(pixels);
 
         // ==============================================================
@@ -65,7 +70,8 @@ public class Test {
         startTime = System.nanoTime();
 
         Renderer.render(width, height, pixels,
-                worldBGColor, bodyPositions, bodyRadii, bodyColors);
+                cameraPosition, cameraYaw, cameraPitch, cameraFOV,
+                bodyPositions, bodyRadii, bodyColors, worldBGColor);
 
         endTime = System.nanoTime();
         System.out.println("Duration: " + (endTime - startTime) / 1000000.0 + " ms");

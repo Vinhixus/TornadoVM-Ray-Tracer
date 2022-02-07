@@ -3,7 +3,7 @@ package com.vinhderful.raytracer.utils;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 
 /**
- * Represents a color using red, green and blue values
+ * Color definitions and operations
  */
 public class Color {
 
