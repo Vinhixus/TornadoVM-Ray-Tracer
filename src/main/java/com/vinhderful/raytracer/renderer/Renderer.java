@@ -68,7 +68,10 @@ public class Renderer {
                     Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
                     Float4 bodyPosition = bodyPositions.get(hitIndex);
                     Float4 bodyColor = bodyColors.get(hitIndex);
-                    pixels[x + y * width] = Color.toARGB(Shader.getDiffuse(hitPosition, bodyPosition, bodyColor, lightPosition, lightColor));
+
+                    pixels[x + y * width] = Color.toARGB(Color.add(
+                            Shader.getAmbient(bodyColor, lightColor),
+                            Shader.getDiffuse(hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)));
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }
