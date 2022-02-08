@@ -35,6 +35,7 @@ public class Controller {
     public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
     public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
+    public static final VectorFloat bodyReflectivities = new VectorFloat(NUM_BODIES);
     private static final double[] frameRates = new double[100];
     // ==============================================================
     public static float[] cameraPosition = {0, 0, -4F};
@@ -89,21 +90,24 @@ public class Controller {
         bodyPositions.set(0, new Float4(-1.5F, 0, 0, 0));
         bodyRadii.set(0, 0.5F);
         bodyColors.set(0, Color.RED);
+        bodyReflectivities.set(0, 8F);
 
         bodyPositions.set(1, new Float4(0, 0, 0, 0));
         bodyRadii.set(1, 0.5F);
         bodyColors.set(1, Color.GREEN);
+        bodyReflectivities.set(1, 16F);
 
         bodyPositions.set(2, new Float4(1.5F, 0, 0, 0));
         bodyRadii.set(2, 0.5F);
         bodyColors.set(2, Color.BLUE);
+        bodyReflectivities.set(2, 32F);
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
         ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV);
         ts.task("t0", Renderer::render, width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
-                bodyPositions, bodyRadii, bodyColors,
+                bodyPositions, bodyRadii, bodyColors, bodyReflectivities,
                 worldBGColor, lightPosition, lightColor);
         ts.streamOut(pixels);
 

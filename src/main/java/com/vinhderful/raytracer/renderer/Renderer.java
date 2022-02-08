@@ -49,7 +49,7 @@ public class Renderer {
 
     public static void render(int width, int height, int[] pixels,
                               float[] cameraPosition, float[] cameraYaw, float[] cameraPitch, float[] cameraFOV,
-                              VectorFloat4 bodyPositions, VectorFloat bodyRadii, VectorFloat4 bodyColors,
+                              VectorFloat4 bodyPositions, VectorFloat bodyRadii, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
                               Float4 worldBGColor, Float4 lightPosition, Float4 lightColor) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(cameraFOV[0] * floatPI() / 360F), 0);
@@ -68,10 +68,12 @@ public class Renderer {
                     Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
                     Float4 bodyPosition = bodyPositions.get(hitIndex);
                     Float4 bodyColor = bodyColors.get(hitIndex);
+                    float bodyReflectivity = bodyReflectivities.get(hitIndex);
 
-                    pixels[x + y * width] = Color.toARGB(Color.add(
-                            Shader.getAmbient(bodyColor, lightColor),
-                            Shader.getDiffuse(hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)));
+                    pixels[x + y * width] = Color.toARGB(Color.add(Color.add(
+                                    Shader.getAmbient(bodyColor, lightColor),
+                                    Shader.getDiffuse(hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
+                            Shader.getSpecular(rayOrigin, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)));
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }
