@@ -88,18 +88,34 @@ public class Shader {
      */
     public static float getShadowFactor(Hit hit, World world) {
         Light light = world.getLight();
-
+        float lightRadius = light.getRadius();
+        Vector3f lightPos = light.getPosition();
         Vector3f hitPos = hit.getPosition();
-        Vector3f rayDir = light.getPosition().subtract(hitPos).normalize();
-        Vector3f rayOrigin = hitPos.add(rayDir.multiply(0.001F));
-        Ray ray = new Ray(rayOrigin, rayDir);
 
-        Hit closestHit = Renderer.getClosestHit(ray, world);
+        int sample = 8;
+        float uniform = lightRadius * 2 / (sample - 1);
 
-        if (closestHit == null || closestHit.getBody() == light)
+        int raysHit = 0;
+        float totalRays = (float) (sample * sample * 1.3);
+
+        for (float i = lightPos.getX() - lightRadius; i <= lightPos.getX() + lightRadius + 0.01F; i += uniform) {
+            for (float j = lightPos.getZ() - lightRadius; j <= lightPos.getZ() + lightRadius + 0.01F; j += uniform) {
+                Vector3f samplePoint = new Vector3f(i, lightPos.getY(), j);
+                Vector3f rayDir = samplePoint.subtract(hitPos).normalize();
+                Vector3f rayOrigin = hitPos.add(rayDir.multiply(0.001F));
+                Ray ray = new Ray(rayOrigin, rayDir);
+
+                Hit closestHit = Renderer.getClosestHit(ray, world);
+
+                if (closestHit != null && closestHit.getBody() != light)
+                    raysHit++;
+            }
+        }
+
+        if (raysHit == 0)
             return 1;
         else
-            return 0.6F;
+            return (1 + ((float) -raysHit / totalRays));
     }
 
     /**

@@ -16,7 +16,7 @@ public class Light extends Sphere {
      * @param color    the color
      */
     public Light(Vector3f position, Color color) {
-        super(position, 0.1F, color);
+        super(position, 0.3F, color);
     }
 
     /**

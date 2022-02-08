@@ -72,4 +72,8 @@ public class Sphere extends Body {
     public Vector3f getNormalAt(Vector3f point) {
         return point.subtract(position).normalize();
     }
+
+    public float getRadius() {
+        return radius;
+    }
 }
