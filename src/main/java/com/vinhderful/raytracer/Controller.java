@@ -30,7 +30,7 @@ public class Controller {
     public static final Float4 lightPosition = new Float4(-1F, 0.8F, -1F, 0);
     public static final Float4 lightColor = new Float4(1F, 1F, 1F, 0);
     // ==============================================================
-    public static final int NUM_BODIES = 4;
+    public static final int NUM_BODIES = 6;
 
     public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
     public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
@@ -95,20 +95,30 @@ public class Controller {
         bodyReflectivities.set(0, 8F);
 
         // Spheres
-        bodyPositions.set(1, new Float4(-1.5F, 0, 0, 0));
-        bodyRadii.set(1, 0.5F);
-        bodyColors.set(1, Color.RED);
-        bodyReflectivities.set(1, 8F);
+        bodyPositions.set(1, new Float4(-2F, 0, 0, 0));
+        bodyRadii.set(1, 0.3F);
+        bodyColors.set(1, Color.WHITE);
+        bodyReflectivities.set(1, 4F);
 
-        bodyPositions.set(2, new Float4(0, 0, 0, 0));
-        bodyRadii.set(2, 0.5F);
-        bodyColors.set(2, Color.GREEN);
-        bodyReflectivities.set(2, 16F);
+        bodyPositions.set(2, new Float4(-1F, 0, 0, 0));
+        bodyRadii.set(2, 0.3F);
+        bodyColors.set(2, Color.RED);
+        bodyReflectivities.set(2, 8F);
 
-        bodyPositions.set(3, new Float4(1.5F, 0, 0, 0));
-        bodyRadii.set(3, 0.5F);
-        bodyColors.set(3, Color.BLUE);
-        bodyReflectivities.set(3, 32F);
+        bodyPositions.set(3, new Float4(0, 0, 0, 0));
+        bodyRadii.set(3, 0.3F);
+        bodyColors.set(3, Color.GREEN);
+        bodyReflectivities.set(3, 16F);
+
+        bodyPositions.set(4, new Float4(1F, 0, 0, 0));
+        bodyRadii.set(4, 0.3F);
+        bodyColors.set(4, Color.BLUE);
+        bodyReflectivities.set(4, 32F);
+
+        bodyPositions.set(5, new Float4(2F, 0, 0, 0));
+        bodyRadii.set(5, 0.3F);
+        bodyColors.set(5, Color.BLACK);
+        bodyReflectivities.set(5, 64F);
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
