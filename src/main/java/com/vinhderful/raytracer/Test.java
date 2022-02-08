@@ -12,6 +12,8 @@ public class Test {
 
     // ==============================================================
     public static final Float4 worldBGColor = Color.BLACK;
+    public static final Float4 lightPosition = new Float4(-1F, 0.8F, -1F, 0);
+    public static final Float4 lightColor = new Float4(1F, 1F, 1F, 0);
     // ==============================================================
     public static final int NUM_BODIES = 3;
 
@@ -23,21 +25,20 @@ public class Test {
     public static float[] cameraPitch = {0};
     public static float[] cameraFOV = {60};
     public static float[] cameraYaw = {0};
-    // ==============================================================
 
     // ==============================================================
     public static void main(String[] args) {
 
-        bodyPositions.set(0, new Float4(-1F, 0, 2.5F, 0));
-        bodyRadii.set(0, 0.4F);
+        bodyPositions.set(0, new Float4(-1.5F, 0, 0, 0));
+        bodyRadii.set(0, 0.5F);
         bodyColors.set(0, Color.RED);
 
-        bodyPositions.set(1, new Float4(0, 0, 2.5F, 0));
-        bodyRadii.set(1, 0.4F);
+        bodyPositions.set(1, new Float4(0, 0, 0, 0));
+        bodyRadii.set(1, 0.5F);
         bodyColors.set(1, Color.GREEN);
 
-        bodyPositions.set(2, new Float4(1F, 0, 2.5F, 0));
-        bodyRadii.set(2, 0.4F);
+        bodyPositions.set(2, new Float4(1.5F, 0, 0, 0));
+        bodyRadii.set(2, 0.5F);
         bodyColors.set(2, Color.BLUE);
 
         int width = 1920;
@@ -49,7 +50,8 @@ public class Test {
         ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV);
         ts.task("t0", Renderer::render, width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
-                bodyPositions, bodyRadii, bodyColors, worldBGColor);
+                bodyPositions, bodyRadii, bodyColors,
+                worldBGColor, lightPosition, lightColor);
         ts.streamOut(pixels);
 
         // ==============================================================
@@ -71,7 +73,8 @@ public class Test {
 
         Renderer.render(width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
-                bodyPositions, bodyRadii, bodyColors, worldBGColor);
+                bodyPositions, bodyRadii, bodyColors,
+                worldBGColor, lightPosition, lightColor);
 
         endTime = System.nanoTime();
         System.out.println("Duration: " + (endTime - startTime) / 1000000.0 + " ms");

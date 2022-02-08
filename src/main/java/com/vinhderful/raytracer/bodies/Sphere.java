@@ -25,4 +25,8 @@ public class Sphere {
         } else
             return NO_INTERSECTION;
     }
+
+    public static Float4 getNormal(Float4 point, Float4 position) {
+        return Float4.normalise(Float4.sub(point, position));
+    }
 }

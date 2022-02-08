@@ -27,6 +27,8 @@ public class Controller {
 
     // ==============================================================
     public static final Float4 worldBGColor = Color.BLACK;
+    public static final Float4 lightPosition = new Float4(-1F, 0.8F, -1F, 0);
+    public static final Float4 lightColor = new Float4(1F, 1F, 1F, 0);
     // ==============================================================
     public static final int NUM_BODIES = 3;
 
@@ -59,16 +61,7 @@ public class Controller {
     public static void render(int width, int height, int[] pixels,
                               PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
                               TaskSchedule ts) {
-
         ts.execute();
-
-        /*
-        Renderer.render(width, height, pixels,
-                cameraPosition, cameraYaw, cameraPitch, cameraFOV,
-                bodyPositions, bodyRadii, bodyColors, worldBGColor);
-
-         */
-
         pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
     }
 
@@ -93,16 +86,16 @@ public class Controller {
         int[] pixels = new int[width * height];
 
         // ==============================================================
-        bodyPositions.set(0, new Float4(-1F, 0, 2.5F, 0));
-        bodyRadii.set(0, 0.4F);
+        bodyPositions.set(0, new Float4(-1.5F, 0, 0, 0));
+        bodyRadii.set(0, 0.5F);
         bodyColors.set(0, Color.RED);
 
-        bodyPositions.set(1, new Float4(0, 0, 2.5F, 0));
-        bodyRadii.set(1, 0.4F);
+        bodyPositions.set(1, new Float4(0, 0, 0, 0));
+        bodyRadii.set(1, 0.5F);
         bodyColors.set(1, Color.GREEN);
 
-        bodyPositions.set(2, new Float4(1F, 0, 2.5F, 0));
-        bodyRadii.set(2, 0.4F);
+        bodyPositions.set(2, new Float4(1.5F, 0, 0, 0));
+        bodyRadii.set(2, 0.5F);
         bodyColors.set(2, Color.BLUE);
 
         // ==============================================================
@@ -110,7 +103,8 @@ public class Controller {
         ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV);
         ts.task("t0", Renderer::render, width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
-                bodyPositions, bodyRadii, bodyColors, worldBGColor);
+                bodyPositions, bodyRadii, bodyColors,
+                worldBGColor, lightPosition, lightColor);
         ts.streamOut(pixels);
 
         // ==============================================================

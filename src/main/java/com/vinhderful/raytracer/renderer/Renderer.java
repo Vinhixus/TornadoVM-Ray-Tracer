@@ -3,7 +3,6 @@ package com.vinhderful.raytracer.renderer;
 import com.vinhderful.raytracer.bodies.Sphere;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.VectorOps;
-import uk.ac.manchester.tornado.api.annotations.Parallel;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
@@ -50,23 +49,26 @@ public class Renderer {
     public static void render(int width, int height, int[] pixels,
                               float[] cameraPosition, float[] cameraYaw, float[] cameraPitch, float[] cameraFOV,
                               VectorFloat4 bodyPositions, VectorFloat bodyRadii, VectorFloat4 bodyColors,
-                              Float4 worldBGColor) {
+                              Float4 worldBGColor, Float4 lightPosition, Float4 lightColor) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(cameraFOV[0] * floatPI() / 360F), 0);
+        Float4 rayOrigin = new Float4(cameraPosition[0], cameraPosition[1], cameraPosition[2], 0);
 
-        for (@Parallel int x = 0; x < width; x++)
-            for (@Parallel int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++) {
 
                 Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
-                Float4 rayOrigin = new Float4(cameraPosition[0], cameraPosition[1], cameraPosition[2], 0);
                 Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), cameraYaw[0], cameraPitch[0]);
 
                 Float4 hit = getClosestHit(bodyPositions, bodyRadii, rayOrigin, rayDirection);
                 int hitIndex = (int) hit.getW();
 
-                if (hitIndex != -1)
-                    pixels[x + y * width] = Color.toARGB(bodyColors.get(hitIndex));
-                else
+                if (hitIndex != -1) {
+                    Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
+                    Float4 bodyPosition = bodyPositions.get(hitIndex);
+                    Float4 bodyColor = bodyColors.get(hitIndex);
+                    pixels[x + y * width] = Color.toARGB(Shader.getDiffuse(hitPosition, bodyPosition, bodyColor, lightPosition, lightColor));
+                } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }
     }
