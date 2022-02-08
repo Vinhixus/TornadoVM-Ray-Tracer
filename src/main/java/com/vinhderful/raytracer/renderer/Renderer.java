@@ -21,7 +21,6 @@ public class Renderer {
 
         Float4 closestHit = new Float4(-1000F, -1000F, -1000F, -1000F);
 
-        // Body Intersection
         for (int i = 0; i < bodyPositions.getLength(); i++) {
             Float4 intersection = Body.getIntersection(i, bodyPositions.get(i), bodyRadii.get(i), rayOrigin, rayDirection);
 
