@@ -3,6 +3,7 @@ package com.vinhderful.raytracer.renderer;
 import com.vinhderful.raytracer.bodies.Sphere;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.VectorOps;
+import uk.ac.manchester.tornado.api.annotations.Parallel;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
@@ -54,8 +55,8 @@ public class Renderer {
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(cameraFOV[0] * floatPI() / 360F), 0);
         Float4 rayOrigin = new Float4(cameraPosition[0], cameraPosition[1], cameraPosition[2], 0);
 
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++) {
+        for (@Parallel int x = 0; x < width; x++)
+            for (@Parallel int y = 0; y < height; y++) {
 
                 Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
                 Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), cameraYaw[0], cameraPitch[0]);
