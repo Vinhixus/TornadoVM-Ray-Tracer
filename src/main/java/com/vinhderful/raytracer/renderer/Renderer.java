@@ -1,6 +1,6 @@
 package com.vinhderful.raytracer.renderer;
 
-import com.vinhderful.raytracer.bodies.Sphere;
+import com.vinhderful.raytracer.bodies.Body;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.VectorOps;
 import uk.ac.manchester.tornado.api.annotations.Parallel;
@@ -19,14 +19,14 @@ public class Renderer {
     public static Float4 getClosestHit(VectorFloat4 bodyPositions, VectorFloat bodyRadii,
                                        Float4 rayOrigin, Float4 rayDirection) {
 
-        Float4 closestHit = new Float4(-1F, -1F, -1F, -1F);
+        Float4 closestHit = new Float4(-1000F, -1000F, -1000F, -1000F);
 
+        // Body Intersection
         for (int i = 0; i < bodyPositions.getLength(); i++) {
+            Float4 intersection = Body.getIntersection(i, bodyPositions.get(i), bodyRadii.get(i), rayOrigin, rayDirection);
 
-            Float4 intersection = Sphere.getIntersection(bodyPositions.get(i), bodyRadii.get(i), rayOrigin, rayDirection);
-
-            if (intersection.getW() == 0 && (closestHit.getW() == -1F ||
-                    VectorOps.distance(bodyPositions.get((int) closestHit.getW()), rayOrigin) > VectorOps.distance(intersection, rayOrigin)))
+            if (intersection.getW() == 0 && (closestHit.getW() == -1000F ||
+                    VectorOps.distance(closestHit, rayOrigin) > VectorOps.distance(intersection, rayOrigin)))
                 closestHit = new Float4(intersection.getX(), intersection.getY(), intersection.getZ(), i);
         }
 
@@ -64,16 +64,19 @@ public class Renderer {
                 Float4 hit = getClosestHit(bodyPositions, bodyRadii, rayOrigin, rayDirection);
                 int hitIndex = (int) hit.getW();
 
-                if (hitIndex != -1) {
+                if (hitIndex != -1000) {
                     Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
                     Float4 bodyPosition = bodyPositions.get(hitIndex);
-                    Float4 bodyColor = bodyColors.get(hitIndex);
                     float bodyReflectivity = bodyReflectivities.get(hitIndex);
+
+                    Float4 bodyColor;
+                    if (hitIndex == 0) bodyColor = Body.getPlaneColor(hitPosition);
+                    else bodyColor = bodyColors.get(hitIndex);
 
                     pixels[x + y * width] = Color.toARGB(Color.add(Color.add(
                                     Shader.getAmbient(bodyColor, lightColor),
-                                    Shader.getDiffuse(hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
-                            Shader.getSpecular(rayOrigin, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)));
+                                    Shader.getDiffuse(hitIndex, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
+                            Shader.getSpecular(rayOrigin, hitIndex, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)));
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }

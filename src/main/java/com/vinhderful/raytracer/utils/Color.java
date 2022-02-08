@@ -17,6 +17,9 @@ public class Color {
     public static final Float4 RED = new Float4(1F, 0, 0, 0);
     public static final Float4 GREEN = new Float4(0, 1F, 0, 0);
     public static final Float4 BLUE = new Float4(0, 0, 1F, 0);
+    public static final Float4 GRAY = new Float4(0.5F, 0.5F, 0.5F, 0);
+    public static final Float4 DARK_GRAY = new Float4(0.2F, 0.2F, 0.2F, 0);
+
 
     public static Float4 add(Float4 a, Float4 b) {
         return new Float4(

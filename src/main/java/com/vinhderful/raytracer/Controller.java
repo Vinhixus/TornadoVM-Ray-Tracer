@@ -30,7 +30,7 @@ public class Controller {
     public static final Float4 lightPosition = new Float4(-1F, 0.8F, -1F, 0);
     public static final Float4 lightColor = new Float4(1F, 1F, 1F, 0);
     // ==============================================================
-    public static final int NUM_BODIES = 3;
+    public static final int NUM_BODIES = 4;
 
     public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
     public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
@@ -78,6 +78,7 @@ public class Controller {
     @FXML
     public void initialize() {
 
+        // ==============================================================
         GraphicsContext g = canvas.getGraphicsContext2D();
         PixelWriter pixelWriter = g.getPixelWriter();
         int width = (int) g.getCanvas().getWidth();
@@ -85,22 +86,29 @@ public class Controller {
 
         WritablePixelFormat<IntBuffer> format = WritablePixelFormat.getIntArgbInstance();
         int[] pixels = new int[width * height];
-
         // ==============================================================
-        bodyPositions.set(0, new Float4(-1.5F, 0, 0, 0));
-        bodyRadii.set(0, 0.5F);
-        bodyColors.set(0, Color.RED);
+
+        // Plane
+        bodyPositions.set(0, new Float4(0, -1F, 0, 0));
+        bodyRadii.set(0, -1F);
+        bodyColors.set(0, Color.BLACK);
         bodyReflectivities.set(0, 8F);
 
-        bodyPositions.set(1, new Float4(0, 0, 0, 0));
+        // Spheres
+        bodyPositions.set(1, new Float4(-1.5F, 0, 0, 0));
         bodyRadii.set(1, 0.5F);
-        bodyColors.set(1, Color.GREEN);
-        bodyReflectivities.set(1, 16F);
+        bodyColors.set(1, Color.RED);
+        bodyReflectivities.set(1, 8F);
 
-        bodyPositions.set(2, new Float4(1.5F, 0, 0, 0));
+        bodyPositions.set(2, new Float4(0, 0, 0, 0));
         bodyRadii.set(2, 0.5F);
-        bodyColors.set(2, Color.BLUE);
-        bodyReflectivities.set(2, 32F);
+        bodyColors.set(2, Color.GREEN);
+        bodyReflectivities.set(2, 16F);
+
+        bodyPositions.set(3, new Float4(1.5F, 0, 0, 0));
+        bodyRadii.set(3, 0.5F);
+        bodyColors.set(3, Color.BLUE);
+        bodyReflectivities.set(3, 32F);
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
