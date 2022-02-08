@@ -3,6 +3,8 @@ package com.vinhderful.raytracer.renderer;
 import com.vinhderful.raytracer.bodies.Body;
 import com.vinhderful.raytracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.pow;
@@ -39,5 +41,34 @@ public class Shader {
         float specularBrightness = pow(specularFactor, bodyReflectivity);
 
         return Color.mult(Color.mult(lightColor, specularBrightness), SPECULAR_STRENGTH);
+    }
+
+    public static float getShadow(Float4 hitPosition,
+                                  VectorFloat4 bodyPositions, VectorFloat bodyRadii,
+                                  Float4 lightPosition) {
+
+        float lightRadius = 0.3F;
+
+        int sample = 12;
+        float uniform = lightRadius * 2 / (sample - 1);
+
+        int raysHit = 0;
+        int totalRays = sample * sample;
+
+        for (float i = lightPosition.getX() - lightRadius; i <= lightPosition.getX() + lightRadius + 0.01F; i += uniform) {
+            for (float j = lightPosition.getZ() - lightRadius; j <= lightPosition.getZ() + lightRadius + 0.01F; j += uniform) {
+                Float4 samplePoint = new Float4(i, lightPosition.getY(), j, 0);
+                Float4 rayDir = Float4.normalise(Float4.sub(samplePoint, hitPosition));
+                Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDir, 0.001F));
+
+                Float4 closestHit = Renderer.getClosestHit(bodyPositions, bodyRadii, rayOrigin, rayDir);
+
+                if (closestHit.getW() != -1000F)
+                    raysHit++;
+            }
+        }
+
+        if (raysHit == 0) return 1;
+        else return 1 + -raysHit / (totalRays * 1.3F);
     }
 }
