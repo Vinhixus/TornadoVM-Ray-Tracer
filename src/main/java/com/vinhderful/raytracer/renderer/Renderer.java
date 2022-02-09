@@ -7,6 +7,7 @@ import uk.ac.manchester.tornado.api.annotations.Parallel;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.collections.types.VectorInt;
 
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatPI;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatTan;
@@ -16,7 +17,7 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatTan
  */
 public class Renderer {
 
-    public static Float4 getClosestHit(VectorFloat4 bodyPositions, VectorFloat bodyRadii,
+    public static Float4 getClosestHit(VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodyRadii,
                                        Float4 rayOrigin, Float4 rayDirection) {
 
         Float4 closestHit = new Float4(-1000F, -1000F, -1000F, -1000F);
@@ -47,7 +48,7 @@ public class Renderer {
     }
 
     public static void render(int[] dimensions, int[] pixels, float[] camera,
-                              VectorFloat4 bodyPositions, VectorFloat bodyRadii, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
+                              VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
                               Float4 worldBGColor, Float4 lightPosition, Float4 lightColor, int[] sample) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * floatPI() / 360F), 0);
@@ -62,23 +63,25 @@ public class Renderer {
                 Float4 normalizedCoords = new Float4(getNormalizedX(dimensions[0], dimensions[1], x), getNormalizedY(dimensions[0], dimensions[1], y), 0, 0);
                 Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), camera[3], camera[4]);
 
-                Float4 hit = getClosestHit(bodyPositions, bodyRadii, camPos, rayDirection);
+                Float4 hit = getClosestHit(bodyTypes, bodyPositions, bodySizes, camPos, rayDirection);
                 int hitIndex = (int) hit.getW();
 
                 if (hitIndex != -1000) {
                     Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
+
+                    int bodyType = bodyTypes.get(hitIndex);
                     Float4 bodyPosition = bodyPositions.get(hitIndex);
                     float bodyReflectivity = bodyReflectivities.get(hitIndex);
 
                     Float4 bodyColor;
-                    if (hitIndex == 0) bodyColor = Body.getPlaneColor(hitPosition);
+                    if (bodyType == 0) bodyColor = Body.getPlaneColor(hitPosition);
                     else bodyColor = bodyColors.get(hitIndex);
 
                     pixels[x + y * width] = Color.toARGB(Color.mult(Color.add(Color.add(
                                             Shader.getAmbient(bodyColor, lightColor),
-                                            Shader.getDiffuse(hitIndex, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
-                                    Shader.getSpecular(camPos, hitIndex, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)),
-                            Shader.getShadow(sample[0], hitPosition, bodyPositions, bodyRadii, lightPosition)));
+                                            Shader.getDiffuse(bodyType, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
+                                    Shader.getSpecular(camPos, bodyType, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)),
+                            Shader.getShadow(sample[0], hitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition)));
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }

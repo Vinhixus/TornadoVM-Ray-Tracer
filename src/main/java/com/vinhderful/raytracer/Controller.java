@@ -18,6 +18,7 @@ import uk.ac.manchester.tornado.api.WorkerGrid2D;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.collections.types.VectorInt;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
@@ -29,26 +30,25 @@ import java.nio.IntBuffer;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Controller {
 
-    public static GridScheduler grid;
-
-    // ==============================================================
-    public static final Float4 worldBGColor = Color.BLACK;
-    public static final Float4 lightPosition = new Float4(-1F, 0.8F, -1F, 0);
-    public static final Float4 lightColor = new Float4(1F, 1F, 1F, 0);
-    // ==============================================================
-    public static final int NUM_BODIES = 4;
-    public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
-    public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
-    public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
-    public static final VectorFloat bodyReflectivities = new VectorFloat(NUM_BODIES);
     private static final double[] frameRates = new double[100];
-
     // ==============================================================
-    private static final float[] camera = {0, 0, -4F, 0, 0, 60};
+    private static float[] camera;
+    private static int[] dimensions;
+    private static int[] softShadowSampleSize;
+    private static GridScheduler grid;
+    // ==============================================================
+    private static Float4 worldBGColor;
+    private static Float4 lightPosition;
+    private static Float4 lightColor;
+    // ==============================================================
+    private static VectorInt bodyTypes;
+    private static VectorFloat4 bodyPositions;
+    private static VectorFloat bodySizes;
+    private static VectorFloat4 bodyColors;
+    private static VectorFloat bodyReflectivities;
+    // ==============================================================
     private static int[] pixels;
-    private static final int[] dimensions = new int[2];
-    private static final int[] softShadowSampleSize = {1};
-
+    private static GraphicsContext g;
     private static PixelWriter pixelWriter;
     private static WritablePixelFormat<IntBuffer> format;
     // ==============================================================
@@ -82,6 +82,68 @@ public class Controller {
         return total / frameRates.length;
     }
 
+    public static void setRenderingProperties() {
+        int width = (int) g.getCanvas().getWidth();
+        int height = (int) g.getCanvas().getHeight();
+
+        dimensions = new int[]{width, height};
+        pixels = new int[dimensions[0] * dimensions[1]];
+
+        format = WritablePixelFormat.getIntArgbInstance();
+        pixelWriter = g.getPixelWriter();
+
+        camera = new float[]{0, 0, -4F, 0, 0, 60};
+        softShadowSampleSize = new int[]{1};
+    }
+
+    public static void setWorldProperties() {
+
+        // Background color
+        worldBGColor = Color.BLACK;
+
+        // Light source properties
+        lightPosition = new Float4(-1F, 0.8F, -1F, 0);
+        lightColor = new Float4(1F, 1F, 1F, 0);
+    }
+
+    public static void populateWorld() {
+
+        // Number of bodies
+        final int NUM_BODIES = 4;
+
+        bodyTypes = new VectorInt(NUM_BODIES);
+        bodyPositions = new VectorFloat4(NUM_BODIES);
+        bodySizes = new VectorFloat(NUM_BODIES);
+        bodyColors = new VectorFloat4(NUM_BODIES);
+        bodyReflectivities = new VectorFloat(NUM_BODIES);
+
+        // Planes
+        bodyTypes.set(0, 0);
+        bodyPositions.set(0, new Float4(0, -1F, 0, 0));
+        bodySizes.set(0, -1F);
+        bodyColors.set(0, Color.BLACK);
+        bodyReflectivities.set(0, 8F);
+
+        // Spheres
+        bodyTypes.set(1, 2);
+        bodyPositions.set(1, new Float4(-1F, 0, 0, 0));
+        bodySizes.set(1, 0.3F);
+        bodyColors.set(1, Color.RED);
+        bodyReflectivities.set(1, 8F);
+
+        bodyTypes.set(2, 2);
+        bodyPositions.set(2, new Float4(0, 0, 0, 0));
+        bodySizes.set(2, 0.3F);
+        bodyColors.set(2, Color.GREEN);
+        bodyReflectivities.set(2, 16F);
+
+        bodyTypes.set(3, 2);
+        bodyPositions.set(3, new Float4(1F, 0, 0, 0));
+        bodySizes.set(3, 0.3F);
+        bodyColors.set(3, Color.BLUE);
+        bodyReflectivities.set(3, 32F);
+    }
+
     /**
      * Initialise renderer, world, camera and populate with objects
      */
@@ -89,43 +151,17 @@ public class Controller {
     public void initialize() {
 
         // ==============================================================
-        GraphicsContext g = canvas.getGraphicsContext2D();
+        g = canvas.getGraphicsContext2D();
 
-        format = WritablePixelFormat.getIntArgbInstance();
-        pixelWriter = g.getPixelWriter();
-
-        dimensions[0] = (int) g.getCanvas().getWidth();
-        dimensions[1] = (int) g.getCanvas().getHeight();
-        pixels = new int[dimensions[0] * dimensions[1]];
-        // ==============================================================
-
-        // Plane
-        bodyPositions.set(0, new Float4(0, -1F, 0, 0));
-        bodyRadii.set(0, -1F);
-        bodyColors.set(0, Color.BLACK);
-        bodyReflectivities.set(0, 8F);
-
-        // Spheres
-        bodyPositions.set(1, new Float4(-1F, 0, 0, 0));
-        bodyRadii.set(1, 0.3F);
-        bodyColors.set(1, Color.RED);
-        bodyReflectivities.set(1, 8F);
-
-        bodyPositions.set(2, new Float4(0, 0, 0, 0));
-        bodyRadii.set(2, 0.3F);
-        bodyColors.set(2, Color.GREEN);
-        bodyReflectivities.set(2, 16F);
-
-        bodyPositions.set(3, new Float4(1F, 0, 0, 0));
-        bodyRadii.set(3, 0.3F);
-        bodyColors.set(3, Color.BLUE);
-        bodyReflectivities.set(3, 32F);
+        setRenderingProperties();
+        setWorldProperties();
+        populateWorld();
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
         ts.streamIn(dimensions, camera, softShadowSampleSize);
         ts.task("t0", Renderer::render, dimensions, pixels, camera,
-                bodyPositions, bodyRadii, bodyColors, bodyReflectivities,
+                bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 worldBGColor, lightPosition, lightColor, softShadowSampleSize);
         ts.streamOut(pixels);
 
@@ -146,7 +182,6 @@ public class Controller {
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
 
         ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
-
         // ==============================================================
         AnimationTimer timer = new AnimationTimer() {
 

@@ -9,13 +9,13 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatSqr
  */
 public class Body {
 
-    public static Float4 getIntersection(int index, Float4 position, float radius,
+    public static Float4 getIntersection(int bodyType, Float4 position, float radius,
                                          Float4 rayOrigin, Float4 rayDirection) {
 
         final Float4 NO_INTERSECTION = new Float4(-1F, -1F, -1F, -1F);
 
         // Plane
-        if (index == 0) {
+        if (bodyType == 0) {
             float t = -(rayOrigin.getY() - position.getY()) / rayDirection.getY();
             if (t > 0 && Float.isFinite(t))
                 return Float4.add(rayOrigin, Float4.mult(rayDirection, t));
@@ -39,8 +39,8 @@ public class Body {
         }
     }
 
-    public static Float4 getNormal(int index, Float4 point, Float4 position) {
-        if (index == 0) return new Float4(0, 1F, 0, 0);
+    public static Float4 getNormal(int bodyType, Float4 point, Float4 position) {
+        if (bodyType == 0) return new Float4(0, 1F, 0, 0);
         else return Float4.normalise(Float4.sub(point, position));
     }
 

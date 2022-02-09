@@ -5,6 +5,7 @@ import com.vinhderful.raytracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.collections.types.VectorInt;
 
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.pow;
@@ -17,14 +18,14 @@ public class Shader {
         return Color.mult(Color.mult(bodyColor, lightColor), AMBIENT_STRENGTH);
     }
 
-    public static Float4 getDiffuse(int hitIndex, Float4 hitPosition,
+    public static Float4 getDiffuse(int bodyType, Float4 hitPosition,
                                     Float4 bodyPosition, Float4 bodyColor,
                                     Float4 lightPosition, Float4 lightColor) {
-        float diffuseBrightness = max(0, Float4.dot(Body.getNormal(hitIndex, hitPosition, bodyPosition), Float4.normalise(Float4.sub(lightPosition, hitPosition))));
+        float diffuseBrightness = max(0, Float4.dot(Body.getNormal(bodyType, hitPosition, bodyPosition), Float4.normalise(Float4.sub(lightPosition, hitPosition))));
         return Color.mult(Color.mult(bodyColor, lightColor), diffuseBrightness);
     }
 
-    public static Float4 getSpecular(Float4 cameraPosition, int hitIndex, Float4 hitPosition,
+    public static Float4 getSpecular(Float4 cameraPosition, int bodyType, Float4 hitPosition,
                                      Float4 bodyPosition, float bodyReflectivity,
                                      Float4 lightPosition, Float4 lightColor) {
 
@@ -34,8 +35,8 @@ public class Shader {
         Float4 lightDirection = Float4.normalise(Float4.sub(lightPosition, hitPosition));
 
         Float4 reflectionVector = Float4.sub(lightDirection,
-                Float4.mult(Body.getNormal(hitIndex, hitPosition, bodyPosition),
-                        2 * Float4.dot(lightDirection, Body.getNormal(hitIndex, hitPosition, bodyPosition))));
+                Float4.mult(Body.getNormal(bodyType, hitPosition, bodyPosition),
+                        2 * Float4.dot(lightDirection, Body.getNormal(bodyType, hitPosition, bodyPosition))));
 
         float specularFactor = max(0, Float4.dot(reflectionVector, rayDirection));
         float specularBrightness = pow(specularFactor, bodyReflectivity);
@@ -44,7 +45,7 @@ public class Shader {
     }
 
     public static float getShadow(int sample, Float4 hitPosition,
-                                  VectorFloat4 bodyPositions, VectorFloat bodyRadii,
+                                  VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes,
                                   Float4 lightPosition) {
 
         float lightRadius = 0.3F;
@@ -59,7 +60,7 @@ public class Shader {
                 Float4 rayDir = Float4.normalise(Float4.sub(samplePoint, hitPosition));
                 Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDir, 0.001F));
 
-                Float4 closestHit = Renderer.getClosestHit(bodyPositions, bodyRadii, rayOrigin, rayDir);
+                Float4 closestHit = Renderer.getClosestHit(bodyTypes, bodyPositions, bodySizes, rayOrigin, rayDir);
 
                 if (closestHit.getW() != -1000F)
                     raysHit++;
