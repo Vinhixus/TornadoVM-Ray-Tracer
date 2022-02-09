@@ -103,15 +103,15 @@ public class Controller {
         worldBGColor = Color.BLACK;
 
         // Light source properties
-        lightPosition = new Float4(-1F, 0.8F, -1F, 0);
+        lightPosition = new Float4(2F, 1.5F, -1.5F, 0);
         lightSize = new float[]{0.3F};
-        lightColor = new Float4(1F, 1F, 1F, 0);
+        lightColor = Color.WHITE;
     }
 
     private static void populateWorld() {
 
         // Number of bodies
-        final int NUM_BODIES = 4;
+        final int NUM_BODIES = 5;
 
         bodyTypes = new VectorInt(NUM_BODIES);
         bodyPositions = new VectorFloat4(NUM_BODIES);
@@ -126,24 +126,31 @@ public class Controller {
         bodyColors.set(0, Color.BLACK);
         bodyReflectivities.set(0, 8F);
 
-        // Spheres
-        bodyTypes.set(1, 2);
-        bodyPositions.set(1, new Float4(-1F, 0, 0, 0));
-        bodySizes.set(1, 0.3F);
-        bodyColors.set(1, Color.RED);
-        bodyReflectivities.set(1, 8F);
+        // Cubes
+        bodyTypes.set(1, 1);
+        bodyPositions.set(1, new Float4(1.5F, 0, 2.5F, 0));
+        bodySizes.set(1, 2F);
+        bodyColors.set(1, Color.GRAY);
+        bodyReflectivities.set(1, 16F);
 
+        // Spheres
         bodyTypes.set(2, 2);
-        bodyPositions.set(2, new Float4(0, 0, 0, 0));
-        bodySizes.set(2, 0.3F);
-        bodyColors.set(2, Color.GREEN);
-        bodyReflectivities.set(2, 16F);
+        bodyPositions.set(2, new Float4(-1.5F, 0, 0, 0));
+        bodySizes.set(2, 0.5F);
+        bodyColors.set(2, Color.RED);
+        bodyReflectivities.set(2, 8F);
 
         bodyTypes.set(3, 2);
-        bodyPositions.set(3, new Float4(1F, 0, 0, 0));
-        bodySizes.set(3, 0.3F);
-        bodyColors.set(3, Color.BLUE);
-        bodyReflectivities.set(3, 32F);
+        bodyPositions.set(3, new Float4(0, 0, 0, 0));
+        bodySizes.set(3, 0.5F);
+        bodyColors.set(3, Color.GREEN);
+        bodyReflectivities.set(3, 16F);
+
+        bodyTypes.set(4, 2);
+        bodyPositions.set(4, new Float4(1.5F, 0, 0, 0));
+        bodySizes.set(4, 0.5F);
+        bodyColors.set(4, Color.BLUE);
+        bodyReflectivities.set(4, 32F);
     }
 
     /**
