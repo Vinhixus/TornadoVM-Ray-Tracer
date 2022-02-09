@@ -31,12 +31,12 @@ public class Controller {
     public static final Float4 lightColor = new Float4(1F, 1F, 1F, 0);
     // ==============================================================
     public static final int NUM_BODIES = 4;
-
     public static final VectorFloat4 bodyPositions = new VectorFloat4(NUM_BODIES);
     public static final VectorFloat bodyRadii = new VectorFloat(NUM_BODIES);
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
     public static final VectorFloat bodyReflectivities = new VectorFloat(NUM_BODIES);
     private static final double[] frameRates = new double[100];
+    public static int[] softShadowSampleSize = {1};
     // ==============================================================
     public static float[] cameraPosition = {0, 0, -4F};
     public static float[] cameraPitch = {0};
@@ -57,6 +57,7 @@ public class Controller {
     public Slider camYaw;
     public Slider camPitch;
     public Slider camFOV;
+    public Slider ssSample;
 
     // ==============================================================
     public static void render(int width, int height, int[] pixels,
@@ -112,11 +113,11 @@ public class Controller {
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV);
+        ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV, softShadowSampleSize);
         ts.task("t0", Renderer::render, width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
                 bodyPositions, bodyRadii, bodyColors, bodyReflectivities,
-                worldBGColor, lightPosition, lightColor);
+                worldBGColor, lightPosition, lightColor, softShadowSampleSize);
         ts.streamOut(pixels);
 
         // ==============================================================
@@ -126,6 +127,8 @@ public class Controller {
         camYaw.valueProperty().addListener((observable, oldValue, newValue) -> cameraYaw[0] = newValue.floatValue());
         camPitch.valueProperty().addListener((observable, oldValue, newValue) -> cameraPitch[0] = newValue.floatValue());
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> cameraFOV[0] = newValue.floatValue());
+
+        ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
 
         // ==============================================================
         AnimationTimer timer = new AnimationTimer() {

@@ -68,13 +68,14 @@ public class Test {
         int height = 1080;
 
         int[] pixels = new int[width * height];
+        int[] softShadowSampleSize = {12};
 
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV);
+        ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV, softShadowSampleSize);
         ts.task("t0", Renderer::render, width, height, pixels,
                 cameraPosition, cameraYaw, cameraPitch, cameraFOV,
                 bodyPositions, bodyRadii, bodyColors, bodyReflectivities,
-                worldBGColor, lightPosition, lightColor);
+                worldBGColor, lightPosition, lightColor, softShadowSampleSize);
         ts.streamOut(pixels);
 
         // ==============================================================
@@ -101,7 +102,7 @@ public class Test {
             Renderer.render(width, height, pixels,
                     cameraPosition, cameraYaw, cameraPitch, cameraFOV,
                     bodyPositions, bodyRadii, bodyColors, bodyReflectivities,
-                    worldBGColor, lightPosition, lightColor);
+                    worldBGColor, lightPosition, lightColor, softShadowSampleSize);
 
         endTime = System.nanoTime();
         System.out.println("Duration: " + (endTime - startTime) / 1000000.0 + " ms");

@@ -49,7 +49,7 @@ public class Renderer {
     public static void render(int width, int height, int[] pixels,
                               float[] cameraPosition, float[] cameraYaw, float[] cameraPitch, float[] cameraFOV,
                               VectorFloat4 bodyPositions, VectorFloat bodyRadii, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              Float4 worldBGColor, Float4 lightPosition, Float4 lightColor) {
+                              Float4 worldBGColor, Float4 lightPosition, Float4 lightColor, int[] sample) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(cameraFOV[0] * floatPI() / 360F), 0);
         Float4 rayOrigin = new Float4(cameraPosition[0], cameraPosition[1], cameraPosition[2], 0);
@@ -76,7 +76,7 @@ public class Renderer {
                                             Shader.getAmbient(bodyColor, lightColor),
                                             Shader.getDiffuse(hitIndex, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
                                     Shader.getSpecular(rayOrigin, hitIndex, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)),
-                            Shader.getShadow(hitPosition, bodyPositions, bodyRadii, lightPosition)));
+                            Shader.getShadow(sample[0], hitPosition, bodyPositions, bodyRadii, lightPosition)));
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }

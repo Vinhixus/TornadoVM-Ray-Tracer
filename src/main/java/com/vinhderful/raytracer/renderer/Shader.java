@@ -43,13 +43,11 @@ public class Shader {
         return Color.mult(Color.mult(lightColor, specularBrightness), SPECULAR_STRENGTH);
     }
 
-    public static float getShadow(Float4 hitPosition,
+    public static float getShadow(int sample, Float4 hitPosition,
                                   VectorFloat4 bodyPositions, VectorFloat bodyRadii,
                                   Float4 lightPosition) {
 
         float lightRadius = 0.3F;
-
-        int sample = 12;
         float uniform = lightRadius * 2 / (sample - 1);
 
         int raysHit = 0;
