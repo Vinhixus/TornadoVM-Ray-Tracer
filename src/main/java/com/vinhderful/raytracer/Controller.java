@@ -11,10 +11,15 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.Pane;
+import uk.ac.manchester.tornado.api.GridScheduler;
 import uk.ac.manchester.tornado.api.TaskSchedule;
+import uk.ac.manchester.tornado.api.WorkerGrid;
+import uk.ac.manchester.tornado.api.WorkerGrid2D;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.common.TornadoDevice;
+import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
 import java.nio.IntBuffer;
 
@@ -24,6 +29,7 @@ import java.nio.IntBuffer;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Controller {
 
+    public static GridScheduler grid;
 
     // ==============================================================
     public static final Float4 worldBGColor = Color.BLACK;
@@ -63,7 +69,7 @@ public class Controller {
     public static void render(int width, int height, int[] pixels,
                               PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
                               TaskSchedule ts) {
-        ts.execute();
+        ts.execute(grid);
         pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
     }
 
@@ -119,6 +125,14 @@ public class Controller {
                 bodyPositions, bodyRadii, bodyColors, bodyReflectivities,
                 worldBGColor, lightPosition, lightColor, softShadowSampleSize);
         ts.streamOut(pixels);
+
+        WorkerGrid worker = new WorkerGrid2D(width, height);
+        worker.setLocalWork(32, 16, 1);
+        grid = new GridScheduler();
+        grid.setWorkerGrid("s0.t0", worker);
+
+        TornadoDevice device = TornadoRuntime.getTornadoRuntime().getDriver(0).getDevice(1);
+        ts.mapAllTo(device);
 
         // ==============================================================
         camX.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition[0] = newValue.floatValue());

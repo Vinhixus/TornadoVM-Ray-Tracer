@@ -12,11 +12,11 @@
 <BorderPane stylesheets="@GUI.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vinhderful.raytracer.Controller">
     <center>
         <Pane fx:id="pane" BorderPane.alignment="CENTER">
-            <Canvas fx:id="canvas" height="900" width="1600" />
+            <Canvas fx:id="canvas" height="512" width="1024" />
         </Pane>
     </center>
     <right>
-        <VBox prefHeight="900.0" prefWidth="300.0" BorderPane.alignment="CENTER">
+        <VBox prefWidth="300.0" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
@@ -42,7 +42,7 @@
                 </VBox.margin>
             </Separator>
          <Label alignment="CENTER" contentDisplay="CENTER" text="Soft Shadow Sample" />
-         <Slider id="camFOV" fx:id="ssSample" blockIncrement="1.0" majorTickUnit="1.0" max="16.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+         <Slider id="camFOV" fx:id="ssSample" blockIncrement="1.0" majorTickUnit="4.0" max="25.0" min="1.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
          <Separator prefWidth="200.0">
             <VBox.margin>
                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
