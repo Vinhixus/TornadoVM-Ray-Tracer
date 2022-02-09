@@ -26,8 +26,8 @@ public class Cube extends Body {
 
     @Override
     public Vector3f getIntersection(Ray ray) {
-        float t1, t2, tnear = Float.NEGATIVE_INFINITY, tfar = Float.POSITIVE_INFINITY, temp;
-        boolean intersectFlag = true;
+        float t1, t2, tNear = Float.NEGATIVE_INFINITY, tFar = Float.POSITIVE_INFINITY;
+        boolean intersects = true;
         float[] rayDirection = ray.getDirection().toArray();
         float[] rayOrigin = ray.getOrigin().toArray();
         float[] b1 = min.toArray();
@@ -36,29 +36,29 @@ public class Cube extends Body {
         for (int i = 0; i < 3; i++) {
             if (rayDirection[i] == 0) {
                 if (rayOrigin[i] < b1[i] || rayOrigin[i] > b2[i])
-                    intersectFlag = false;
+                    intersects = false;
             } else {
                 t1 = (b1[i] - rayOrigin[i]) / rayDirection[i];
                 t2 = (b2[i] - rayOrigin[i]) / rayDirection[i];
+
+
                 if (t1 > t2) {
-                    temp = t1;
+                    float temp = t1;
                     t1 = t2;
                     t2 = temp;
                 }
-                if (t1 > tnear)
-                    tnear = t1;
-                if (t2 < tfar)
-                    tfar = t2;
-                if (tnear > tfar)
-                    intersectFlag = false;
-                if (tfar < 0)
-                    intersectFlag = false;
+
+                if (t1 > tNear)
+                    tNear = t1;
+                if (t2 < tFar)
+                    tFar = t2;
+                if (tNear > tFar || tFar < 0)
+                    intersects = false;
             }
         }
-        if (intersectFlag)
-            return ray.getOrigin().add(ray.getDirection().multiply(tnear));
-        else
-            return null;
+
+        if (intersects) return ray.getOrigin().add(ray.getDirection().multiply(tNear));
+        else return null;
     }
 
     @Override
