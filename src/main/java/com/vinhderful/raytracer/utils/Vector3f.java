@@ -109,6 +109,17 @@ public class Vector3f {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }
 
+
+    /**
+     * Add this vector to a scalar value
+     *
+     * @param scalar the scalar
+     * @return the resulting vector
+     */
+    public Vector3f add(float scalar) {
+        return new Vector3f(x + scalar, y + scalar, z + scalar);
+    }
+
     /**
      * Add this vector to another given vector
      *
@@ -127,6 +138,16 @@ public class Vector3f {
      */
     public Vector3f subtract(Vector3f vec) {
         return new Vector3f(x - vec.x, y - vec.y, z - vec.z);
+    }
+
+    /**
+     * Subtract this vector with a scalar value
+     *
+     * @param scalar the scalar
+     * @return the resulting vector
+     */
+    public Vector3f subtract(float scalar) {
+        return new Vector3f(x - scalar, y - scalar, z - scalar);
     }
 
     /**
@@ -167,6 +188,10 @@ public class Vector3f {
      */
     public float distanceFrom(Vector3f vec) {
         return (float) Math.sqrt(Math.pow(x - vec.x, 2) + Math.pow(y - vec.y, 2) + Math.pow(z - vec.z, 2));
+    }
+
+    public float[] toArray() {
+        return new float[]{x, y, z};
     }
 
     /**

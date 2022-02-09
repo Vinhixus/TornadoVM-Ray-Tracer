@@ -28,7 +28,7 @@ public class World {
         this.bodies = new ArrayList<>();
         this.camera = new Camera();
         this.plane = new Plane(-1F);
-        this.light = new Light(new Vector3f(-1F, 1.5F, -1F), Color.WHITE);
+        this.light = new Light(new Vector3f(2F, 1.5F, -1.5F), Color.WHITE);
         this.bodies.add(light);
         this.bodies.add(plane);
         this.backgroundColor = Color.BLACK;

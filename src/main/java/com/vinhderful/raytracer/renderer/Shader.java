@@ -92,7 +92,7 @@ public class Shader {
         Vector3f lightPos = light.getPosition();
         Vector3f hitPos = hit.getPosition();
 
-        int sample = 8;
+        int sample = 18;
         float uniform = lightRadius * 2 / (sample - 1);
 
         int raysHit = 0;
