@@ -36,7 +36,7 @@ public class Test {
     // ==============================================================
     private static int[] pixels;
 
-    public static void setRenderingProperties() {
+    private static void setRenderingProperties() {
         int width = 512;
         int height = 1024;
 
@@ -47,7 +47,7 @@ public class Test {
         softShadowSampleSize = new int[]{1};
     }
 
-    public static void setWorldProperties() {
+    private static void setWorldProperties() {
 
         // Background color
         worldBGColor = Color.BLACK;
@@ -58,7 +58,7 @@ public class Test {
         lightColor = new Float4(1F, 1F, 1F, 0);
     }
 
-    public static void populateWorld() {
+    private static void populateWorld() {
 
         // Number of bodies
         final int NUM_BODIES = 4;

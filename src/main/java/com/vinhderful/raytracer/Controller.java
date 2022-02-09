@@ -70,20 +70,20 @@ public class Controller {
     public Slider ssSample;
 
     // ==============================================================
-    public static void render(int[] dimensions, int[] pixels,
-                              PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
-                              TaskSchedule ts) {
+    private static void render(int[] dimensions, int[] pixels,
+                               PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
+                               TaskSchedule ts) {
         ts.execute(grid);
         pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);
     }
 
-    public static double getFPS() {
+    private static double getFPS() {
         double total = 0.0d;
         for (double frameRate : frameRates) total += frameRate;
         return total / frameRates.length;
     }
 
-    public static void setRenderingProperties() {
+    private static void setRenderingProperties() {
         int width = (int) g.getCanvas().getWidth();
         int height = (int) g.getCanvas().getHeight();
 
@@ -97,7 +97,7 @@ public class Controller {
         softShadowSampleSize = new int[]{1};
     }
 
-    public static void setWorldProperties() {
+    private static void setWorldProperties() {
 
         // Background color
         worldBGColor = Color.BLACK;
@@ -108,7 +108,7 @@ public class Controller {
         lightColor = new Float4(1F, 1F, 1F, 0);
     }
 
-    public static void populateWorld() {
+    private static void populateWorld() {
 
         // Number of bodies
         final int NUM_BODIES = 4;
