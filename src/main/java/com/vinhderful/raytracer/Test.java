@@ -25,6 +25,7 @@ public class Test {
     // ==============================================================
     private static Float4 worldBGColor;
     private static Float4 lightPosition;
+    private static float[] lightSize;
     private static Float4 lightColor;
     // ==============================================================
     private static VectorInt bodyTypes;
@@ -53,6 +54,7 @@ public class Test {
 
         // Light source properties
         lightPosition = new Float4(-1F, 0.8F, -1F, 0);
+        lightSize = new float[]{0.3F};
         lightColor = new Float4(1F, 1F, 1F, 0);
     }
 
@@ -106,7 +108,7 @@ public class Test {
         ts.streamIn(dimensions, camera, softShadowSampleSize);
         ts.task("t0", Renderer::render, dimensions, pixels, camera,
                 bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                worldBGColor, lightPosition, lightColor, softShadowSampleSize);
+                worldBGColor, lightPosition, lightSize, lightColor, softShadowSampleSize);
         ts.streamOut(pixels);
 
         WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
@@ -140,7 +142,7 @@ public class Test {
         for (int i = 0; i < TEST_LOOP_ITERATIONS; i++)
             Renderer.render(dimensions, pixels, camera,
                     bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    worldBGColor, lightPosition, lightColor, softShadowSampleSize);
+                    worldBGColor, lightPosition, lightSize, lightColor, softShadowSampleSize);
 
         endTime = System.nanoTime();
         System.out.println("Duration: " + (endTime - startTime) / 1000000.0 + " ms");

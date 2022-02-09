@@ -44,18 +44,17 @@ public class Shader {
         return Color.mult(Color.mult(lightColor, specularBrightness), SPECULAR_STRENGTH);
     }
 
-    public static float getShadow(int sample, Float4 hitPosition,
+    public static float getShadow(int sampleSize, Float4 hitPosition,
                                   VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes,
-                                  Float4 lightPosition) {
+                                  Float4 lightPosition, float lightSize) {
 
-        float lightRadius = 0.3F;
-        float uniform = lightRadius * 2 / (sample - 1);
+        float uniform = lightSize * 2 / (sampleSize - 1);
 
         int raysHit = 0;
-        int totalRays = sample * sample;
+        int totalRays = sampleSize * sampleSize;
 
-        for (float i = lightPosition.getX() - lightRadius; i <= lightPosition.getX() + lightRadius + 0.01F; i += uniform) {
-            for (float j = lightPosition.getZ() - lightRadius; j <= lightPosition.getZ() + lightRadius + 0.01F; j += uniform) {
+        for (float i = lightPosition.getX() - lightSize; i <= lightPosition.getX() + lightSize + 0.01F; i += uniform) {
+            for (float j = lightPosition.getZ() - lightSize; j <= lightPosition.getZ() + lightSize + 0.01F; j += uniform) {
                 Float4 samplePoint = new Float4(i, lightPosition.getY(), j, 0);
                 Float4 rayDir = Float4.normalise(Float4.sub(samplePoint, hitPosition));
                 Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDir, 0.001F));

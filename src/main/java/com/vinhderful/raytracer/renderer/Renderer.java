@@ -23,7 +23,7 @@ public class Renderer {
         Float4 closestHit = new Float4(-1000F, -1000F, -1000F, -1000F);
 
         for (int i = 0; i < bodyPositions.getLength(); i++) {
-            Float4 intersection = Body.getIntersection(i, bodyPositions.get(i), bodyRadii.get(i), rayOrigin, rayDirection);
+            Float4 intersection = Body.getIntersection(bodyTypes.get(i), bodyPositions.get(i), bodyRadii.get(i), rayOrigin, rayDirection);
 
             if (intersection.getW() == 0 && (closestHit.getW() == -1000F ||
                     VectorOps.distance(closestHit, rayOrigin) > VectorOps.distance(intersection, rayOrigin)))
@@ -49,7 +49,7 @@ public class Renderer {
 
     public static void render(int[] dimensions, int[] pixels, float[] camera,
                               VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              Float4 worldBGColor, Float4 lightPosition, Float4 lightColor, int[] sample) {
+                              Float4 worldBGColor, Float4 lightPosition, float[] lightSize, Float4 lightColor, int[] ssSample) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * floatPI() / 360F), 0);
         Float4 camPos = new Float4(camera[0], camera[1], camera[2], 0);
@@ -81,7 +81,7 @@ public class Renderer {
                                             Shader.getAmbient(bodyColor, lightColor),
                                             Shader.getDiffuse(bodyType, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
                                     Shader.getSpecular(camPos, bodyType, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)),
-                            Shader.getShadow(sample[0], hitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition)));
+                            Shader.getShadow(ssSample[0], hitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize[0])));
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }
