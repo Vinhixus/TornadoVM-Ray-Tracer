@@ -9,13 +9,19 @@ import com.vinhderful.raytracer.utils.Vector3f;
  */
 public class Cube extends Body {
 
+    private final float scale;
     private final Vector3f min;
     private final Vector3f max;
 
     public Cube(Vector3f position, float scale, Color color, float reflectivity) {
         super(position, color, reflectivity);
+        this.scale = scale;
         this.max = position.add(scale * 0.5F);
         this.min = position.subtract(scale * 0.5F);
+    }
+
+    public float getScale() {
+        return scale;
     }
 
     @Override

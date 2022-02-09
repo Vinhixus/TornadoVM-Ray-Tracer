@@ -88,18 +88,18 @@ public class Shader {
      */
     public static float getShadowFactor(Hit hit, World world) {
         Light light = world.getLight();
-        float lightRadius = light.getRadius();
+        float lightScale = light.getScale();
         Vector3f lightPos = light.getPosition();
         Vector3f hitPos = hit.getPosition();
 
         int sample = 18;
-        float uniform = lightRadius * 2 / (sample - 1);
+        float uniform = lightScale * 2 / (sample - 1);
 
         int raysHit = 0;
         float totalRays = (float) (sample * sample * 1.3);
 
-        for (float i = lightPos.getX() - lightRadius; i <= lightPos.getX() + lightRadius + 0.01F; i += uniform) {
-            for (float j = lightPos.getZ() - lightRadius; j <= lightPos.getZ() + lightRadius + 0.01F; j += uniform) {
+        for (float i = lightPos.getX() - lightScale; i <= lightPos.getX() + lightScale + 0.01F; i += uniform) {
+            for (float j = lightPos.getZ() - lightScale; j <= lightPos.getZ() + lightScale + 0.01F; j += uniform) {
                 Vector3f samplePoint = new Vector3f(i, lightPos.getY(), j);
                 Vector3f rayDir = samplePoint.subtract(hitPos).normalize();
                 Vector3f rayOrigin = hitPos.add(rayDir.multiply(0.001F));
