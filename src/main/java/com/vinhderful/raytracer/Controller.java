@@ -42,12 +42,15 @@ public class Controller {
     public static final VectorFloat4 bodyColors = new VectorFloat4(NUM_BODIES);
     public static final VectorFloat bodyReflectivities = new VectorFloat(NUM_BODIES);
     private static final double[] frameRates = new double[100];
-    public static int[] softShadowSampleSize = {1};
+
     // ==============================================================
-    public static float[] cameraPosition = {0, 0, -4F};
-    public static float[] cameraPitch = {0};
-    public static float[] cameraFOV = {60};
-    public static float[] cameraYaw = {0};
+    private static final float[] camera = {0, 0, -4F, 0, 0, 60};
+    private static int[] pixels;
+    private static final int[] dimensions = new int[2];
+    private static final int[] softShadowSampleSize = {1};
+
+    private static PixelWriter pixelWriter;
+    private static WritablePixelFormat<IntBuffer> format;
     // ==============================================================
     private static int index = 0;
     private static long lastUpdate = 0;
@@ -66,11 +69,11 @@ public class Controller {
     public Slider ssSample;
 
     // ==============================================================
-    public static void render(int width, int height, int[] pixels,
+    public static void render(int[] dimensions, int[] pixels,
                               PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
                               TaskSchedule ts) {
         ts.execute(grid);
-        pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
+        pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);
     }
 
     public static double getFPS() {
@@ -87,12 +90,13 @@ public class Controller {
 
         // ==============================================================
         GraphicsContext g = canvas.getGraphicsContext2D();
-        PixelWriter pixelWriter = g.getPixelWriter();
-        int width = (int) g.getCanvas().getWidth();
-        int height = (int) g.getCanvas().getHeight();
 
-        WritablePixelFormat<IntBuffer> format = WritablePixelFormat.getIntArgbInstance();
-        int[] pixels = new int[width * height];
+        format = WritablePixelFormat.getIntArgbInstance();
+        pixelWriter = g.getPixelWriter();
+
+        dimensions[0] = (int) g.getCanvas().getWidth();
+        dimensions[1] = (int) g.getCanvas().getHeight();
+        pixels = new int[dimensions[0] * dimensions[1]];
         // ==============================================================
 
         // Plane
@@ -119,15 +123,14 @@ public class Controller {
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(cameraPosition, cameraYaw, cameraPitch, cameraFOV, softShadowSampleSize);
-        ts.task("t0", Renderer::render, width, height, pixels,
-                cameraPosition, cameraYaw, cameraPitch, cameraFOV,
+        ts.streamIn(dimensions, camera, softShadowSampleSize);
+        ts.task("t0", Renderer::render, dimensions, pixels, camera,
                 bodyPositions, bodyRadii, bodyColors, bodyReflectivities,
                 worldBGColor, lightPosition, lightColor, softShadowSampleSize);
         ts.streamOut(pixels);
 
-        WorkerGrid worker = new WorkerGrid2D(width, height);
-        worker.setLocalWork(32, 16, 1);
+        WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
+        worker.setLocalWork(16, 16, 1);
         grid = new GridScheduler();
         grid.setWorkerGrid("s0.t0", worker);
 
@@ -135,12 +138,12 @@ public class Controller {
         ts.mapAllTo(device);
 
         // ==============================================================
-        camX.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition[0] = newValue.floatValue());
-        camY.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition[1] = newValue.floatValue());
-        camZ.valueProperty().addListener((observable, oldValue, newValue) -> cameraPosition[2] = newValue.floatValue());
-        camYaw.valueProperty().addListener((observable, oldValue, newValue) -> cameraYaw[0] = newValue.floatValue());
-        camPitch.valueProperty().addListener((observable, oldValue, newValue) -> cameraPitch[0] = newValue.floatValue());
-        camFOV.valueProperty().addListener((observable, oldValue, newValue) -> cameraFOV[0] = newValue.floatValue());
+        camX.valueProperty().addListener((observable, oldValue, newValue) -> camera[0] = newValue.floatValue());
+        camY.valueProperty().addListener((observable, oldValue, newValue) -> camera[1] = newValue.floatValue());
+        camZ.valueProperty().addListener((observable, oldValue, newValue) -> camera[2] = newValue.floatValue());
+        camYaw.valueProperty().addListener((observable, oldValue, newValue) -> camera[3] = newValue.floatValue());
+        camPitch.valueProperty().addListener((observable, oldValue, newValue) -> camera[4] = newValue.floatValue());
+        camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
 
         ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
 
@@ -149,7 +152,7 @@ public class Controller {
 
             @Override
             public void handle(long now) {
-                render(width, height, pixels, pixelWriter, format, ts);
+                render(dimensions, pixels, pixelWriter, format, ts);
 
                 if (lastUpdate > 0) {
                     double frameRate = 1_000_000_000.0 / (now - lastUpdate);

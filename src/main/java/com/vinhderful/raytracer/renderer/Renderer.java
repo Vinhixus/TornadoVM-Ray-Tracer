@@ -46,21 +46,23 @@ public class Renderer {
             return -((float) (y - height / 2 + width / 2) / width * 2 - 1);
     }
 
-    public static void render(int width, int height, int[] pixels,
-                              float[] cameraPosition, float[] cameraYaw, float[] cameraPitch, float[] cameraFOV,
+    public static void render(int[] dimensions, int[] pixels, float[] camera,
                               VectorFloat4 bodyPositions, VectorFloat bodyRadii, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
                               Float4 worldBGColor, Float4 lightPosition, Float4 lightColor, int[] sample) {
 
-        Float4 eyePos = new Float4(0, 0, -1 / floatTan(cameraFOV[0] * floatPI() / 360F), 0);
-        Float4 rayOrigin = new Float4(cameraPosition[0], cameraPosition[1], cameraPosition[2], 0);
+        Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * floatPI() / 360F), 0);
+        Float4 camPos = new Float4(camera[0], camera[1], camera[2], 0);
+
+        int width = dimensions[0];
+        int height = dimensions[1];
 
         for (@Parallel int x = 0; x < width; x++)
             for (@Parallel int y = 0; y < height; y++) {
 
-                Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
-                Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), cameraYaw[0], cameraPitch[0]);
+                Float4 normalizedCoords = new Float4(getNormalizedX(dimensions[0], dimensions[1], x), getNormalizedY(dimensions[0], dimensions[1], y), 0, 0);
+                Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), camera[3], camera[4]);
 
-                Float4 hit = getClosestHit(bodyPositions, bodyRadii, rayOrigin, rayDirection);
+                Float4 hit = getClosestHit(bodyPositions, bodyRadii, camPos, rayDirection);
                 int hitIndex = (int) hit.getW();
 
                 if (hitIndex != -1000) {
@@ -75,7 +77,7 @@ public class Renderer {
                     pixels[x + y * width] = Color.toARGB(Color.mult(Color.add(Color.add(
                                             Shader.getAmbient(bodyColor, lightColor),
                                             Shader.getDiffuse(hitIndex, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
-                                    Shader.getSpecular(rayOrigin, hitIndex, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)),
+                                    Shader.getSpecular(camPos, hitIndex, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)),
                             Shader.getShadow(sample[0], hitPosition, bodyPositions, bodyRadii, lightPosition)));
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
