@@ -38,7 +38,7 @@ public class Controller {
         world.addBody(sphere2);
         world.addBody(sphere3);
 
-        Cube cube = new Cube(new Vector3f(1.5F, 0, 2.5F), 2F, new Color(0.35F, 0.35F, 0.35F), 16F);
+        Cube cube = new Cube(new Vector3f(1.5F, 0, 2.5F), 2F, new Color(0.35F, 0.35F, 0.35F), 64F);
         world.addBody(cube);
 
         renderer.render(world);

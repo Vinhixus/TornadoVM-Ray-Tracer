@@ -23,7 +23,7 @@ public abstract class Body {
     public Body(Vector3f position) {
         this.position = position;
         this.color = Color.BLACK;
-        this.reflectivity = 16F;
+        this.reflectivity = 32F;
     }
 
     /**
@@ -35,7 +35,7 @@ public abstract class Body {
     public Body(Vector3f position, Color color) {
         this.position = position;
         this.color = color;
-        this.reflectivity = 16F;
+        this.reflectivity = 32F;
     }
 
     /**

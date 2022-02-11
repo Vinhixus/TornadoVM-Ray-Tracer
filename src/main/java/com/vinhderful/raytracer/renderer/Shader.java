@@ -92,7 +92,7 @@ public class Shader {
         Vector3f lightPos = light.getPosition();
         Vector3f hitPos = hit.getPosition();
 
-        int sample = 18;
+        int sample = 10;
         float uniform = lightScale * 2 / (sample - 1);
 
         int raysHit = 0;
@@ -122,17 +122,18 @@ public class Shader {
      * Recursively bounce ray in the given world and compute colors according to the
      * reflectivities of the hit objects until the recursion limit is reached
      *
-     * @param hit            the hit event
-     * @param world          the world
-     * @param recursionLimit the limit of how many times the ray is bounced
+     * @param hit                     the hit event
+     * @param world                   the world
+     * @param recursionLimit          the limit of how many times the ray is bounced
+     * @param accumulatedReflectivity the total reflection from the previous iterations of the recursion
      * @return the resulting color of the reflections
      */
-    public static Color getReflection(Hit hit, World world, int recursionLimit) {
+    public static Color getReflection(Hit hit, World world, int recursionLimit, float accumulatedReflectivity) {
         Vector3f hitPos = hit.getPosition();
         Vector3f rayDir = hit.getRay().getDirection();
         Vector3f reflectionDir = rayDir.subtract(hit.getNormal().multiply(2 * rayDir.dotProduct(hit.getNormal())));
         Vector3f reflectionOrigin = hitPos.add(reflectionDir.multiply(0.001F));
-        float reflectivity = hit.getBody().getReflectivity() / MAX_REFLECTIVITY;
+        float reflectivity = (hit.getBody().getReflectivity() / MAX_REFLECTIVITY) * accumulatedReflectivity;
 
         Ray reflectionRay = new Ray(reflectionOrigin, reflectionDir);
         Hit closestHit = Renderer.getClosestHit(reflectionRay, world);
@@ -142,7 +143,7 @@ public class Shader {
             finalColor = getPhong(closestHit, world).multiply(reflectivity);
 
             if (recursionLimit != 0)
-                finalColor = finalColor.add(getReflection(closestHit, world, recursionLimit - 1));
+                finalColor = finalColor.add(getReflection(closestHit, world, recursionLimit - 1, reflectivity));
 
             return finalColor;
         } else

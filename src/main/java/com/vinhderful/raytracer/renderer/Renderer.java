@@ -108,7 +108,7 @@ public class Renderer {
                     if (hit.getBody().equals(world.getLight()))
                         pixels[x + y * width] = hit.getColor().toARGB();
                     else
-                        pixels[x + y * width] = Shader.getPhong(hit, world).add(Shader.getReflection(hit, world, 6)).multiply(Shader.getShadowFactor(hit, world)).toARGB();
+                        pixels[x + y * width] = Shader.getPhong(hit, world).add(Shader.getReflection(hit, world, 6, 1F)).multiply(Shader.getShadowFactor(hit, world)).toARGB();
                 } else {
                     pixels[x + y * width] = world.getBackgroundColor().toARGB();
                 }
