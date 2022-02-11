@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -41,6 +41,12 @@
                 </VBox.margin>
             </Separator>
             <Label fx:id="debugOutput"/>
+            <Separator prefWidth="200.0">
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </VBox.margin>
+            </Separator>
+            <ComboBox fx:id="deviceDropdown" onAction="#selectDevice"/>
         </VBox>
     </right>
 </BorderPane>

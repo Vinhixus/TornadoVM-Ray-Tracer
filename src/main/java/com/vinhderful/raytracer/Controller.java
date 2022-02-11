@@ -3,9 +3,11 @@ package com.vinhderful.raytracer;
 import com.vinhderful.raytracer.renderer.Renderer;
 import com.vinhderful.raytracer.utils.Color;
 import javafx.animation.AnimationTimer;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.PixelWriter;
@@ -13,12 +15,8 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import uk.ac.manchester.tornado.api.GridScheduler;
-import uk.ac.manchester.tornado.api.TaskSchedule;
-import uk.ac.manchester.tornado.api.WorkerGrid;
-import uk.ac.manchester.tornado.api.WorkerGrid2D;
+import uk.ac.manchester.tornado.api.*;
 import uk.ac.manchester.tornado.api.collections.types.*;
-import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
 import java.nio.IntBuffer;
@@ -64,6 +62,10 @@ public class Controller {
     public Slider camFOV;
     public Slider ssSample;
     public float mouseSensitivity = 0.5F;
+    public ComboBox<String> deviceDropdown;
+    private int selectedDeviceIndex = 0;
+    private TornadoDriver driver;
+    private TaskSchedule ts;
     // ==============================================================
     private double mousePosX;
     private double mousePosY;
@@ -73,7 +75,6 @@ public class Controller {
     private float moveSpeed = 0.2F;
     private boolean fwd, strafeL, strafeR, back, up, down;
     private Float3 upVector;
-    private Float3 eye;
 
     // ==============================================================
     private static void render(int[] dimensions, int[] pixels,
@@ -165,11 +166,10 @@ public class Controller {
         setWorldProperties();
         populateWorld();
 
-        eye = new Float3(camera[0], camera[1], camera[2]);
         upVector = new Float3(0, 1F, 0);
 
         // ==============================================================
-        TaskSchedule ts = new TaskSchedule("s0");
+        ts = new TaskSchedule("s0");
         ts.streamIn(dimensions, camera, softShadowSampleSize);
         ts.task("t0", Renderer::render, dimensions, pixels, camera,
                 bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
@@ -181,8 +181,13 @@ public class Controller {
         grid = new GridScheduler();
         grid.setWorkerGrid("s0.t0", worker);
 
-        TornadoDevice device = TornadoRuntime.getTornadoRuntime().getDriver(0).getDevice(1);
-        ts.mapAllTo(device);
+        driver = TornadoRuntime.getTornadoRuntime().getDriver(0);
+        int numDevices = driver.getDeviceCount();
+        for (int i = 0; i < numDevices; i++)
+            deviceDropdown.getItems().add(driver.getDevice(i).getPhysicalDevice().getDeviceName());
+
+        deviceDropdown.getSelectionModel().selectFirst();
+        ts.mapAllTo(driver.getDevice(selectedDeviceIndex));
 
         // ==============================================================
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
@@ -195,6 +200,7 @@ public class Controller {
             public void handle(long now) {
                 render(dimensions, pixels, pixelWriter, format, ts);
                 updatePos();
+                debugOutput.setText(selectedDeviceIndex + "");
 
                 if (lastUpdate > 0) {
                     double frameRate = 1_000_000_000.0 / (now - lastUpdate);
@@ -281,7 +287,7 @@ public class Controller {
 
     public void updatePos() {
 
-        eye = new Float3(camera[0], camera[1], camera[2]);
+        Float3 eye = new Float3(camera[0], camera[1], camera[2]);
 
         float yaw = camera[3] * floatPI() / 180;
         float pitch = -camera[4] * floatPI() / 180;
@@ -304,5 +310,10 @@ public class Controller {
         camera[0] = eye.get(0);
         camera[1] = eye.get(1);
         camera[2] = eye.get(2);
+    }
+
+    public void selectDevice(ActionEvent actionEvent) {
+        selectedDeviceIndex = deviceDropdown.getSelectionModel().getSelectedIndex();
+        ts.mapAllTo(driver.getDevice(selectedDeviceIndex));
     }
 }
