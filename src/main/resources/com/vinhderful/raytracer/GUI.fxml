@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" stylesheets="@GUI.css" xmlns="http://javafx.com/javafx/17"
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" onKeyPressed="#keyPressed" onKeyReleased="#keyReleased"
+            stylesheets="@GUI.css" xmlns="http://javafx.com/javafx/17"
             fx:controller="com.vinhderful.raytracer.Controller">
     <center>
         <Pane fx:id="pane" BorderPane.alignment="CENTER">
-            <Canvas fx:id="canvas" height="512" width="1024" onMouseDragged="#mouseDragged"
-                    onMousePressed="#mousePressed"/>
+            <Canvas fx:id="canvas" height="512" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed"
+                    width="1024"/>
         </Pane>
     </center>
     <right>
@@ -17,19 +18,6 @@
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
             </padding>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera X">
-                <VBox.margin>
-                    <Insets/>
-                </VBox.margin>
-            </Label>
-            <Slider id="camX" fx:id="camX" majorTickUnit="1.0" max="4.0" min="-4.0" minorTickCount="1"
-                    showTickLabels="true" showTickMarks="true"/>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Y"/>
-            <Slider id="camY" fx:id="camY" majorTickUnit="1.0" max="4.0" min="-4.0" minorTickCount="1"
-                    showTickLabels="true" showTickMarks="true"/>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Z"/>
-            <Slider id="camZ" fx:id="camZ" majorTickUnit="1.0" max="0.0" min="-8.0" minorTickCount="1"
-                    showTickLabels="true" showTickMarks="true" value="-4.0"/>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Camera FOV"/>
             <Slider id="camFOV" fx:id="camFOV" majorTickUnit="10.0" max="90.0" min="30.0" minorTickCount="5"
                     showTickLabels="true" showTickMarks="true" value="60.0"/>
@@ -38,7 +26,7 @@
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </VBox.margin>
             </Separator>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Soft Shadow Sample"/>
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Soft Shadow Sample Size"/>
             <Slider id="camFOV" fx:id="ssSample" blockIncrement="1.0" majorTickUnit="4.0" max="25.0" min="1.0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
             <Separator prefWidth="200.0">

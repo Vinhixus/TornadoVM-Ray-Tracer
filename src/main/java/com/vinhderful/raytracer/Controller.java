@@ -10,23 +10,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import uk.ac.manchester.tornado.api.GridScheduler;
 import uk.ac.manchester.tornado.api.TaskSchedule;
 import uk.ac.manchester.tornado.api.WorkerGrid;
 import uk.ac.manchester.tornado.api.WorkerGrid2D;
-import uk.ac.manchester.tornado.api.collections.types.Float4;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
-import uk.ac.manchester.tornado.api.collections.types.VectorInt;
+import uk.ac.manchester.tornado.api.collections.types.*;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
 import java.nio.IntBuffer;
 
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.min;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
  * Initialises JavaFX FXML elements together with GUI.fxml, contains driver code
@@ -59,27 +56,24 @@ public class Controller {
     // ==============================================================
     private static int index = 0;
     private static long lastUpdate = 0;
-    // ==============================================================
-
     @FXML
     public Label fps;
     public Label debugOutput;
-
     public Pane pane;
     public Canvas canvas;
-
-    public Slider camX;
-    public Slider camY;
-    public Slider camZ;
     public Slider camFOV;
-
     public Slider ssSample;
-
     public float mouseSensitivity = 0.5F;
+    // ==============================================================
     private double mousePosX;
     private double mousePosY;
     private double mouseOldX;
     private double mouseOldY;
+
+    private float moveSpeed = 0.2F;
+    private boolean fwd, strafeL, strafeR, back, up, down;
+    private Float3 upVector;
+    private Float3 eye;
 
     // ==============================================================
     private static void render(int[] dimensions, int[] pixels,
@@ -171,6 +165,9 @@ public class Controller {
         setWorldProperties();
         populateWorld();
 
+        eye = new Float3(camera[0], camera[1], camera[2]);
+        upVector = new Float3(0, 1F, 0);
+
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
         ts.streamIn(dimensions, camera, softShadowSampleSize);
@@ -188,11 +185,7 @@ public class Controller {
         ts.mapAllTo(device);
 
         // ==============================================================
-        camX.valueProperty().addListener((observable, oldValue, newValue) -> camera[0] = newValue.floatValue());
-        camY.valueProperty().addListener((observable, oldValue, newValue) -> camera[1] = newValue.floatValue());
-        camZ.valueProperty().addListener((observable, oldValue, newValue) -> camera[2] = newValue.floatValue());
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
-
         ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
 
         // ==============================================================
@@ -201,6 +194,7 @@ public class Controller {
             @Override
             public void handle(long now) {
                 render(dimensions, pixels, pixelWriter, format, ts);
+                updatePos();
 
                 if (lastUpdate > 0) {
                     double frameRate = 1_000_000_000.0 / (now - lastUpdate);
@@ -231,5 +225,84 @@ public class Controller {
         mousePosY = mouseEvent.getY();
         mouseOldX = mousePosX;
         mouseOldY = mousePosY;
+    }
+
+    public void keyPressed(KeyEvent keyEvent) {
+        switch (keyEvent.getCode()) {
+            case SPACE:
+                up = true;
+                break;
+            case C:
+                down = true;
+                break;
+            case W:
+                fwd = true;
+                break;
+            case S:
+                back = true;
+                break;
+            case A:
+                strafeL = true;
+                break;
+            case D:
+                strafeR = true;
+                break;
+            case SHIFT:
+                moveSpeed = 0.4F;
+                break;
+        }
+    }
+
+    public void keyReleased(KeyEvent keyEvent) {
+        switch (keyEvent.getCode()) {
+            case SPACE:
+                up = false;
+                break;
+            case C:
+                down = false;
+                break;
+            case W:
+                fwd = false;
+                break;
+            case S:
+                back = false;
+                break;
+            case A:
+                strafeL = false;
+                break;
+            case D:
+                strafeR = false;
+                break;
+            case SHIFT:
+                moveSpeed = 0.2F;
+                break;
+        }
+    }
+
+    public void updatePos() {
+
+        eye = new Float3(camera[0], camera[1], camera[2]);
+
+        float yaw = camera[3] * floatPI() / 180;
+        float pitch = -camera[4] * floatPI() / 180;
+
+        Float3 fwdVector = Float3.normalise(new Float3(
+                floatSin(yaw) * floatCos(pitch),
+                floatSin(pitch),
+                floatCos(yaw) * floatCos(pitch)));
+
+        Float3 leftVector = Float3.cross(fwdVector, upVector);
+        Float3 rightVector = Float3.cross(upVector, fwdVector);
+
+        if (fwd) eye = Float3.add(eye, Float3.mult(fwdVector, moveSpeed));
+        if (back) eye = Float3.sub(eye, Float3.mult(fwdVector, moveSpeed));
+        if (strafeL) eye = Float3.add(eye, Float3.mult(leftVector, moveSpeed));
+        if (strafeR) eye = Float3.add(eye, Float3.mult(rightVector, moveSpeed));
+        if (up) eye = Float3.add(eye, Float3.mult(upVector, moveSpeed));
+        if (down) eye = Float3.sub(eye, Float3.mult(upVector, moveSpeed));
+
+        camera[0] = eye.get(0);
+        camera[1] = eye.get(1);
+        camera[2] = eye.get(2);
     }
 }
