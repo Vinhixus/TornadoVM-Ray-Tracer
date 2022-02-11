@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import uk.ac.manchester.tornado.api.GridScheduler;
 import uk.ac.manchester.tornado.api.TaskSchedule;
@@ -23,6 +24,9 @@ import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
 import java.nio.IntBuffer;
+
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.min;
 
 /**
  * Initialises JavaFX FXML elements together with GUI.fxml, contains driver code
@@ -59,15 +63,23 @@ public class Controller {
 
     @FXML
     public Label fps;
+    public Label debugOutput;
+
     public Pane pane;
     public Canvas canvas;
+
     public Slider camX;
     public Slider camY;
     public Slider camZ;
-    public Slider camYaw;
-    public Slider camPitch;
     public Slider camFOV;
+
     public Slider ssSample;
+
+    public float mouseSensitivity = 0.5F;
+    private double mousePosX;
+    private double mousePosY;
+    private double mouseOldX;
+    private double mouseOldY;
 
     // ==============================================================
     private static void render(int[] dimensions, int[] pixels,
@@ -111,7 +123,7 @@ public class Controller {
     private static void populateWorld() {
 
         // Number of bodies
-        final int NUM_BODIES = 5;
+        final int NUM_BODIES = 4;
 
         bodyTypes = new VectorInt(NUM_BODIES);
         bodyPositions = new VectorFloat4(NUM_BODIES);
@@ -126,31 +138,24 @@ public class Controller {
         bodyColors.set(0, Color.BLACK);
         bodyReflectivities.set(0, 8F);
 
-        // Cubes
-        bodyTypes.set(1, 1);
-        bodyPositions.set(1, new Float4(1.5F, 0, 2.5F, 0));
-        bodySizes.set(1, 2F);
-        bodyColors.set(1, Color.GRAY);
-        bodyReflectivities.set(1, 16F);
-
         // Spheres
+        bodyTypes.set(1, 2);
+        bodyPositions.set(1, new Float4(-1.5F, 0, 0, 0));
+        bodySizes.set(1, 0.5F);
+        bodyColors.set(1, Color.RED);
+        bodyReflectivities.set(1, 8F);
+
         bodyTypes.set(2, 2);
-        bodyPositions.set(2, new Float4(-1.5F, 0, 0, 0));
+        bodyPositions.set(2, new Float4(0, 0, 0, 0));
         bodySizes.set(2, 0.5F);
-        bodyColors.set(2, Color.RED);
-        bodyReflectivities.set(2, 8F);
+        bodyColors.set(2, Color.GREEN);
+        bodyReflectivities.set(2, 16F);
 
         bodyTypes.set(3, 2);
-        bodyPositions.set(3, new Float4(0, 0, 0, 0));
+        bodyPositions.set(3, new Float4(1.5F, 0, 0, 0));
         bodySizes.set(3, 0.5F);
-        bodyColors.set(3, Color.GREEN);
-        bodyReflectivities.set(3, 16F);
-
-        bodyTypes.set(4, 2);
-        bodyPositions.set(4, new Float4(1.5F, 0, 0, 0));
-        bodySizes.set(4, 0.5F);
-        bodyColors.set(4, Color.BLUE);
-        bodyReflectivities.set(4, 32F);
+        bodyColors.set(3, Color.BLUE);
+        bodyReflectivities.set(3, 32F);
     }
 
     /**
@@ -186,11 +191,10 @@ public class Controller {
         camX.valueProperty().addListener((observable, oldValue, newValue) -> camera[0] = newValue.floatValue());
         camY.valueProperty().addListener((observable, oldValue, newValue) -> camera[1] = newValue.floatValue());
         camZ.valueProperty().addListener((observable, oldValue, newValue) -> camera[2] = newValue.floatValue());
-        camYaw.valueProperty().addListener((observable, oldValue, newValue) -> camera[3] = newValue.floatValue());
-        camPitch.valueProperty().addListener((observable, oldValue, newValue) -> camera[4] = newValue.floatValue());
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
 
         ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
+
         // ==============================================================
         AnimationTimer timer = new AnimationTimer() {
 
@@ -210,5 +214,22 @@ public class Controller {
         };
 
         timer.start();
+    }
+
+    public void mouseDragged(MouseEvent mouseEvent) {
+        mouseOldX = mousePosX;
+        mouseOldY = mousePosY;
+        mousePosX = mouseEvent.getX();
+        mousePosY = mouseEvent.getY();
+
+        camera[3] += (mousePosX - mouseOldX) * mouseSensitivity;
+        camera[4] = (float) min(90, max(-90, camera[4] + (mousePosY - mouseOldY) * mouseSensitivity));
+    }
+
+    public void mousePressed(MouseEvent mouseEvent) {
+        mousePosX = mouseEvent.getX();
+        mousePosY = mouseEvent.getY();
+        mouseOldX = mousePosX;
+        mouseOldY = mousePosY;
     }
 }
