@@ -17,13 +17,13 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatTan
  */
 public class Renderer {
 
-    public static Float4 getClosestHit(VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodyRadii,
+    public static Float4 getClosestHit(VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes,
                                        Float4 rayOrigin, Float4 rayDirection) {
 
         Float4 closestHit = new Float4(-1000F, -1000F, -1000F, -1000F);
 
         for (int i = 0; i < bodyPositions.getLength(); i++) {
-            Float4 intersection = Body.getIntersection(bodyTypes.get(i), bodyPositions.get(i), bodyRadii.get(i), rayOrigin, rayDirection);
+            Float4 intersection = Body.getIntersection(bodyTypes.get(i), bodyPositions.get(i), bodySizes.get(i), rayOrigin, rayDirection);
 
             if (intersection.getW() == 0 && (closestHit.getW() == -1000F ||
                     VectorOps.distance(closestHit, rayOrigin) > VectorOps.distance(intersection, rayOrigin)))
