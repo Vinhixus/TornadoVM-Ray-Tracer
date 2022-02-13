@@ -3,7 +3,6 @@ package com.vinhderful.raytracer;
 import com.vinhderful.raytracer.renderer.Renderer;
 import com.vinhderful.raytracer.utils.Color;
 import javafx.animation.AnimationTimer;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -29,12 +28,11 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Controller {
 
-    private static final double[] frameRates = new double[100];
+    private static long lastUpdate = 0;
     // ==============================================================
     private static float[] camera;
     private static int[] dimensions;
     private static int[] softShadowSampleSize;
-    private static GridScheduler grid;
     // ==============================================================
     private static Float4 worldBGColor;
     private static Float4 lightPosition;
@@ -48,12 +46,12 @@ public class Controller {
     private static VectorFloat bodyReflectivities;
     // ==============================================================
     private static int[] pixels;
+
+    private static GridScheduler grid;
     private static GraphicsContext g;
     private static PixelWriter pixelWriter;
     private static WritablePixelFormat<IntBuffer> format;
     // ==============================================================
-    private static int index = 0;
-    private static long lastUpdate = 0;
     @FXML
     public Label fps;
     public Label debugOutput;
@@ -63,7 +61,7 @@ public class Controller {
     public Slider ssSample;
     public float mouseSensitivity = 0.5F;
     public ComboBox<String> deviceDropdown;
-    private int selectedDeviceIndex = 0;
+    private int selectedDeviceIndex;
     private TornadoDriver driver;
     private TaskSchedule ts;
     // ==============================================================
@@ -77,19 +75,6 @@ public class Controller {
     private Float3 upVector;
 
     // ==============================================================
-    private static void render(int[] dimensions, int[] pixels,
-                               PixelWriter pixelWriter, WritablePixelFormat<IntBuffer> format,
-                               TaskSchedule ts) {
-        ts.execute(grid);
-        pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);
-    }
-
-    private static double getFPS() {
-        double total = 0.0d;
-        for (double frameRate : frameRates) total += frameRate;
-        return total / frameRates.length;
-    }
-
     private static void setRenderingProperties() {
         int width = (int) g.getCanvas().getWidth();
         int height = (int) g.getCanvas().getHeight();
@@ -153,6 +138,19 @@ public class Controller {
         bodyReflectivities.set(3, 32F);
     }
 
+    // ==============================================================
+    private void render(boolean renderWithTornado) {
+
+        if (renderWithTornado)
+            ts.execute(grid);
+        else
+            Renderer.render(dimensions, pixels, camera,
+                    bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                    worldBGColor, lightPosition, lightSize, lightColor, softShadowSampleSize);
+
+        pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);
+    }
+
     /**
      * Initialise renderer, world, camera and populate with objects
      */
@@ -183,11 +181,13 @@ public class Controller {
 
         driver = TornadoRuntime.getTornadoRuntime().getDriver(0);
         int numDevices = driver.getDeviceCount();
+
+        deviceDropdown.getItems().add("CPU - Pure Java Sequential");
         for (int i = 0; i < numDevices; i++)
             deviceDropdown.getItems().add(driver.getDevice(i).getPhysicalDevice().getDeviceName());
 
+        selectedDeviceIndex = 0;
         deviceDropdown.getSelectionModel().selectFirst();
-        ts.mapAllTo(driver.getDevice(selectedDeviceIndex));
 
         // ==============================================================
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
@@ -198,18 +198,10 @@ public class Controller {
 
             @Override
             public void handle(long now) {
-                render(dimensions, pixels, pixelWriter, format, ts);
+                render(selectedDeviceIndex > 0);
                 updatePos();
-                debugOutput.setText(selectedDeviceIndex + "");
-
-                if (lastUpdate > 0) {
-                    double frameRate = 1_000_000_000.0 / (now - lastUpdate);
-                    index %= frameRates.length;
-                    frameRates[index++] = frameRate;
-                }
-
+                fps.setText(String.format("FPS: %.2f", 1_000_000_000.0 / (now - lastUpdate)));
                 lastUpdate = now;
-                fps.setText(String.format("FPS: %.2f", getFPS()));
             }
         };
 
@@ -312,8 +304,10 @@ public class Controller {
         camera[2] = eye.get(2);
     }
 
-    public void selectDevice(ActionEvent actionEvent) {
+    public void selectDevice() {
         selectedDeviceIndex = deviceDropdown.getSelectionModel().getSelectedIndex();
-        ts.mapAllTo(driver.getDevice(selectedDeviceIndex));
+
+        if (selectedDeviceIndex > 0)
+            ts.mapAllTo(driver.getDevice(selectedDeviceIndex - 1));
     }
 }
