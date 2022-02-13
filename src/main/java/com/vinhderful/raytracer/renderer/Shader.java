@@ -12,6 +12,15 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.pow;
 
 public class Shader {
 
+    public static Float4 getPhong(Float4 cameraPosition, int bodyType, Float4 hitPosition,
+                                  Float4 bodyPosition, Float4 bodyColor, float bodyReflectivity,
+                                  Float4 lightPosition, Float4 lightColor) {
+        return Color.add(Color.add(
+                        Shader.getAmbient(bodyColor, lightColor),
+                        Shader.getDiffuse(bodyType, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
+                Shader.getSpecular(cameraPosition, bodyType, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor));
+    }
+
     public static Float4 getAmbient(Float4 bodyColor, Float4 lightColor) {
 
         final float AMBIENT_STRENGTH = 0.05F;
@@ -96,11 +105,10 @@ public class Shader {
             if (bodyType == 0) bodyColor = Body.getPlaneColor(closestHitPosition);
             else bodyColor = bodyColors.get(closestHitIndex);
 
-            return Float4.mult(Color.add(Color.add(
-                            Shader.getAmbient(bodyColor, lightColor),
-                            Shader.getDiffuse(bodyType, closestHitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
-                    Shader.getSpecular(reflectionOrigin, bodyType, closestHitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)), reflectivity);
+            return Color.mult(
+                    getPhong(reflectionOrigin, bodyType, closestHitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
+                    reflectivity);
         } else
-            return Float4.mult(worldBGColor, reflectivity);
+            return Color.mult(worldBGColor, reflectivity);
     }
 }
