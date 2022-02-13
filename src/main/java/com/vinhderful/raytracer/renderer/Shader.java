@@ -69,4 +69,38 @@ public class Shader {
         if (raysHit == 0) return 1;
         else return 1 + -raysHit / (totalRays * 1.3F);
     }
+
+    public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
+                                       VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
+                                       Float4 worldBGColor, Float4 lightPosition, Float4 lightColor) {
+
+        final float MAX_REFLECTIVITY = 256F;
+
+        Float4 hitNormal = Body.getNormal(bodyTypes.get(hitIndex), hitPosition, bodyPositions.get(hitIndex));
+        Float4 reflectionDir = Float4.sub(rayDirection, Float4.mult(hitNormal, 2 * Float4.dot(rayDirection, hitNormal)));
+        Float4 reflectionOrigin = Float4.add(hitPosition, Float4.mult(reflectionDir, 0.001F));
+
+        float reflectivity = bodyReflectivities.get(hitIndex) / MAX_REFLECTIVITY;
+        Float4 closestHit = Renderer.getClosestHit(bodyTypes, bodyPositions, bodySizes, reflectionOrigin, reflectionDir);
+        int closestHitIndex = (int) closestHit.getW();
+
+        if (closestHitIndex != -1000) {
+
+            Float4 closestHitPosition = new Float4(closestHit.getX(), closestHit.getY(), closestHit.getZ(), 0);
+
+            int bodyType = bodyTypes.get(closestHitIndex);
+            Float4 bodyPosition = bodyPositions.get(closestHitIndex);
+            float bodyReflectivity = bodyReflectivities.get(closestHitIndex);
+
+            Float4 bodyColor;
+            if (bodyType == 0) bodyColor = Body.getPlaneColor(closestHitPosition);
+            else bodyColor = bodyColors.get(closestHitIndex);
+
+            return Float4.mult(Color.add(Color.add(
+                            Shader.getAmbient(bodyColor, lightColor),
+                            Shader.getDiffuse(bodyType, closestHitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
+                    Shader.getSpecular(reflectionOrigin, bodyType, closestHitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)), reflectivity);
+        } else
+            return Float4.mult(worldBGColor, reflectivity);
+    }
 }

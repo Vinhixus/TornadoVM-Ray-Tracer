@@ -77,11 +77,12 @@ public class Renderer {
                     if (bodyType == 0) bodyColor = Body.getPlaneColor(hitPosition);
                     else bodyColor = bodyColors.get(hitIndex);
 
-                    pixels[x + y * width] = Color.toARGB(Color.mult(Color.add(Color.add(
-                                            Shader.getAmbient(bodyColor, lightColor),
-                                            Shader.getDiffuse(bodyType, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
-                                    Shader.getSpecular(camPos, bodyType, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)),
-                            Shader.getShadow(ssSample[0], hitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize[0])));
+                    pixels[x + y * width] = Color.toARGB(Color.add(Color.mult(Color.add(Color.add(
+                                                    Shader.getAmbient(bodyColor, lightColor),
+                                                    Shader.getDiffuse(bodyType, hitPosition, bodyPosition, bodyColor, lightPosition, lightColor)),
+                                            Shader.getSpecular(camPos, bodyType, hitPosition, bodyPosition, bodyReflectivity, lightPosition, lightColor)),
+                                    Shader.getShadow(ssSample[0], hitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize[0])),
+                            Shader.getReflection(hitIndex, hitPosition, rayDirection, bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities, worldBGColor, lightPosition, lightColor)));
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }
