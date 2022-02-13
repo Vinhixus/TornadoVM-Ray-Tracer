@@ -103,7 +103,7 @@ public class Controller {
     private static void populateWorld() {
 
         // Number of bodies
-        final int NUM_BODIES = 4;
+        final int NUM_BODIES = 6;
 
         bodyTypes = new VectorInt(NUM_BODIES);
         bodyPositions = new VectorFloat4(NUM_BODIES);
@@ -116,7 +116,7 @@ public class Controller {
         bodyPositions.set(0, new Float4(0, -1F, 0, 0));
         bodySizes.set(0, -1F);
         bodyColors.set(0, Color.BLACK);
-        bodyReflectivities.set(0, 8F);
+        bodyReflectivities.set(0, 32F);
 
         // Spheres
         bodyTypes.set(1, 2);
@@ -136,6 +136,18 @@ public class Controller {
         bodySizes.set(3, 0.5F);
         bodyColors.set(3, Color.BLUE);
         bodyReflectivities.set(3, 32F);
+
+        bodyTypes.set(4, 2);
+        bodyPositions.set(4, new Float4(-3F, 0, 0, 0));
+        bodySizes.set(4, 0.5F);
+        bodyColors.set(4, Color.WHITE);
+        bodyReflectivities.set(4, 4F);
+
+        bodyTypes.set(5, 2);
+        bodyPositions.set(5, new Float4(3F, 0, 0, 0));
+        bodySizes.set(5, 0.5F);
+        bodyColors.set(5, Color.BLACK);
+        bodyReflectivities.set(5, 64F);
     }
 
     // ==============================================================

@@ -61,7 +61,7 @@ public class Test {
     private static void populateWorld() {
 
         // Number of bodies
-        final int NUM_BODIES = 4;
+        final int NUM_BODIES = 6;
 
         bodyTypes = new VectorInt(NUM_BODIES);
         bodyPositions = new VectorFloat4(NUM_BODIES);
@@ -74,26 +74,38 @@ public class Test {
         bodyPositions.set(0, new Float4(0, -1F, 0, 0));
         bodySizes.set(0, -1F);
         bodyColors.set(0, Color.BLACK);
-        bodyReflectivities.set(0, 8F);
+        bodyReflectivities.set(0, 32F);
 
         // Spheres
         bodyTypes.set(1, 2);
-        bodyPositions.set(1, new Float4(-1F, 0, 0, 0));
-        bodySizes.set(1, 0.3F);
+        bodyPositions.set(1, new Float4(-1.5F, 0, 0, 0));
+        bodySizes.set(1, 0.5F);
         bodyColors.set(1, Color.RED);
         bodyReflectivities.set(1, 8F);
 
         bodyTypes.set(2, 2);
         bodyPositions.set(2, new Float4(0, 0, 0, 0));
-        bodySizes.set(2, 0.3F);
+        bodySizes.set(2, 0.5F);
         bodyColors.set(2, Color.GREEN);
         bodyReflectivities.set(2, 16F);
 
         bodyTypes.set(3, 2);
-        bodyPositions.set(3, new Float4(1F, 0, 0, 0));
-        bodySizes.set(3, 0.3F);
+        bodyPositions.set(3, new Float4(1.5F, 0, 0, 0));
+        bodySizes.set(3, 0.5F);
         bodyColors.set(3, Color.BLUE);
         bodyReflectivities.set(3, 32F);
+
+        bodyTypes.set(4, 2);
+        bodyPositions.set(4, new Float4(-3F, 0, 0, 0));
+        bodySizes.set(4, 0.5F);
+        bodyColors.set(4, Color.WHITE);
+        bodyReflectivities.set(4, 4F);
+
+        bodyTypes.set(5, 2);
+        bodyPositions.set(5, new Float4(3F, 0, 0, 0));
+        bodySizes.set(5, 0.5F);
+        bodyColors.set(5, Color.BLACK);
+        bodyReflectivities.set(5, 64F);
     }
 
     // ==============================================================
