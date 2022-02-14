@@ -4,6 +4,7 @@ import com.vinhderful.raytracer.renderer.Renderer;
 import com.vinhderful.raytracer.utils.Color;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ComboBox;
@@ -235,6 +236,12 @@ public class Controller {
         mousePosY = mouseEvent.getY();
         mouseOldX = mousePosX;
         mouseOldY = mousePosY;
+
+        canvas.setCursor(Cursor.NONE);
+    }
+
+    public void mouseReleased() {
+        canvas.setCursor(Cursor.DEFAULT);
     }
 
     public void keyPressed(KeyEvent keyEvent) {
