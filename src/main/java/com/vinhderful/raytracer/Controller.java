@@ -52,6 +52,7 @@ public class Controller {
     private static GraphicsContext g;
     private static PixelWriter pixelWriter;
     private static WritablePixelFormat<IntBuffer> format;
+    private static TaskSchedule ts;
     // ==============================================================
     @FXML
     public Label fps;
@@ -64,7 +65,6 @@ public class Controller {
     public ComboBox<String> deviceDropdown;
     private int selectedDeviceIndex;
     private TornadoDriver driver;
-    private TaskSchedule ts;
     // ==============================================================
     private double mousePosX;
     private double mousePosY;
@@ -152,7 +152,7 @@ public class Controller {
     }
 
     // ==============================================================
-    private void render(boolean renderWithTornado) {
+    private static void render(boolean renderWithTornado) {
 
         if (renderWithTornado)
             ts.execute(grid);
