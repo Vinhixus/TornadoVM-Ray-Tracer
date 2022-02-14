@@ -96,7 +96,7 @@ public class Controller {
         worldBGColor = Color.BLACK;
 
         // Light source properties
-        lightPosition = new Float4(2F, 1.5F, -1.5F, 0);
+        lightPosition = new Float4(1F, 1.5F, -1.5F, 0);
         lightSize = new float[]{0.3F};
         lightColor = Color.WHITE;
     }
@@ -114,7 +114,7 @@ public class Controller {
 
         // Planes
         bodyTypes.set(0, 0);
-        bodyPositions.set(0, new Float4(0, -1F, 0, 0));
+        bodyPositions.set(0, new Float4(0, -0.5F, 0, 0));
         bodySizes.set(0, -1F);
         bodyColors.set(0, Color.BLACK);
         bodyReflectivities.set(0, 16F);
