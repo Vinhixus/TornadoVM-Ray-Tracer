@@ -196,8 +196,11 @@ public class Controller {
         int numDevices = driver.getDeviceCount();
 
         deviceDropdown.getItems().add("CPU - Pure Java Sequential");
-        for (int i = 0; i < numDevices; i++)
+        for (int i = 0; i < numDevices; i++) {
             deviceDropdown.getItems().add(driver.getDevice(i).getPhysicalDevice().getDeviceName());
+            ts.mapAllTo(driver.getDevice(i));
+            ts.execute(grid);
+        }
 
         selectedDeviceIndex = 0;
         deviceDropdown.getSelectionModel().selectFirst();
