@@ -60,7 +60,7 @@ public class Renderer {
         for (@Parallel int x = 0; x < width; x++)
             for (@Parallel int y = 0; y < height; y++) {
 
-                Float4 normalizedCoords = new Float4(getNormalizedX(dimensions[0], dimensions[1], x), getNormalizedY(dimensions[0], dimensions[1], y), 0, 0);
+                Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
                 Float4 rayDirection = VectorOps.rotate(Float4.normalise(Float4.sub(normalizedCoords, eyePos)), camera[3], camera[4]);
 
                 Float4 hit = getClosestHit(bodyTypes, bodyPositions, bodySizes, camPos, rayDirection);

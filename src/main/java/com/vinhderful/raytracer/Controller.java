@@ -116,7 +116,7 @@ public class Controller {
         bodyPositions.set(0, new Float4(0, -1F, 0, 0));
         bodySizes.set(0, -1F);
         bodyColors.set(0, Color.BLACK);
-        bodyReflectivities.set(0, 32F);
+        bodyReflectivities.set(0, 16F);
 
         // Spheres
         bodyTypes.set(1, 2);
