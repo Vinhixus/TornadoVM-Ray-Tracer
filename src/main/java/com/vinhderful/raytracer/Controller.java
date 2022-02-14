@@ -29,6 +29,8 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Controller {
 
+    private static final float MOUSE_SENSITIVITY = 0.5F;
+    // ==============================================================
     private static long lastUpdate = 0;
     // ==============================================================
     private static float[] camera;
@@ -47,12 +49,6 @@ public class Controller {
     private static VectorFloat bodyReflectivities;
     // ==============================================================
     private static int[] pixels;
-
-    private static GridScheduler grid;
-    private static GraphicsContext g;
-    private static PixelWriter pixelWriter;
-    private static WritablePixelFormat<IntBuffer> format;
-    private static TaskSchedule ts;
     // ==============================================================
     @FXML
     public Label fps;
@@ -61,35 +57,26 @@ public class Controller {
     public Canvas canvas;
     public Slider camFOV;
     public Slider ssSample;
-    public float mouseSensitivity = 0.5F;
     public ComboBox<String> deviceDropdown;
-    private int selectedDeviceIndex;
-    private TornadoDriver driver;
     // ==============================================================
     private double mousePosX;
     private double mousePosY;
     private double mouseOldX;
     private double mouseOldY;
-
-    private float moveSpeed = 0.2F;
     private boolean fwd, strafeL, strafeR, back, up, down;
     private Float3 upVector;
+    private float moveSpeed = 0.2F;
+    // ==============================================================
+    private TornadoDriver driver;
+    private int selectedDeviceIndex;
+
+    private TaskSchedule ts;
+    private GridScheduler grid;
+    private GraphicsContext g;
+    private PixelWriter pixelWriter;
+    private WritablePixelFormat<IntBuffer> format;
 
     // ==============================================================
-    private static void setRenderingProperties() {
-        int width = (int) g.getCanvas().getWidth();
-        int height = (int) g.getCanvas().getHeight();
-
-        dimensions = new int[]{width, height};
-        pixels = new int[dimensions[0] * dimensions[1]];
-
-        format = WritablePixelFormat.getIntArgbInstance();
-        pixelWriter = g.getPixelWriter();
-
-        camera = new float[]{0, 0, -4F, 0, 0, 60};
-        softShadowSampleSize = new int[]{1};
-    }
-
     private static void setWorldProperties() {
 
         // Background color
@@ -152,7 +139,40 @@ public class Controller {
     }
 
     // ==============================================================
-    private static void render(boolean renderWithTornado) {
+    private void setRenderingProperties() {
+        int width = (int) g.getCanvas().getWidth();
+        int height = (int) g.getCanvas().getHeight();
+        upVector = new Float3(0, 1F, 0);
+
+        dimensions = new int[]{width, height};
+        pixels = new int[dimensions[0] * dimensions[1]];
+
+        format = WritablePixelFormat.getIntArgbInstance();
+        pixelWriter = g.getPixelWriter();
+
+        camera = new float[]{0, 0, -4F, 0, 0, 60};
+        softShadowSampleSize = new int[]{1};
+    }
+
+    // ==============================================================
+    private void initTornadoSettings() {
+        driver = TornadoRuntime.getTornadoRuntime().getDriver(0);
+
+        ts = new TaskSchedule("s0");
+        ts.streamIn(dimensions, camera, softShadowSampleSize);
+        ts.task("t0", Renderer::render, dimensions, pixels, camera,
+                bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                worldBGColor, lightPosition, lightSize, lightColor, softShadowSampleSize);
+        ts.streamOut(pixels);
+
+        WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
+        worker.setLocalWork(16, 16, 1);
+        grid = new GridScheduler();
+        grid.setWorkerGrid("s0.t0", worker);
+    }
+
+    // ==============================================================
+    private void render(boolean renderWithTornado) {
 
         if (renderWithTornado)
             ts.execute(grid);
@@ -173,26 +193,13 @@ public class Controller {
         // ==============================================================
         g = canvas.getGraphicsContext2D();
 
-        setRenderingProperties();
         setWorldProperties();
         populateWorld();
 
-        upVector = new Float3(0, 1F, 0);
+        setRenderingProperties();
+        initTornadoSettings();
 
         // ==============================================================
-        ts = new TaskSchedule("s0");
-        ts.streamIn(dimensions, camera, softShadowSampleSize);
-        ts.task("t0", Renderer::render, dimensions, pixels, camera,
-                bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                worldBGColor, lightPosition, lightSize, lightColor, softShadowSampleSize);
-        ts.streamOut(pixels);
-
-        WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
-        worker.setLocalWork(16, 16, 1);
-        grid = new GridScheduler();
-        grid.setWorkerGrid("s0.t0", worker);
-
-        driver = TornadoRuntime.getTornadoRuntime().getDriver(0);
         int numDevices = driver.getDeviceCount();
 
         deviceDropdown.getItems().add("CPU - Pure Java Sequential");
@@ -230,8 +237,8 @@ public class Controller {
         mousePosX = mouseEvent.getX();
         mousePosY = mouseEvent.getY();
 
-        camera[3] += (mousePosX - mouseOldX) * mouseSensitivity;
-        camera[4] = (float) min(90, max(-90, camera[4] + (mousePosY - mouseOldY) * mouseSensitivity));
+        camera[3] += (mousePosX - mouseOldX) * MOUSE_SENSITIVITY;
+        camera[4] = (float) min(90, max(-90, camera[4] + (mousePosY - mouseOldY) * MOUSE_SENSITIVITY));
     }
 
     public void mousePressed(MouseEvent mouseEvent) {

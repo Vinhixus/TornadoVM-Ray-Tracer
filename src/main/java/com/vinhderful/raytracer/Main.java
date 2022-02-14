@@ -43,7 +43,7 @@ public class Main extends Application {
         if (root != null)
             scene = new Scene(root);
 
-        stage.setTitle("TornadoVM Ray Tracer");
+        stage.setTitle("TornadoVM Path Tracer");
         stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("icon.png"))));
         stage.setResizable(false);
         stage.setScene(scene);
