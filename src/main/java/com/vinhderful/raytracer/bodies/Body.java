@@ -12,10 +12,10 @@ public class Body {
     public static Float4 getIntersection(int bodyType, Float4 position, float size,
                                          Float4 rayOrigin, Float4 rayDirection) {
 
-        final Float4 NO_INTERSECTION = new Float4(-1F, -1F, -1F, -1F);
+        final Float4 NO_INTERSECTION = new Float4(-1000F, -1000F, -1000F, -1000F);
 
         // Plane
-        if (bodyType == 0) {
+        if (bodyType == 1) {
             float t = -(rayOrigin.getY() - position.getY()) / rayDirection.getY();
             if (t > 0 && Float.isFinite(t))
                 return Float4.add(rayOrigin, Float4.mult(rayDirection, t));
@@ -42,7 +42,7 @@ public class Body {
     public static Float4 getNormal(int bodyType, Float4 point, Float4 position) {
 
         // Plane
-        if (bodyType == 0)
+        if (bodyType == 1)
             return new Float4(0, 1F, 0, 0);
 
             // Sphere

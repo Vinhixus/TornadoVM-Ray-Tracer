@@ -53,9 +53,9 @@ public class Shader {
         return Color.mult(Color.mult(lightColor, specularBrightness), SPECULAR_STRENGTH);
     }
 
-    public static float getShadow(int sampleSize, Float4 hitPosition,
+    public static float getShadow(Float4 hitPosition,
                                   VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes,
-                                  Float4 lightPosition, float lightSize) {
+                                  Float4 lightPosition, float lightSize, int sampleSize) {
 
         float uniform = lightSize * 2 / (sampleSize - 1);
 
@@ -69,9 +69,7 @@ public class Shader {
                 Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDir, 0.001F));
 
                 Float4 closestHit = Renderer.getClosestHit(bodyTypes, bodyPositions, bodySizes, rayOrigin, rayDir);
-
-                if (closestHit.getW() != -1000F)
-                    raysHit++;
+                if (closestHit.getW() > 0) raysHit++;
             }
         }
 
@@ -101,9 +99,7 @@ public class Shader {
             Float4 bodyPosition = bodyPositions.get(closestHitIndex);
             float bodyReflectivity = bodyReflectivities.get(closestHitIndex);
 
-            Float4 bodyColor;
-            if (bodyType == 0) bodyColor = Body.getPlaneColor(closestHitPosition);
-            else bodyColor = bodyColors.get(closestHitIndex);
+            Float4 bodyColor = (bodyType == 1) ? Body.getPlaneColor(closestHitPosition) : bodyColors.get(closestHitIndex);
 
             return Color.mult(
                     getPhong(reflectionOrigin, bodyType, closestHitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),

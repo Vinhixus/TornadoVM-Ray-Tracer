@@ -49,7 +49,7 @@ public class Renderer {
 
     public static void render(int[] dimensions, int[] pixels, float[] camera,
                               VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              Float4 worldBGColor, Float4 lightPosition, float[] lightSize, Float4 lightColor, int[] ssSample) {
+                              Float4 worldBGColor, int[] lightSampleSize) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * floatPI() / 360F), 0);
         Float4 camPos = new Float4(camera[0], camera[1], camera[2], 0);
@@ -67,20 +67,27 @@ public class Renderer {
                 int hitIndex = (int) hit.getW();
 
                 if (hitIndex != -1000) {
-                    Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
 
-                    int bodyType = bodyTypes.get(hitIndex);
-                    Float4 bodyPosition = bodyPositions.get(hitIndex);
-                    float bodyReflectivity = bodyReflectivities.get(hitIndex);
+                    if (hitIndex == 0) pixels[x + y * width] = Color.toARGB(bodyColors.get(0));
+                    else {
+                        Float4 lightPosition = bodyPositions.get(0);
+                        Float4 lightColor = bodyColors.get(0);
+                        float lightSize = bodySizes.get(0);
 
-                    Float4 bodyColor;
-                    if (bodyType == 0) bodyColor = Body.getPlaneColor(hitPosition);
-                    else bodyColor = bodyColors.get(hitIndex);
+                        Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
 
-                    pixels[x + y * width] = Color.toARGB(Color.mult(Color.add(
-                                    Shader.getPhong(camPos, bodyType, hitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
-                                    Shader.getReflection(hitIndex, hitPosition, rayDirection, bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities, worldBGColor, lightPosition, lightColor)),
-                            Shader.getShadow(ssSample[0], hitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize[0])));
+                        int bodyType = bodyTypes.get(hitIndex);
+                        Float4 bodyPosition = bodyPositions.get(hitIndex);
+                        float bodyReflectivity = bodyReflectivities.get(hitIndex);
+
+                        Float4 bodyColor = (bodyType == 1) ? Body.getPlaneColor(hitPosition) : bodyColors.get(hitIndex);
+
+                        pixels[x + y * width] = Color.toARGB(Color.mult(Color.add(
+                                        Shader.getPhong(camPos, bodyType, hitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
+                                        Shader.getReflection(hitIndex, hitPosition, rayDirection, bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities, worldBGColor, lightPosition, lightColor)),
+                                Shader.getShadow(hitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize, lightSampleSize[0])));
+                    }
+
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }
