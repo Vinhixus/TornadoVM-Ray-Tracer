@@ -52,6 +52,11 @@ public class Controller {
     public Label debugOutput;
     public Pane pane;
     public Canvas canvas;
+
+    public Slider lightX;
+    public Slider lightY;
+    public Slider lightZ;
+
     public Slider camFOV;
     public Slider ssSample;
     public ComboBox<String> deviceDropdown;
@@ -158,7 +163,7 @@ public class Controller {
         driver = TornadoRuntime.getTornadoRuntime().getDriver(0);
 
         ts = new TaskSchedule("s0");
-        ts.streamIn(dimensions, camera, softShadowSampleSize);
+        ts.streamIn(bodyPositions, camera, softShadowSampleSize);
         ts.task("t0", Renderer::render, dimensions, pixels, camera,
                 bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 worldBGColor, softShadowSampleSize);
@@ -212,6 +217,10 @@ public class Controller {
         deviceDropdown.getSelectionModel().selectFirst();
 
         // ==============================================================
+        lightX.valueProperty().addListener((observable, oldValue, newValue) -> bodyPositions.set(0, new Float4(newValue.floatValue(), bodyPositions.get(0).getY(), bodyPositions.get(0).getZ(), 0)));
+        lightY.valueProperty().addListener((observable, oldValue, newValue) -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), newValue.floatValue(), bodyPositions.get(0).getZ(), 0)));
+        lightZ.valueProperty().addListener((observable, oldValue, newValue) -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), bodyPositions.get(0).getY(), newValue.floatValue(), 0)));
+
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
         ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
 
