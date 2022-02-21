@@ -9,13 +9,24 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.collections.types.VectorInt;
 
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatPI;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatTan;
 
 /**
  * Implements functions to draw the scene on the canvas
  */
 public class Renderer {
+
+    public static boolean intersects(VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes,
+                                     Float4 rayOrigin, Float4 rayDirection) {
+
+        boolean intersects = false;
+
+        for (int i = 2; i < bodyPositions.getLength(); i++)
+            if (Body.getIntersection(bodyTypes.get(i), bodyPositions.get(i), bodySizes.get(i), rayOrigin, rayDirection).getW() == 0)
+                intersects = true;
+
+        return intersects;
+    }
 
     public static Float4 getClosestHit(VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes,
                                        Float4 rayOrigin, Float4 rayDirection) {
@@ -35,23 +46,23 @@ public class Renderer {
 
     public static float getNormalizedX(int width, int height, int x) {
         if (width > height)
-            return (float) (x - width / 2 + height / 2) / height * 2 - 1;
+            return (x - width * 0.5F + height * 0.5F) / height * 2 - 1;
         else
-            return (float) x / width * 2 - 1;
+            return x * 2F / width - 1;
     }
 
     public static float getNormalizedY(int width, int height, int y) {
         if (width > height)
-            return -((float) y / height * 2 - 1);
+            return -(y * 2F / height - 1);
         else
-            return -((float) (y - height / 2 + width / 2) / width * 2 - 1);
+            return -((y - height * 0.5F + width * 0.5F) / width * 2 - 1);
     }
 
     public static void render(int[] dimensions, int[] pixels, float[] camera,
                               VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
                               Float4 worldBGColor, int[] lightSampleSize) {
 
-        Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * floatPI() / 360F), 0);
+        Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * 0.008726646F), 0);
         Float4 camPos = new Float4(camera[0], camera[1], camera[2], 0);
 
         int width = dimensions[0];

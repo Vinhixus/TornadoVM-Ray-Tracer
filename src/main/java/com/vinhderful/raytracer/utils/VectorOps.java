@@ -11,8 +11,8 @@ public class VectorOps {
 
     public static Float4 rotate(Float4 a, float yaw, float pitch) {
 
-        float _yaw = yaw * floatPI() / 180F;
-        float _pitch = pitch * floatPI() / 180F;
+        float _yaw = yaw * 0.017453292F;
+        float _pitch = pitch * 0.017453292F;
 
         float _y = a.getY() * floatCos(_pitch) - a.getZ() * floatSin(_pitch);
         float _z = a.getY() * floatSin(_pitch) + a.getZ() * floatCos(_pitch);
@@ -24,6 +24,9 @@ public class VectorOps {
     }
 
     public static float distance(Float4 a, Float4 b) {
-        return floatSqrt(pow(a.getX() - b.getX(), 2) + pow(a.getY() - b.getY(), 2) + pow(a.getZ() - b.getZ(), 2));
+        float x = a.getX() - b.getX();
+        float y = a.getY() - b.getY();
+        float z = a.getZ() - b.getZ();
+        return floatSqrt(x * x + y * y + z * z);
     }
 }

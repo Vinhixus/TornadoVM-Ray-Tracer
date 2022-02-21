@@ -68,8 +68,8 @@ public class Shader {
                 Float4 rayDir = Float4.normalise(Float4.sub(samplePoint, hitPosition));
                 Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDir, 0.001F));
 
-                Float4 closestHit = Renderer.getClosestHit(bodyTypes, bodyPositions, bodySizes, rayOrigin, rayDir);
-                if (closestHit.getW() > 0) raysHit++;
+                if (Renderer.intersects(bodyTypes, bodyPositions, bodySizes, rayOrigin, rayDir))
+                    raysHit++;
             }
         }
 
