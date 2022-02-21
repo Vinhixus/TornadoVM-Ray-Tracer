@@ -2,15 +2,22 @@ package com.vinhderful.raytracer.renderer;
 
 import com.vinhderful.raytracer.bodies.Body;
 import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.VectorOps;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.collections.types.VectorInt;
 
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.pow;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 public class Shader {
+
+    public static final float AMBIENT_STRENGTH = 0.05F;
+    public static final float SPECULAR_STRENGTH = 0.5F;
+    public static final float MAX_REFLECTIVITY = 256F;
+    public static final float SHADOW_STRENGTH = 1F / 0.8F;
+
+    public static final float PHI = floatPI() * (3 - floatSqrt(5));
 
     public static Float4 getPhong(Float4 cameraPosition, int bodyType, Float4 hitPosition,
                                   Float4 bodyPosition, Float4 bodyColor, float bodyReflectivity,
@@ -22,8 +29,6 @@ public class Shader {
     }
 
     public static Float4 getAmbient(Float4 bodyColor, Float4 lightColor) {
-
-        final float AMBIENT_STRENGTH = 0.05F;
         return Color.mult(Color.mult(bodyColor, lightColor), AMBIENT_STRENGTH);
     }
 
@@ -37,8 +42,6 @@ public class Shader {
     public static Float4 getSpecular(Float4 cameraPosition, int bodyType, Float4 hitPosition,
                                      Float4 bodyPosition, float bodyReflectivity,
                                      Float4 lightPosition, Float4 lightColor) {
-
-        final float SPECULAR_STRENGTH = 0.5F;
 
         Float4 rayDirection = Float4.normalise(Float4.sub(hitPosition, cameraPosition));
         Float4 lightDirection = Float4.normalise(Float4.sub(lightPosition, hitPosition));
@@ -57,31 +60,35 @@ public class Shader {
                                   VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes,
                                   Float4 lightPosition, float lightSize, int sampleSize) {
 
-        float uniform = lightSize * 2 / (sampleSize - 1);
-
         int raysHit = 0;
-        int totalRays = sampleSize * sampleSize;
 
-        for (float i = lightPosition.getX() - lightSize; i <= lightPosition.getX() + lightSize + 0.01F; i += uniform) {
-            for (float j = lightPosition.getZ() - lightSize; j <= lightPosition.getZ() + lightSize + 0.01F; j += uniform) {
-                Float4 samplePoint = new Float4(i, lightPosition.getY(), j, 0);
-                Float4 rayDir = Float4.normalise(Float4.sub(samplePoint, hitPosition));
-                Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDir, 0.001F));
+        Float4 n = Float4.normalise(Float4.sub(hitPosition, lightPosition));
+        Float4 u = VectorOps.getPerpVector(n);
+        Float4 v = VectorOps.cross(u, n);
 
-                if (Renderer.intersects(bodyTypes, bodyPositions, bodySizes, rayOrigin, rayDir))
-                    raysHit++;
-            }
+        for (int i = 0; i < sampleSize; i++) {
+
+            float t = PHI * i;
+            float r = floatSqrt((float) i / sampleSize);
+
+            float x = 2 * lightSize * r * floatCos(t);
+            float y = 2 * lightSize * r * floatSin(t);
+
+            Float4 samplePoint = Float4.add(Float4.add(lightPosition, Float4.mult(u, x)), Float4.mult(v, y));
+            Float4 rayDir = Float4.normalise(Float4.sub(samplePoint, hitPosition));
+            Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDir, 0.001F));
+
+            if (Renderer.intersects(bodyTypes, bodyPositions, bodySizes, rayOrigin, rayDir))
+                raysHit++;
         }
 
         if (raysHit == 0) return 1;
-        else return 1 + -raysHit / (totalRays * 1.3F);
+        else return 1 - (float) raysHit / (sampleSize * SHADOW_STRENGTH);
     }
 
     public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
                                        Float4 worldBGColor, Float4 lightPosition, Float4 lightColor) {
-
-        final float MAX_REFLECTIVITY = 256F;
 
         Float4 hitNormal = Body.getNormal(bodyTypes.get(hitIndex), hitPosition, bodyPositions.get(hitIndex));
         Float4 reflectionDir = Float4.sub(rayDirection, Float4.mult(hitNormal, 2 * Float4.dot(rayDirection, hitNormal)));

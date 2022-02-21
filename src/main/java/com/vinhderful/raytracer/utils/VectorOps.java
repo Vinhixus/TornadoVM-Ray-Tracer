@@ -29,4 +29,19 @@ public class VectorOps {
         float z = a.getZ() - b.getZ();
         return floatSqrt(x * x + y * y + z * z);
     }
+
+    public static Float4 cross(Float4 a, Float4 b) {
+        return new Float4(
+                a.getY() * b.getZ() - a.getZ() * b.getY(),
+                a.getZ() * b.getX() - a.getX() * b.getZ(),
+                a.getX() * b.getY() - a.getY() * b.getX(),
+                0);
+    }
+
+    public static Float4 getPerpVector(Float4 a) {
+        if (a.getY() == 0 && a.getZ() == 0)
+            return VectorOps.cross(a, new Float4(0, 1, 0, 0));
+
+        return VectorOps.cross(a, new Float4(1, 0, 0, 0));
+    }
 }
