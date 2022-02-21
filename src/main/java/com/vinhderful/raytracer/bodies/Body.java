@@ -3,6 +3,7 @@ package com.vinhderful.raytracer.bodies;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatSqrt;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floor;
 
 /**
  * Represent a sphere in a 3D scene using its position, radius and color
@@ -51,18 +52,9 @@ public class Body {
     }
 
     public static Float4 getPlaneColor(Float4 point) {
-
-        float x = point.getX();
-        float z = point.getZ();
-        // int xInt = (int) x;
-        // int zInt = (int) z;
-        // boolean b = (xInt % 2 == 0 & zInt % 2 != 0) || (xInt % 2 != 0 & zInt % 2 == 0);
-
-        if ((x > 0 & z > 0) || (x < 0 & z < 0))
+        if ((int) (floor(point.getX()) + floor(point.getZ())) % 2 == 0)
             return new Float4(0.5F, 0.5F, 0.5F, 0);
-            // return b ? new Float4(0.5F, 0.5F, 0.5F, 0) : new Float4(0.2F, 0.2F, 0.2F, 0);
         else
             return new Float4(0.2F, 0.2F, 0.2F, 0);
-        // return b ? new Float4(0.2F, 0.2F, 0.2F, 0) : new Float4(0.5F, 0.5F, 0.5F, 0);
     }
 }
