@@ -88,7 +88,7 @@ public class Shader {
 
     public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                                       Float4 worldBGColor, Float4 lightPosition, Float4 lightColor) {
+                                       Float4 worldBGColor, Float4 lightPosition, float lightSize, Float4 lightColor, int lightSampleSize) {
 
         Float4 hitNormal = Body.getNormal(bodyTypes.get(hitIndex), hitPosition, bodyPositions.get(hitIndex));
         Float4 reflectionDir = Float4.sub(rayDirection, Float4.mult(hitNormal, 2 * Float4.dot(rayDirection, hitNormal)));
@@ -108,8 +108,9 @@ public class Shader {
 
             Float4 bodyColor = (bodyType == 1) ? Body.getPlaneColor(closestHitPosition) : bodyColors.get(closestHitIndex);
 
-            return Color.mult(
-                    getPhong(reflectionOrigin, bodyType, closestHitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
+            return Color.mult(Color.mult(
+                            getPhong(reflectionOrigin, bodyType, closestHitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
+                            getShadow(closestHitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize, lightSampleSize)),
                     reflectivity);
         } else
             return Color.mult(worldBGColor, reflectivity);

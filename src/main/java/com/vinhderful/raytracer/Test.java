@@ -10,13 +10,11 @@ import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.collections.types.VectorInt;
-import uk.ac.manchester.tornado.api.common.TornadoDevice;
-import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Test {
 
-    public static final int TEST_LOOP_ITERATIONS = 200;
+    public static final int TEST_LOOP_ITERATIONS = 10;
 
     // ==============================================================
     private static float[] camera;
@@ -34,14 +32,14 @@ public class Test {
     private static int[] pixels;
 
     private static void setRenderingProperties() {
-        int width = 512;
-        int height = 1024;
+        int width = 1920;
+        int height = 960;
 
         dimensions = new int[]{width, height};
         pixels = new int[dimensions[0] * dimensions[1]];
 
         camera = new float[]{0, 0, -4F, 0, 0, 60};
-        softShadowSampleSize = new int[]{1};
+        softShadowSampleSize = new int[]{18};
     }
 
     private static void setWorldProperties() {
@@ -116,7 +114,7 @@ public class Test {
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(dimensions, camera, softShadowSampleSize);
+        ts.streamIn(camera, softShadowSampleSize);
         ts.task("t0", Renderer::render, dimensions, pixels, camera,
                 bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 worldBGColor, softShadowSampleSize);
@@ -126,9 +124,7 @@ public class Test {
         worker.setLocalWork(16, 16, 1);
         GridScheduler grid = new GridScheduler();
         grid.setWorkerGrid("s0.t0", worker);
-
-        TornadoDevice device = TornadoRuntime.getTornadoRuntime().getDriver(0).getDevice(1);
-        ts.mapAllTo(device);
+        ts.execute(grid);
 
         // ==============================================================
         // Run computation in parallel
@@ -141,7 +137,8 @@ public class Test {
             ts.execute(grid);
 
         long endTime = System.nanoTime();
-        System.out.println("Duration: " + (endTime - startTime) / 1000000.0 + " ms");
+        double tornadoTime = (endTime - startTime) / 1000000.0;
+        System.out.println("Duration: " + tornadoTime + " ms");
 
         // ==============================================================
         // Run computation sequentially
@@ -156,6 +153,14 @@ public class Test {
                     worldBGColor, softShadowSampleSize);
 
         endTime = System.nanoTime();
-        System.out.println("Duration: " + (endTime - startTime) / 1000000.0 + " ms");
+        double sequentialTime = (endTime - startTime) / 1000000.0;
+        System.out.println("Duration: " + sequentialTime + " ms");
+
+        // ==============================================================
+        // Performance increase
+        // ==============================================================
+        System.out.println("-----------------------------------------");
+        System.out.println("Performance increase: " + sequentialTime / tornadoTime + "x");
+        System.out.println("-----------------------------------------");
     }
 }

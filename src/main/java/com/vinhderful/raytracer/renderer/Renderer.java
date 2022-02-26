@@ -95,7 +95,7 @@ public class Renderer {
 
                         pixels[x + y * width] = Color.toARGB(Color.mult(Color.add(
                                         Shader.getPhong(camPos, bodyType, hitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
-                                        Shader.getReflection(hitIndex, hitPosition, rayDirection, bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities, worldBGColor, lightPosition, lightColor)),
+                                        Shader.getReflection(hitIndex, hitPosition, rayDirection, bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities, worldBGColor, lightPosition, lightSize, lightColor, lightSampleSize[0])),
                                 Shader.getShadow(hitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize, lightSampleSize[0])));
                     }
 
