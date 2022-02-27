@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -30,6 +31,7 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 public class Controller {
 
     private static final float MOUSE_SENSITIVITY = 0.5F;
+    private static float t = 0;
     // ==============================================================
     private static long lastUpdate = 0;
     // ==============================================================
@@ -53,16 +55,16 @@ public class Controller {
     public Label debugOutput;
     public Pane pane;
     public Canvas canvas;
-
     public Slider lightX;
     public Slider lightY;
     public Slider lightZ;
-
     public Slider camFOV;
     public Slider ssSample;
     public Slider rBounce;
     public ComboBox<String> deviceDropdown;
+    public Button animBtn;
     // ==============================================================
+    private boolean animating;
     private double mousePosX;
     private double mousePosY;
     private double mouseOldX;
@@ -73,7 +75,6 @@ public class Controller {
     // ==============================================================
     private TornadoDriver driver;
     private int selectedDeviceIndex;
-
     private TaskSchedule ts;
     private GridScheduler grid;
     private GraphicsContext g;
@@ -90,7 +91,7 @@ public class Controller {
     private static void populateWorld() {
 
         // Number of bodies
-        final int NUM_BODIES = 7;
+        final int NUM_BODIES = 6;
 
         bodyTypes = new VectorInt(NUM_BODIES);
         bodyPositions = new VectorFloat4(NUM_BODIES);
@@ -100,7 +101,7 @@ public class Controller {
 
         // Light
         bodyTypes.set(0, 0);
-        bodyPositions.set(0, new Float4(1F, 1.5F, -1.5F, 0));
+        bodyPositions.set(0, new Float4(1F, 3F, -1.5F, 0));
         bodySizes.set(0, 0.4F);
         bodyColors.set(0, Color.WHITE);
         bodyReflectivities.set(0, 0);
@@ -114,34 +115,28 @@ public class Controller {
 
         // Spheres
         bodyTypes.set(2, 2);
-        bodyPositions.set(2, new Float4(-3F, 0.5F, 0, 0));
-        bodySizes.set(2, 0.5F);
-        bodyColors.set(2, Color.WHITE);
-        bodyReflectivities.set(2, 4F);
+        bodyPositions.set(2, new Float4(0, 1F, 0, 0));
+        bodySizes.set(2, 1F);
+        bodyColors.set(2, Color.GRAY);
+        bodyReflectivities.set(2, 32F);
 
         bodyTypes.set(3, 2);
-        bodyPositions.set(3, new Float4(-1.5F, 0.5F, 0, 0));
+        bodyPositions.set(3, new Float4(3F, 0.5F, 0, 0));
         bodySizes.set(3, 0.5F);
         bodyColors.set(3, Color.RED);
         bodyReflectivities.set(3, 8F);
 
         bodyTypes.set(4, 2);
-        bodyPositions.set(4, new Float4(0, 0.5F, 0, 0));
+        bodyPositions.set(4, new Float4(4.5F, 0.5F, 0, 0));
         bodySizes.set(4, 0.5F);
         bodyColors.set(4, Color.GREEN);
         bodyReflectivities.set(4, 16F);
 
         bodyTypes.set(5, 2);
-        bodyPositions.set(5, new Float4(1.5F, 0.5F, 0, 0));
+        bodyPositions.set(5, new Float4(6F, 0.5F, 0, 0));
         bodySizes.set(5, 0.5F);
         bodyColors.set(5, Color.BLUE);
         bodyReflectivities.set(5, 32F);
-
-        bodyTypes.set(6, 2);
-        bodyPositions.set(6, new Float4(3F, 1F, 1F, 0));
-        bodySizes.set(6, 1F);
-        bodyColors.set(6, Color.DARK_GRAY);
-        bodyReflectivities.set(6, 64F);
     }
 
     // ==============================================================
@@ -156,7 +151,7 @@ public class Controller {
         format = WritablePixelFormat.getIntArgbInstance();
         pixelWriter = g.getPixelWriter();
 
-        camera = new float[]{0, 0, -4F, 0, 0, 60};
+        camera = new float[]{0, 1F, -4F, 0, 0, 60};
         softShadowSampleSize = new int[]{1};
         rayBounceLimit = new int[]{1};
     }
@@ -228,6 +223,8 @@ public class Controller {
         rBounce.valueProperty().addListener((observable, oldValue, newValue) -> rayBounceLimit[0] = newValue.intValue());
         ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
 
+        animating = false;
+
         // ==============================================================
         AnimationTimer timer = new AnimationTimer() {
 
@@ -235,6 +232,7 @@ public class Controller {
             public void handle(long now) {
                 render(selectedDeviceIndex > 0);
                 updatePos();
+                if (animating) animate();
                 fps.setText(String.format("FPS: %.2f", 1_000_000_000.0 / (now - lastUpdate)));
                 lastUpdate = now;
             }
@@ -350,5 +348,22 @@ public class Controller {
 
         if (selectedDeviceIndex > 0)
             ts.mapAllTo(driver.getDevice(selectedDeviceIndex - 1));
+    }
+
+    private void animate() {
+        t = (t + 0.017453292F) % 6.2831855F;
+        bodyPositions.set(3, new Float4(3 * floatCos(t), bodyPositions.get(3).getY(), 3 * floatSin(t), 0));
+        bodyPositions.set(4, new Float4(4.5F * floatCos(-t), bodyPositions.get(4).getY(), 4.5F * floatSin(-t), 0));
+        bodyPositions.set(5, new Float4(6 * floatCos(t), bodyPositions.get(5).getY(), 6 * floatSin(t), 0));
+    }
+
+    public void setAnimation() {
+        if (animating) {
+            animBtn.setText("Animate");
+            animating = false;
+        } else {
+            animBtn.setText("Stop");
+            animating = true;
+        }
     }
 }
