@@ -14,7 +14,7 @@ public class Shader {
 
     public static final float AMBIENT_STRENGTH = 0.05F;
     public static final float SPECULAR_STRENGTH = 0.5F;
-    public static final float MAX_REFLECTIVITY = 256F;
+    public static final float MAX_REFLECTIVITY = 128F;
     public static final float SHADOW_STRENGTH = 1F / 0.8F;
 
     public static final float PHI = floatPI() * (3 - floatSqrt(5));
@@ -86,33 +86,48 @@ public class Shader {
         else return 1 - (float) raysHit / (sampleSize * SHADOW_STRENGTH);
     }
 
-    public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
+    public static Float4 getReflection(int bounceLimit, int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorInt bodyTypes, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                                       Float4 worldBGColor, Float4 lightPosition, float lightSize, Float4 lightColor, int lightSampleSize) {
+                                       Float4 lightPosition, float lightSize, Float4 lightColor, int lightSampleSize) {
 
-        Float4 hitNormal = Body.getNormal(bodyTypes.get(hitIndex), hitPosition, bodyPositions.get(hitIndex));
-        Float4 reflectionDir = Float4.sub(rayDirection, Float4.mult(hitNormal, 2 * Float4.dot(rayDirection, hitNormal)));
-        Float4 reflectionOrigin = Float4.add(hitPosition, Float4.mult(reflectionDir, 0.001F));
+        Float4 reflectionColor = new Float4(0, 0, 0, 0);
+        int _index = hitIndex;
+        float reflectivity = 1F;
+        Float4 _rayDirection = new Float4(rayDirection.getX(), rayDirection.getY(), rayDirection.getZ(), 0);
+        Float4 _hitPosition = new Float4(hitPosition.getX(), hitPosition.getY(), hitPosition.getZ(), 0);
 
-        float reflectivity = bodyReflectivities.get(hitIndex) / MAX_REFLECTIVITY;
-        Float4 closestHit = Renderer.getClosestHit(bodyTypes, bodyPositions, bodySizes, reflectionOrigin, reflectionDir);
-        int closestHitIndex = (int) closestHit.getW();
+        for (int i = 0; i < bounceLimit; i++) {
 
-        if (closestHitIndex != -1000) {
+            Float4 hitNormal = Body.getNormal(bodyTypes.get(_index), _hitPosition, bodyPositions.get(_index));
+            Float4 reflectionDir = Float4.sub(_rayDirection, Float4.mult(hitNormal, 2 * Float4.dot(_rayDirection, hitNormal)));
+            Float4 reflectionOrigin = Float4.add(_hitPosition, Float4.mult(reflectionDir, 0.001F));
 
-            Float4 closestHitPosition = new Float4(closestHit.getX(), closestHit.getY(), closestHit.getZ(), 0);
+            reflectivity *= bodyReflectivities.get(_index) / MAX_REFLECTIVITY;
+            Float4 closestHit = Renderer.getClosestHit(bodyTypes, bodyPositions, bodySizes, reflectionOrigin, reflectionDir);
+            int closestHitIndex = (int) closestHit.getW();
 
-            int bodyType = bodyTypes.get(closestHitIndex);
-            Float4 bodyPosition = bodyPositions.get(closestHitIndex);
-            float bodyReflectivity = bodyReflectivities.get(closestHitIndex);
+            if (closestHitIndex != -1000) {
 
-            Float4 bodyColor = (bodyType == 1) ? Body.getPlaneColor(closestHitPosition) : bodyColors.get(closestHitIndex);
+                Float4 closestHitPosition = new Float4(closestHit.getX(), closestHit.getY(), closestHit.getZ(), 0);
 
-            return Color.mult(Color.mult(
-                            getPhong(reflectionOrigin, bodyType, closestHitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
-                            getShadow(closestHitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize, lightSampleSize)),
-                    reflectivity);
-        } else
-            return Color.mult(worldBGColor, reflectivity);
+                int bodyType = bodyTypes.get(closestHitIndex);
+                Float4 bodyPosition = bodyPositions.get(closestHitIndex);
+                float bodyReflectivity = bodyReflectivities.get(closestHitIndex);
+
+                Float4 bodyColor = (bodyType == 1) ? Body.getPlaneColor(closestHitPosition) : bodyColors.get(closestHitIndex);
+
+                reflectionColor = Color.add(reflectionColor, Color.mult(Color.mult(
+                                getPhong(reflectionOrigin, bodyType, closestHitPosition, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
+                                getShadow(closestHitPosition, bodyTypes, bodyPositions, bodySizes, lightPosition, lightSize, lightSampleSize)),
+                        reflectivity));
+
+                _rayDirection = new Float4(reflectionDir.getX(), reflectionDir.getY(), reflectionDir.getZ(), 0);
+                _hitPosition = new Float4(closestHitPosition.getX(), closestHitPosition.getY(), closestHitPosition.getZ(), 0);
+                _index = closestHitIndex;
+            } else
+                break;
+        }
+
+        return reflectionColor;
     }
 }

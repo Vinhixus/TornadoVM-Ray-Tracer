@@ -36,6 +36,7 @@ public class Controller {
     private static float[] camera;
     private static int[] dimensions;
     private static int[] softShadowSampleSize;
+    private static int[] rayBounceLimit;
     // ==============================================================
     private static Float4 worldBGColor;
     // ==============================================================
@@ -59,6 +60,7 @@ public class Controller {
 
     public Slider camFOV;
     public Slider ssSample;
+    public Slider rBounce;
     public ComboBox<String> deviceDropdown;
     // ==============================================================
     private double mousePosX;
@@ -105,40 +107,40 @@ public class Controller {
 
         // Planes
         bodyTypes.set(1, 1);
-        bodyPositions.set(1, new Float4(0, -0.5F, 0, 0));
+        bodyPositions.set(1, new Float4(0, 0, 0, 0));
         bodySizes.set(1, -1F);
         bodyColors.set(1, Color.BLACK);
         bodyReflectivities.set(1, 16F);
 
         // Spheres
         bodyTypes.set(2, 2);
-        bodyPositions.set(2, new Float4(-3F, 0, 0, 0));
+        bodyPositions.set(2, new Float4(-3F, 0.5F, 0, 0));
         bodySizes.set(2, 0.5F);
         bodyColors.set(2, Color.WHITE);
         bodyReflectivities.set(2, 4F);
 
         bodyTypes.set(3, 2);
-        bodyPositions.set(3, new Float4(-1.5F, 0, 0, 0));
+        bodyPositions.set(3, new Float4(-1.5F, 0.5F, 0, 0));
         bodySizes.set(3, 0.5F);
         bodyColors.set(3, Color.RED);
         bodyReflectivities.set(3, 8F);
 
         bodyTypes.set(4, 2);
-        bodyPositions.set(4, new Float4(0, 0, 0, 0));
+        bodyPositions.set(4, new Float4(0, 0.5F, 0, 0));
         bodySizes.set(4, 0.5F);
         bodyColors.set(4, Color.GREEN);
         bodyReflectivities.set(4, 16F);
 
         bodyTypes.set(5, 2);
-        bodyPositions.set(5, new Float4(1.5F, 0, 0, 0));
+        bodyPositions.set(5, new Float4(1.5F, 0.5F, 0, 0));
         bodySizes.set(5, 0.5F);
         bodyColors.set(5, Color.BLUE);
         bodyReflectivities.set(5, 32F);
 
         bodyTypes.set(6, 2);
-        bodyPositions.set(6, new Float4(3F, 0, 0, 0));
-        bodySizes.set(6, 0.5F);
-        bodyColors.set(6, Color.BLACK);
+        bodyPositions.set(6, new Float4(3F, 1F, 1F, 0));
+        bodySizes.set(6, 1F);
+        bodyColors.set(6, Color.DARK_GRAY);
         bodyReflectivities.set(6, 64F);
     }
 
@@ -156,6 +158,7 @@ public class Controller {
 
         camera = new float[]{0, 0, -4F, 0, 0, 60};
         softShadowSampleSize = new int[]{1};
+        rayBounceLimit = new int[]{1};
     }
 
     // ==============================================================
@@ -163,10 +166,10 @@ public class Controller {
         driver = TornadoRuntime.getTornadoRuntime().getDriver(0);
 
         ts = new TaskSchedule("s0");
-        ts.streamIn(bodyPositions, camera, softShadowSampleSize);
+        ts.streamIn(bodyPositions, camera, softShadowSampleSize, rayBounceLimit);
         ts.task("t0", Renderer::render, dimensions, pixels, camera,
                 bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                worldBGColor, softShadowSampleSize);
+                worldBGColor, softShadowSampleSize, rayBounceLimit);
         ts.streamOut(pixels);
 
         WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
@@ -183,7 +186,7 @@ public class Controller {
         else
             Renderer.render(dimensions, pixels, camera,
                     bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    worldBGColor, softShadowSampleSize);
+                    worldBGColor, softShadowSampleSize, rayBounceLimit);
 
         pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);
     }
@@ -222,6 +225,7 @@ public class Controller {
         lightZ.valueProperty().addListener((observable, oldValue, newValue) -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), bodyPositions.get(0).getY(), newValue.floatValue(), 0)));
 
         camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
+        rBounce.valueProperty().addListener((observable, oldValue, newValue) -> rayBounceLimit[0] = newValue.intValue());
         ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
 
         // ==============================================================

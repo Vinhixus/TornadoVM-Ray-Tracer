@@ -20,6 +20,7 @@ public class Test {
     private static float[] camera;
     private static int[] dimensions;
     private static int[] softShadowSampleSize;
+    private static int[] rayBounceLimit;
     // ==============================================================
     private static Float4 worldBGColor;
     // ==============================================================
@@ -40,6 +41,7 @@ public class Test {
 
         camera = new float[]{0, 0, -4F, 0, 0, 60};
         softShadowSampleSize = new int[]{18};
+        rayBounceLimit = new int[]{4};
     }
 
     private static void setWorldProperties() {
@@ -114,10 +116,10 @@ public class Test {
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(camera, softShadowSampleSize);
+        ts.streamIn(camera, softShadowSampleSize, rayBounceLimit);
         ts.task("t0", Renderer::render, dimensions, pixels, camera,
                 bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                worldBGColor, softShadowSampleSize);
+                worldBGColor, softShadowSampleSize, rayBounceLimit);
         ts.streamOut(pixels);
 
         WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
@@ -150,7 +152,7 @@ public class Test {
         for (int i = 0; i < TEST_LOOP_ITERATIONS; i++)
             Renderer.render(dimensions, pixels, camera,
                     bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    worldBGColor, softShadowSampleSize);
+                    worldBGColor, softShadowSampleSize, rayBounceLimit);
 
         endTime = System.nanoTime();
         double sequentialTime = (endTime - startTime) / 1000000.0;

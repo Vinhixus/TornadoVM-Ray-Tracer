@@ -9,10 +9,8 @@
             fx:controller="com.vinhderful.raytracer.Controller">
     <center>
         <Pane fx:id="pane" BorderPane.alignment="CENTER">
-            <Canvas fx:id="canvas" width="1280" height="720"
-                    onMouseDragged="#mouseDragged"
-                    onMousePressed="#mousePressed"
-                    onMouseReleased="#mouseReleased"/>
+            <Canvas fx:id="canvas" height="720" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed"
+                    onMouseReleased="#mouseReleased" width="1280"/>
         </Pane>
     </center>
     <right>
@@ -24,8 +22,8 @@
             <Slider id="lightX" fx:id="lightX" majorTickUnit="1.0" max="4.0" min="-4.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true" value="1"/>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Light Y"/>
-            <Slider id="lightY" fx:id="lightY" majorTickUnit="1.0" max="8.0" minorTickCount="1"
-                    showTickLabels="true" showTickMarks="true" value="1.5"/>
+            <Slider id="lightY" fx:id="lightY" majorTickUnit="1.0" max="8.0" minorTickCount="1" showTickLabels="true"
+                    showTickMarks="true" value="1.5"/>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Light Z"/>
             <Slider id="lightZ" fx:id="lightZ" majorTickUnit="1.0" max="4.0" min="-4.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true" value="-1.5"/>
@@ -44,6 +42,14 @@
             </Separator>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Soft Shadow Sample Size"/>
             <Slider id="ssSample" fx:id="ssSample" blockIncrement="1.0" majorTickUnit="50.0" max="400.0" min="1.0"
+                    showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
+            <Separator prefWidth="200.0">
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </VBox.margin>
+            </Separator>
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Ray Bounces"/>
+            <Slider id="rBounce" fx:id="rBounce" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" minorTickCount="0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
             <Separator prefWidth="200.0">
                 <VBox.margin>
