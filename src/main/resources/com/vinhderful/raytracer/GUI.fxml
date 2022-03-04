@@ -41,8 +41,7 @@
                 </VBox.margin>
             </Separator>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Soft Shadow Sample Size"/>
-            <Slider id="ssSample" fx:id="shadowSampleSize" blockIncrement="1.0" majorTickUnit="50.0" max="400.0"
-                    min="1.0"
+            <Slider id="shadowSampleSize" fx:id="shadowSampleSize" blockIncrement="1.0" majorTickUnit="50.0" max="400.0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
             <Separator prefWidth="200.0">
                 <VBox.margin>
@@ -50,7 +49,8 @@
                 </VBox.margin>
             </Separator>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Ray Bounces"/>
-            <Slider id="rBounce" fx:id="reflectionBounceLimit" blockIncrement="1.0" majorTickUnit="1.0" max="10.0"
+            <Slider id="reflectionBounceLimit" fx:id="reflectionBounceLimit" blockIncrement="1.0" majorTickUnit="1.0"
+                    max="10.0"
                     minorTickCount="0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
             <Separator prefWidth="200.0">
