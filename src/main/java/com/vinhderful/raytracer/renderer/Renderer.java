@@ -84,7 +84,7 @@ public class Renderer {
                 if (hitIndex != -1) {
 
                     if (hitIndex == 0)
-                        pixels[x + y * width] = Color.toARGB(bodyColors.get(0));
+                        pixels[x + y * width] = Color.toARGB(bodyColors.get(LIGHT_INDEX));
                     else {
                         Float4 lightPosition = bodyPositions.get(LIGHT_INDEX);
                         Float4 lightColor = bodyColors.get(LIGHT_INDEX);
