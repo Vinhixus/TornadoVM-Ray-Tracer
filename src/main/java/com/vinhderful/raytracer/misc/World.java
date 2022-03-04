@@ -60,6 +60,7 @@ public class World {
         addBody(new Sphere(new Float4(3F, 0.5F, 0, 0), 0.5F, Color.RED, 8F));
         addBody(new Sphere(new Float4(4.5F, 0.5F, 0, 0), 0.5F, Color.GREEN, 16F));
         addBody(new Sphere(new Float4(6F, 0.5F, 0, 0), 0.5F, Color.BLUE, 32F));
+        addBody(new Sphere(new Float4(7.5F, 0.5F, 0, 0), 0.5F, Color.BLACK, 64F));
     }
 
     private void generateTornadoCompatibleData() {

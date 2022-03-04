@@ -83,7 +83,7 @@ public class Controller {
     private static Float4 worldBGColor;
 
     /**
-     * The following 5 vectors define the objects in the scene.
+     * The following 4 vectors define the objects in the scene.
      * Example:
      * bodyPositions.get(2), bodySizes.get(2), bodyColors.get(2), bodyReflectivities.get(2)
      * define the properties of the body at index 2
@@ -404,10 +404,10 @@ public class Controller {
      */
     public void keyPressed(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
-            case SPACE:
+            case Q:
                 up = true;
                 break;
-            case C:
+            case E:
                 down = true;
                 break;
             case W:
@@ -435,10 +435,10 @@ public class Controller {
      */
     public void keyReleased(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
-            case SPACE:
+            case Q:
                 up = false;
                 break;
-            case C:
+            case E:
                 down = false;
                 break;
             case W:
@@ -522,6 +522,7 @@ public class Controller {
         bodyPositions.set(3, new Float4(3 * floatCos(t), bodyPositions.get(3).getY(), 3 * floatSin(t), 0));
         bodyPositions.set(4, new Float4(4.5F * floatCos(-t), bodyPositions.get(4).getY(), 4.5F * floatSin(-t), 0));
         bodyPositions.set(5, new Float4(6 * floatCos(t), bodyPositions.get(5).getY(), 6 * floatSin(t), 0));
+        bodyPositions.set(6, new Float4(7.5F * floatCos(-t), bodyPositions.get(6).getY(), 7.5F * floatSin(-t), 0));
     }
 
     /**
