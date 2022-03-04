@@ -8,31 +8,35 @@ import com.vinhderful.raytracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
-import uk.ac.manchester.tornado.api.collections.types.VectorInt;
 
 import java.util.ArrayList;
 
 public class World {
 
+    public static final int LIGHT_INDEX = 0;
+    public static final int PLANE_INDEX = 1;
+
     private Float4 backgroundColor;
     private final ArrayList<Body> bodies;
 
-    private VectorInt bodyTypes;
     private VectorFloat4 bodyPositions;
     private VectorFloat bodySizes;
     private VectorFloat4 bodyColors;
     private VectorFloat bodyReflectivities;
 
-    public World() {
+    public World() throws Exception {
 
         // Populate world
         bodies = new ArrayList<>();
         generateDefaultWorld();
 
         // Make sure we have 1 light and 1 plane at the first two indexes
-        assert bodies.size() >= 2;
-        assert bodies.get(0).getType() == 0;
-        assert bodies.get(1).getType() == 1;
+        if (bodies.size() < 2)
+            throw new Exception("A light source and a plane are mandatory!");
+        if (!(bodies.get(LIGHT_INDEX) instanceof Light))
+            throw new Exception("A light source needs to be at index " + LIGHT_INDEX + "!");
+        if (!(bodies.get(PLANE_INDEX) instanceof Plane))
+            throw new Exception("A plane needs to be at index " + PLANE_INDEX + "!");
 
         // Generate the tornado compatible vector representations of the bodies
         generateTornadoCompatibleData();
@@ -61,7 +65,6 @@ public class World {
     private void generateTornadoCompatibleData() {
         int numBodies = bodies.size();
 
-        bodyTypes = new VectorInt(numBodies);
         bodyPositions = new VectorFloat4(numBodies);
         bodySizes = new VectorFloat(numBodies);
         bodyColors = new VectorFloat4(numBodies);
@@ -70,7 +73,6 @@ public class World {
         for (int i = 0; i < numBodies; i++) {
             Body body = bodies.get(i);
 
-            bodyTypes.set(i, body.getType());
             bodyPositions.set(i, body.getPosition());
             bodySizes.set(i, body.getSize());
             bodyColors.set(i, body.getColor());
@@ -84,10 +86,6 @@ public class World {
 
     public Float4 getBackgroundColor() {
         return backgroundColor;
-    }
-
-    public VectorInt getBodyTypes() {
-        return bodyTypes;
     }
 
     public VectorFloat4 getBodyPositions() {

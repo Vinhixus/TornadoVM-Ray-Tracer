@@ -9,7 +9,6 @@ import uk.ac.manchester.tornado.api.WorkerGrid2D;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
-import uk.ac.manchester.tornado.api.collections.types.VectorInt;
 
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Test {
@@ -34,13 +33,12 @@ public class Test {
     }
 
     // ==============================================================
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         setRenderingProperties();
 
         World world = new World();
         Float4 worldBGColor = world.getBackgroundColor();
-        VectorInt bodyTypes = world.getBodyTypes();
         VectorFloat4 bodyPositions = world.getBodyPositions();
         VectorFloat bodySizes = world.getBodySizes();
         VectorFloat4 bodyColors = world.getBodyColors();
@@ -50,7 +48,7 @@ public class Test {
         TaskSchedule ts = new TaskSchedule("s0");
         ts.streamIn(bodyPositions, camera, pathTracingProperties);
         ts.task("t0", Renderer::render, pixels, dimensions, camera,
-                bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 worldBGColor, pathTracingProperties);
         ts.streamOut(pixels);
 
@@ -83,7 +81,7 @@ public class Test {
 
         for (int i = 0; i < TEST_LOOP_ITERATIONS; i++)
             Renderer.render(pixels, dimensions, camera,
-                    bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                     worldBGColor, pathTracingProperties);
 
         endTime = System.nanoTime();

@@ -18,7 +18,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import uk.ac.manchester.tornado.api.*;
-import uk.ac.manchester.tornado.api.collections.types.*;
+import uk.ac.manchester.tornado.api.collections.types.Float3;
+import uk.ac.manchester.tornado.api.collections.types.Float4;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
@@ -82,16 +85,14 @@ public class Controller {
     /**
      * The following 5 vectors define the objects in the scene.
      * Example:
-     * bodyTypes.get(2), bodyPositions.get(2), bodySizes.get(2), bodyColors.get(2), bodyReflectivities.get(2)
+     * bodyPositions.get(2), bodySizes.get(2), bodyColors.get(2), bodyReflectivities.get(2)
      * define the properties of the body at index 2
      * -----------------------------------------
-     * bodyType: 0 - light, 1 - plane, 2- sphere
      * bodyPosition: position of the body in 3D space
      * bodySize: size of the body (e.g. radius of sphere)
      * bodyColor: color of the sphere defined by R, G, B float values
      * bodyReflectivity: reflectivity of the object, higher is more reflective
      */
-    private static VectorInt bodyTypes;
     private static VectorFloat4 bodyPositions;
     private static VectorFloat bodySizes;
     private static VectorFloat4 bodyColors;
@@ -162,12 +163,11 @@ public class Controller {
      * Initialise renderer, world, camera and populate with objects
      */
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
 
         // Build world
         World world = new World();
         worldBGColor = world.getBackgroundColor();
-        bodyTypes = world.getBodyTypes();
         bodyPositions = world.getBodyPositions();
         bodySizes = world.getBodySizes();
         bodyColors = world.getBodyColors();
@@ -251,7 +251,7 @@ public class Controller {
         ts = new TaskSchedule("s0");
         ts.streamIn(bodyPositions, camera, pathTracingProperties);
         ts.task("t0", Renderer::render, pixels, dimensions, camera,
-                bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 worldBGColor, pathTracingProperties);
         ts.streamOut(pixels);
 
@@ -344,7 +344,7 @@ public class Controller {
             ts.execute(grid);
         else
             Renderer.render(pixels, dimensions, camera,
-                    bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                     worldBGColor, pathTracingProperties);
 
         // Set the pixels on the canvas
