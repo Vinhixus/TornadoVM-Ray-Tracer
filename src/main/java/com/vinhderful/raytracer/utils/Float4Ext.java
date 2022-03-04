@@ -2,17 +2,18 @@ package com.vinhderful.raytracer.utils;
 
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 
+import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
  * Additional 3D vector operations
  */
-public class VectorOps {
+public class Float4Ext {
 
     public static Float4 rotate(Float4 a, float yaw, float pitch) {
 
-        float _yaw = yaw * 0.017453292F;
-        float _pitch = pitch * 0.017453292F;
+        float _yaw = yaw * TO_RADIANS;
+        float _pitch = pitch * TO_RADIANS;
 
         float _y = a.getY() * floatCos(_pitch) - a.getZ() * floatSin(_pitch);
         float _z = a.getY() * floatSin(_pitch) + a.getZ() * floatCos(_pitch);
@@ -38,10 +39,10 @@ public class VectorOps {
                 0);
     }
 
-    public static Float4 getPerpVector(Float4 a) {
+    public static Float4 perpVector(Float4 a) {
         if (a.getY() == 0 && a.getZ() == 0)
-            return VectorOps.cross(a, new Float4(0, 1, 0, 0));
+            return cross(a, new Float4(0, 1, 0, 0));
 
-        return VectorOps.cross(a, new Float4(1, 0, 0, 0));
+        return cross(a, new Float4(1, 0, 0, 0));
     }
 }

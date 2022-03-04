@@ -1,7 +1,8 @@
 package com.vinhderful.raytracer;
 
+import com.vinhderful.raytracer.misc.TornadoDeviceInfo;
+import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
-import com.vinhderful.raytracer.utils.Color;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -18,10 +19,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import uk.ac.manchester.tornado.api.*;
 import uk.ac.manchester.tornado.api.collections.types.*;
+import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 
+import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
@@ -30,161 +34,129 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Controller {
 
-    private static final float MOUSE_SENSITIVITY = 0.5F;
-    private static float t = 0;
-    // ==============================================================
-    private static long lastUpdate = 0;
-    // ==============================================================
-    private static float[] camera;
+    /**
+     * Pixel buffer containing ARGB values of pixel colors
+     * Size = width * height of canvas resolution
+     **/
+    private static int[] pixels;
+
+    /**
+     * Resolution of the canvas
+     * ------------------------
+     * dimensions[0]: width
+     * dimensions[1]: height
+     **/
     private static int[] dimensions;
-    private static int[] softShadowSampleSize;
-    private static int[] rayBounceLimit;
-    // ==============================================================
+
+    /**
+     * Camera properties
+     * -----------------
+     * camera[0]: x coordinate of position
+     * camera[1]: y coordinate of position
+     * camera[2]: z coordinate of position
+     * camera[3]: yaw of rotation
+     * camera[4]: pitch of rotation
+     * camera[5]: field of view (FOV)
+     **/
+    private static float[] camera;
+
+    /**
+     * Define up direction (only needed for camera movement controls)
+     **/
+    private Float3 upVector;
+
+    /**
+     * Path tracing properties
+     * -----------------------
+     * pathTracingProperties[0]: Sample size of soft shadows
+     * pathTracingProperties[1]: Bounce limit for reflection rays
+     **/
+    private static int[] pathTracingProperties;
+
+
+    /**
+     * Color of the global background
+     **/
     private static Float4 worldBGColor;
-    // ==============================================================
+
+    /**
+     * The following 5 vectors define the objects in the scene.
+     * Example:
+     * bodyTypes.get(2), bodyPositions.get(2), bodySizes.get(2), bodyColors.get(2), bodyReflectivities.get(2)
+     * define the properties of the body at index 2
+     * -----------------------------------------
+     * bodyType: 0 - light, 1 - plane, 2- sphere
+     * bodyPosition: position of the body in 3D space
+     * bodySize: size of the body (e.g. radius of sphere)
+     * bodyColor: color of the sphere defined by R, G, B float values
+     * bodyReflectivity: reflectivity of the object, higher is more reflective
+     */
     private static VectorInt bodyTypes;
     private static VectorFloat4 bodyPositions;
     private static VectorFloat bodySizes;
     private static VectorFloat4 bodyColors;
     private static VectorFloat bodyReflectivities;
-    // ==============================================================
-    private static int[] pixels;
-    // ==============================================================
+
+
+    /**
+     * JavaFX GUI elements
+     */
     @FXML
-    public Label fps;
-    public Label debugOutput;
+
+    // Main pane and canvas encapsulating the viewport
     public Pane pane;
     public Canvas canvas;
+
+    // Adjustable light position
     public Slider lightX;
     public Slider lightY;
     public Slider lightZ;
-    public Slider camFOV;
-    public Slider ssSample;
-    public Slider rBounce;
+
+    // Adjustable camera field of view
+    public Slider cameraFOV;
+
+    // Adjustable soft shadow sample size and reflection bounce limit
+    public Slider shadowSampleSize;
+    public Slider reflectionBounceLimit;
+
+    // Frames per second text output and helper variables
+    public Label fps;
+    private static long fpsLastUpdate = 0;
+
+    // Debug text output
+    public Label debugOutput;
+
+    // Device selection dropdown
     public ComboBox<String> deviceDropdown;
-    public Button animBtn;
-    // ==============================================================
+    private int selectedDeviceIndex;
+
+    // Button to play predefined animation, helper variables for animation
+    public Button animateButton;
     private boolean animating;
+    private static float t = 0;
+
+    // Camera control
+    private static final float MOUSE_SENSITIVITY = 0.5F;
     private double mousePosX;
     private double mousePosY;
     private double mouseOldX;
     private double mouseOldY;
+
+    // Movement
     private boolean fwd, strafeL, strafeR, back, up, down;
-    private Float3 upVector;
     private float moveSpeed = 0.2F;
-    // ==============================================================
-    private TornadoDriver driver;
-    private int selectedDeviceIndex;
+
+    // Tornado elements
+    private ArrayList<TornadoDeviceInfo> devices;
+    private TornadoRuntimeCI runtimeCI;
     private TaskSchedule ts;
     private GridScheduler grid;
-    private GraphicsContext g;
+    private boolean renderWithTornado;
+
+    // PixelWriter and it's format
     private PixelWriter pixelWriter;
     private WritablePixelFormat<IntBuffer> format;
 
-    // ==============================================================
-    private static void setWorldProperties() {
-
-        // Background color
-        worldBGColor = Color.BLACK;
-    }
-
-    private static void populateWorld() {
-
-        // Number of bodies
-        final int NUM_BODIES = 6;
-
-        bodyTypes = new VectorInt(NUM_BODIES);
-        bodyPositions = new VectorFloat4(NUM_BODIES);
-        bodySizes = new VectorFloat(NUM_BODIES);
-        bodyColors = new VectorFloat4(NUM_BODIES);
-        bodyReflectivities = new VectorFloat(NUM_BODIES);
-
-        // Light
-        bodyTypes.set(0, 0);
-        bodyPositions.set(0, new Float4(1F, 3F, -1.5F, 0));
-        bodySizes.set(0, 0.4F);
-        bodyColors.set(0, Color.WHITE);
-        bodyReflectivities.set(0, 0);
-
-        // Planes
-        bodyTypes.set(1, 1);
-        bodyPositions.set(1, new Float4(0, 0, 0, 0));
-        bodySizes.set(1, -1F);
-        bodyColors.set(1, Color.BLACK);
-        bodyReflectivities.set(1, 16F);
-
-        // Spheres
-        bodyTypes.set(2, 2);
-        bodyPositions.set(2, new Float4(0, 1F, 0, 0));
-        bodySizes.set(2, 1F);
-        bodyColors.set(2, Color.GRAY);
-        bodyReflectivities.set(2, 32F);
-
-        bodyTypes.set(3, 2);
-        bodyPositions.set(3, new Float4(3F, 0.5F, 0, 0));
-        bodySizes.set(3, 0.5F);
-        bodyColors.set(3, Color.RED);
-        bodyReflectivities.set(3, 8F);
-
-        bodyTypes.set(4, 2);
-        bodyPositions.set(4, new Float4(4.5F, 0.5F, 0, 0));
-        bodySizes.set(4, 0.5F);
-        bodyColors.set(4, Color.GREEN);
-        bodyReflectivities.set(4, 16F);
-
-        bodyTypes.set(5, 2);
-        bodyPositions.set(5, new Float4(6F, 0.5F, 0, 0));
-        bodySizes.set(5, 0.5F);
-        bodyColors.set(5, Color.BLUE);
-        bodyReflectivities.set(5, 32F);
-    }
-
-    // ==============================================================
-    private void setRenderingProperties() {
-        int width = (int) g.getCanvas().getWidth();
-        int height = (int) g.getCanvas().getHeight();
-        upVector = new Float3(0, 1F, 0);
-
-        dimensions = new int[]{width, height};
-        pixels = new int[dimensions[0] * dimensions[1]];
-
-        format = WritablePixelFormat.getIntArgbInstance();
-        pixelWriter = g.getPixelWriter();
-
-        camera = new float[]{0, 1F, -4F, 0, 0, 60};
-        softShadowSampleSize = new int[]{1};
-        rayBounceLimit = new int[]{1};
-    }
-
-    // ==============================================================
-    private void initTornadoSettings() {
-        driver = TornadoRuntime.getTornadoRuntime().getDriver(0);
-
-        ts = new TaskSchedule("s0");
-        ts.streamIn(bodyPositions, camera, softShadowSampleSize, rayBounceLimit);
-        ts.task("t0", Renderer::render, dimensions, pixels, camera,
-                bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                worldBGColor, softShadowSampleSize, rayBounceLimit);
-        ts.streamOut(pixels);
-
-        WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
-        worker.setLocalWork(16, 16, 1);
-        grid = new GridScheduler();
-        grid.setWorkerGrid("s0.t0", worker);
-    }
-
-    // ==============================================================
-    private void render(boolean renderWithTornado) {
-
-        if (renderWithTornado)
-            ts.execute(grid);
-        else
-            Renderer.render(dimensions, pixels, camera,
-                    bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    worldBGColor, softShadowSampleSize, rayBounceLimit);
-
-        pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);
-    }
 
     /**
      * Initialise renderer, world, camera and populate with objects
@@ -192,78 +164,244 @@ public class Controller {
     @FXML
     public void initialize() {
 
-        // ==============================================================
-        g = canvas.getGraphicsContext2D();
+        // Build world
+        World world = new World();
+        worldBGColor = world.getBackgroundColor();
+        bodyTypes = world.getBodyTypes();
+        bodyPositions = world.getBodyPositions();
+        bodySizes = world.getBodySizes();
+        bodyColors = world.getBodyColors();
+        bodyReflectivities = world.getBodyReflectivities();
 
-        setWorldProperties();
-        populateWorld();
-
+        // Initialise settings
         setRenderingProperties();
-        initTornadoSettings();
+        setTornadoTaskSchedule();
+        setAvailableDevices();
+        setSliderListeners();
 
-        // ==============================================================
-        int numDevices = driver.getDeviceCount();
-
-        deviceDropdown.getItems().add("CPU - Pure Java Sequential");
-        for (int i = 0; i < numDevices; i++) {
-            deviceDropdown.getItems().add(driver.getDevice(i).getPhysicalDevice().getDeviceName());
-            ts.mapAllTo(driver.getDevice(i));
-            ts.execute(grid);
-        }
-
-        selectedDeviceIndex = 0;
-        deviceDropdown.getSelectionModel().selectFirst();
-
-        // ==============================================================
-        lightX.valueProperty().addListener((observable, oldValue, newValue) -> bodyPositions.set(0, new Float4(newValue.floatValue(), bodyPositions.get(0).getY(), bodyPositions.get(0).getZ(), 0)));
-        lightY.valueProperty().addListener((observable, oldValue, newValue) -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), newValue.floatValue(), bodyPositions.get(0).getZ(), 0)));
-        lightZ.valueProperty().addListener((observable, oldValue, newValue) -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), bodyPositions.get(0).getY(), newValue.floatValue(), 0)));
-
-        camFOV.valueProperty().addListener((observable, oldValue, newValue) -> camera[5] = newValue.floatValue());
-        rBounce.valueProperty().addListener((observable, oldValue, newValue) -> rayBounceLimit[0] = newValue.intValue());
-        ssSample.valueProperty().addListener((observable, oldValue, newValue) -> softShadowSampleSize[0] = newValue.intValue());
-
+        // Start with no animation
         animating = false;
 
-        // ==============================================================
+        // Initialise fps last update
+        fpsLastUpdate = 0;
+
+        // Define main animation loop - gets called every frame
         AnimationTimer timer = new AnimationTimer() {
 
             @Override
             public void handle(long now) {
-                render(selectedDeviceIndex > 0);
-                updatePos();
+
+                // Update frame
+                render();
+
+                // Camera movement
+                updateCameraPosition();
+
+                // Play animation if button is pressed
                 if (animating) animate();
-                fps.setText(String.format("FPS: %.2f", 1_000_000_000.0 / (now - lastUpdate)));
-                lastUpdate = now;
+
+                // Record and output fps
+                fps.setText(String.format("FPS: %.2f", 1_000_000_000.0 / (now - fpsLastUpdate)));
+                fpsLastUpdate = now;
             }
         };
 
+        // Start animation loop
         timer.start();
     }
 
+
+    /**
+     * Initialise canvas, up vector, dimensions, pixel buffer, pixel writer, format, camera and path tracing properties
+     */
+    private void setRenderingProperties() {
+
+        // Get graphics context and dimensions
+        GraphicsContext g = canvas.getGraphicsContext2D();
+        int width = (int) g.getCanvas().getWidth();
+        int height = (int) g.getCanvas().getHeight();
+
+        dimensions = new int[]{width, height};
+        pixels = new int[width * height];
+
+        pixelWriter = g.getPixelWriter();
+        format = WritablePixelFormat.getIntArgbInstance();
+
+        // camera position: {0, 1, -4}
+        // camera yaw: 0
+        // camera pitch: 0
+        // camera FOV: 60
+        camera = new float[]{0, 1F, -4F, 0, 0, 60};
+
+        // shadow sample size = 1
+        // reflection bounces = 1
+        pathTracingProperties = new int[]{1, 1};
+
+        // Up direction is positive y direction
+        upVector = new Float3(0, 1F, 0);
+    }
+
+
+    /**
+     * Define Tornado task schedule for Parallel Renderer.render method
+     */
+    private void setTornadoTaskSchedule() {
+
+        // Define task schedule
+        ts = new TaskSchedule("s0");
+        ts.streamIn(bodyPositions, camera, pathTracingProperties);
+        ts.task("t0", Renderer::render, pixels, dimensions, camera,
+                bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                worldBGColor, pathTracingProperties);
+        ts.streamOut(pixels);
+
+        // Define worker grid
+        WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
+        worker.setLocalWork(16, 16, 1);
+        grid = new GridScheduler();
+        grid.setWorkerGrid("s0.t0", worker);
+    }
+
+
+    /**
+     * Populate device dropdown list, perform initial mapping to avoid runtime lag
+     */
+    private void setAvailableDevices() {
+
+        // Initialise list of devices
+        devices = new ArrayList<>();
+
+        // Add sequential execution to devices list
+        TornadoDeviceInfo cpu = new TornadoDeviceInfo("Pure Java", "CPU", false);
+        devices.add(cpu);
+        deviceDropdown.getItems().add(cpu.getName());
+
+        // Get Tornado drivers
+        runtimeCI = TornadoRuntime.getTornadoRuntime();
+        int numTornadoDrivers = runtimeCI.getNumDrivers();
+
+        for (int driverIndex = 0; driverIndex < numTornadoDrivers; driverIndex++) {
+
+            TornadoDriver driver = runtimeCI.getDriver(driverIndex);
+            int numDevices = driver.getDeviceCount();
+
+            // Add Tornado devices, perform initial mapping
+            for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++) {
+
+                TornadoDevice device = driver.getDevice(deviceIndex);
+                TornadoDeviceInfo deviceInfo = new TornadoDeviceInfo(
+                        driverIndex, deviceIndex,
+                        driver.getName(), device.getPhysicalDevice().getDeviceName(),
+                        true);
+
+                devices.add(deviceInfo);
+                deviceDropdown.getItems().add(deviceInfo.getName());
+
+                // Perform an initial mapping to avoid runtime lag
+                ts.mapAllTo(device);
+                ts.execute(grid);
+            }
+        }
+
+        // Select first device (Pure Java sequential)
+        selectedDeviceIndex = 0;
+        deviceDropdown.getSelectionModel().selectFirst();
+        renderWithTornado = false;
+    }
+
+    /**
+     * Set up slider listeners and define actions on change
+     */
+    private void setSliderListeners() {
+
+        // Adjustable light position
+        lightX.valueProperty().addListener((observable, oldValue, newValue)
+                -> bodyPositions.set(0, new Float4(newValue.floatValue(), bodyPositions.get(0).getY(), bodyPositions.get(0).getZ(), 0)));
+        lightY.valueProperty().addListener((observable, oldValue, newValue)
+                -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), newValue.floatValue(), bodyPositions.get(0).getZ(), 0)));
+        lightZ.valueProperty().addListener((observable, oldValue, newValue)
+                -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), bodyPositions.get(0).getY(), newValue.floatValue(), 0)));
+
+        // Adjustable camera field of view
+        cameraFOV.valueProperty().addListener((observable, oldValue, newValue)
+                -> camera[5] = newValue.floatValue());
+
+        // Adjustable path tracing rendering properties
+        shadowSampleSize.valueProperty().addListener((observable, oldValue, newValue)
+                -> pathTracingProperties[0] = newValue.intValue());
+        reflectionBounceLimit.valueProperty().addListener((observable, oldValue, newValue)
+                -> pathTracingProperties[1] = newValue.intValue());
+    }
+
+
+    /**
+     * Render one frame: Populate pixels array and set pixels on the canvas
+     */
+    private void render() {
+
+        // Populate pixels array depending on selected device
+        if (renderWithTornado)
+            ts.execute(grid);
+        else
+            Renderer.render(pixels, dimensions, camera,
+                    bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                    worldBGColor, pathTracingProperties);
+
+        // Set the pixels on the canvas
+        pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);
+    }
+
+    /**
+     * Define action on mouse drag
+     *
+     * @param mouseEvent mouse event
+     */
     public void mouseDragged(MouseEvent mouseEvent) {
+
+        // Record mouse position
         mouseOldX = mousePosX;
         mouseOldY = mousePosY;
         mousePosX = mouseEvent.getX();
         mousePosY = mouseEvent.getY();
 
+        // Add mouse displacement in x direction to camera yaw
         camera[3] += (mousePosX - mouseOldX) * MOUSE_SENSITIVITY;
+
+        // Add mouse displacement in y direction to camera pitch
+        // Limit y direction lookaround to a 180-degree angle
         camera[4] = (float) min(90, max(-90, camera[4] + (mousePosY - mouseOldY) * MOUSE_SENSITIVITY));
     }
 
+    /**
+     * Define action of mouse press
+     *
+     * @param mouseEvent mouse event
+     */
     public void mousePressed(MouseEvent mouseEvent) {
+
+        // Record mouse position
         mousePosX = mouseEvent.getX();
         mousePosY = mouseEvent.getY();
         mouseOldX = mousePosX;
         mouseOldY = mousePosY;
 
+        // Hide mouse cursor while controlling camera
         canvas.setCursor(Cursor.NONE);
     }
 
+    /**
+     * Define action on mouse release
+     */
     public void mouseReleased() {
         canvas.setCursor(Cursor.DEFAULT);
     }
 
+
+    /**
+     * Define action on key press
+     *
+     * @param keyEvent key event
+     */
     public void keyPressed(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
             case SPACE:
@@ -290,6 +428,11 @@ public class Controller {
         }
     }
 
+    /**
+     * Define action on key release
+     *
+     * @param keyEvent key event
+     */
     public void keyReleased(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
             case SPACE:
@@ -316,40 +459,64 @@ public class Controller {
         }
     }
 
-    public void updatePos() {
+    /**
+     * Update camera position on movement
+     */
+    public void updateCameraPosition() {
 
-        Float3 eye = new Float3(camera[0], camera[1], camera[2]);
+        // Get current camera position from camera properties
+        Float3 cameraPosition = new Float3(camera[0], camera[1], camera[2]);
 
-        float yaw = camera[3] * floatPI() / 180;
-        float pitch = -camera[4] * floatPI() / 180;
+        // Get yaw and pitch in radians
+        float yaw = camera[3] * TO_RADIANS;
+        float pitch = -camera[4] * TO_RADIANS;
 
+        // Calculate forward pointing vector from yaw and pitch
         Float3 fwdVector = Float3.normalise(new Float3(
                 floatSin(yaw) * floatCos(pitch),
                 floatSin(pitch),
                 floatCos(yaw) * floatCos(pitch)));
 
+        // Calculate left and right pointing vector from forward and up vectors
         Float3 leftVector = Float3.cross(fwdVector, upVector);
         Float3 rightVector = Float3.cross(upVector, fwdVector);
 
-        if (fwd) eye = Float3.add(eye, Float3.mult(fwdVector, moveSpeed));
-        if (back) eye = Float3.sub(eye, Float3.mult(fwdVector, moveSpeed));
-        if (strafeL) eye = Float3.add(eye, Float3.mult(leftVector, moveSpeed));
-        if (strafeR) eye = Float3.add(eye, Float3.mult(rightVector, moveSpeed));
-        if (up) eye = Float3.add(eye, Float3.mult(upVector, moveSpeed));
-        if (down) eye = Float3.sub(eye, Float3.mult(upVector, moveSpeed));
+        // Depending on key pressed, update camera position
+        if (fwd) cameraPosition = Float3.add(cameraPosition, Float3.mult(fwdVector, moveSpeed));
+        if (back) cameraPosition = Float3.sub(cameraPosition, Float3.mult(fwdVector, moveSpeed));
+        if (strafeL) cameraPosition = Float3.add(cameraPosition, Float3.mult(leftVector, moveSpeed));
+        if (strafeR) cameraPosition = Float3.add(cameraPosition, Float3.mult(rightVector, moveSpeed));
+        if (up) cameraPosition = Float3.add(cameraPosition, Float3.mult(upVector, moveSpeed));
+        if (down) cameraPosition = Float3.sub(cameraPosition, Float3.mult(upVector, moveSpeed));
 
-        camera[0] = eye.get(0);
-        camera[1] = eye.get(1);
-        camera[2] = eye.get(2);
+        // Write result back to camera properties
+        camera[0] = cameraPosition.get(0);
+        camera[1] = cameraPosition.get(1);
+        camera[2] = cameraPosition.get(2);
     }
 
+    /**
+     * Define action on device dropdown selection
+     */
     public void selectDevice() {
-        selectedDeviceIndex = deviceDropdown.getSelectionModel().getSelectedIndex();
 
-        if (selectedDeviceIndex > 0)
-            ts.mapAllTo(driver.getDevice(selectedDeviceIndex - 1));
+        // Get selection from dropdown box
+        selectedDeviceIndex = deviceDropdown.getSelectionModel().getSelectedIndex();
+        TornadoDeviceInfo deviceInfo = devices.get(selectedDeviceIndex);
+
+        // Map task schedule to selected device if selected device is tornado device
+        if (deviceInfo.isTornadoDevice()) {
+            renderWithTornado = true;
+            ts.mapAllTo(runtimeCI.getDriver(deviceInfo.getDriverIndex()).getDevice(deviceInfo.getDeviceIndex()));
+        } else
+            renderWithTornado = false;
     }
 
+    /**
+     * Predefined simple animation
+     * ---------------------------
+     * Spheres move around in a circle
+     */
     private void animate() {
         t = (t + 0.017453292F) % 6.2831855F;
         bodyPositions.set(3, new Float4(3 * floatCos(t), bodyPositions.get(3).getY(), 3 * floatSin(t), 0));
@@ -357,12 +524,15 @@ public class Controller {
         bodyPositions.set(5, new Float4(6 * floatCos(t), bodyPositions.get(5).getY(), 6 * floatSin(t), 0));
     }
 
-    public void setAnimation() {
+    /**
+     * Define action on clicking "Animate" button
+     */
+    public void setAnimationStatus() {
         if (animating) {
-            animBtn.setText("Animate");
+            animateButton.setText("Animate");
             animating = false;
         } else {
-            animBtn.setText("Stop");
+            animateButton.setText("Stop");
             animating = true;
         }
     }

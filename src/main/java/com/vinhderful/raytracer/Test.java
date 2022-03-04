@@ -1,7 +1,7 @@
 package com.vinhderful.raytracer;
 
+import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
-import com.vinhderful.raytracer.utils.Color;
 import uk.ac.manchester.tornado.api.GridScheduler;
 import uk.ac.manchester.tornado.api.TaskSchedule;
 import uk.ac.manchester.tornado.api.WorkerGrid;
@@ -16,110 +16,42 @@ public class Test {
 
     public static final int TEST_LOOP_ITERATIONS = 10;
 
-    // ==============================================================
+    private static int[] pixels;
     private static float[] camera;
     private static int[] dimensions;
-    private static int[] softShadowSampleSize;
-    private static int[] rayBounceLimit;
+    private static int[] pathTracingProperties;
     // ==============================================================
-    private static Float4 worldBGColor;
-    // ==============================================================
-    private static VectorInt bodyTypes;
-    private static VectorFloat4 bodyPositions;
-    private static VectorFloat bodySizes;
-    private static VectorFloat4 bodyColors;
-    private static VectorFloat bodyReflectivities;
-    // ==============================================================
-    private static int[] pixels;
 
     private static void setRenderingProperties() {
         int width = 1920;
         int height = 960;
 
         dimensions = new int[]{width, height};
-        pixels = new int[dimensions[0] * dimensions[1]];
+        pixels = new int[width * height];
 
         camera = new float[]{0, 0, -4F, 0, 0, 60};
-        softShadowSampleSize = new int[]{18};
-        rayBounceLimit = new int[]{4};
-    }
-
-    private static void setWorldProperties() {
-
-        // Background color
-        worldBGColor = Color.BLACK;
-    }
-
-    private static void populateWorld() {
-
-        // Number of bodies
-        final int NUM_BODIES = 7;
-
-        bodyTypes = new VectorInt(NUM_BODIES);
-        bodyPositions = new VectorFloat4(NUM_BODIES);
-        bodySizes = new VectorFloat(NUM_BODIES);
-        bodyColors = new VectorFloat4(NUM_BODIES);
-        bodyReflectivities = new VectorFloat(NUM_BODIES);
-
-        // Light
-        bodyTypes.set(0, 0);
-        bodyPositions.set(0, new Float4(1F, 1.5F, -1.5F, 0));
-        bodySizes.set(0, 0.4F);
-        bodyColors.set(0, Color.WHITE);
-        bodyReflectivities.set(0, 0);
-
-        // Planes
-        bodyTypes.set(1, 1);
-        bodyPositions.set(1, new Float4(0, -0.5F, 0, 0));
-        bodySizes.set(1, -1F);
-        bodyColors.set(1, Color.BLACK);
-        bodyReflectivities.set(1, 16F);
-
-        // Spheres
-        bodyTypes.set(2, 2);
-        bodyPositions.set(2, new Float4(-3F, 0, 0, 0));
-        bodySizes.set(2, 0.5F);
-        bodyColors.set(2, Color.WHITE);
-        bodyReflectivities.set(2, 4F);
-
-        bodyTypes.set(3, 2);
-        bodyPositions.set(3, new Float4(-1.5F, 0, 0, 0));
-        bodySizes.set(3, 0.5F);
-        bodyColors.set(3, Color.RED);
-        bodyReflectivities.set(3, 8F);
-
-        bodyTypes.set(4, 2);
-        bodyPositions.set(4, new Float4(0, 0, 0, 0));
-        bodySizes.set(4, 0.5F);
-        bodyColors.set(4, Color.GREEN);
-        bodyReflectivities.set(4, 16F);
-
-        bodyTypes.set(5, 2);
-        bodyPositions.set(5, new Float4(1.5F, 0, 0, 0));
-        bodySizes.set(5, 0.5F);
-        bodyColors.set(5, Color.BLUE);
-        bodyReflectivities.set(5, 32F);
-
-        bodyTypes.set(6, 2);
-        bodyPositions.set(6, new Float4(3F, 0, 0, 0));
-        bodySizes.set(6, 0.5F);
-        bodyColors.set(6, Color.BLACK);
-        bodyReflectivities.set(6, 64F);
+        pathTracingProperties = new int[]{18, 4};
     }
 
     // ==============================================================
     public static void main(String[] args) {
 
         setRenderingProperties();
-        setWorldProperties();
-        populateWorld();
+
+        World world = new World();
+        Float4 worldBGColor = world.getBackgroundColor();
+        VectorInt bodyTypes = world.getBodyTypes();
+        VectorFloat4 bodyPositions = world.getBodyPositions();
+        VectorFloat bodySizes = world.getBodySizes();
+        VectorFloat4 bodyColors = world.getBodyColors();
+        VectorFloat bodyReflectivities = world.getBodyReflectivities();
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(camera, softShadowSampleSize, rayBounceLimit);
-        ts.task("t0", Renderer::render, dimensions, pixels, camera,
+        ts.streamIn(bodyPositions, camera, pathTracingProperties);
+        ts.task("t0", Renderer::render, pixels, dimensions, camera,
                 bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                worldBGColor, softShadowSampleSize, rayBounceLimit);
+                worldBGColor, pathTracingProperties);
         ts.streamOut(pixels);
 
         WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
@@ -150,9 +82,9 @@ public class Test {
         startTime = System.nanoTime();
 
         for (int i = 0; i < TEST_LOOP_ITERATIONS; i++)
-            Renderer.render(dimensions, pixels, camera,
+            Renderer.render(pixels, dimensions, camera,
                     bodyTypes, bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    worldBGColor, softShadowSampleSize, rayBounceLimit);
+                    worldBGColor, pathTracingProperties);
 
         endTime = System.nanoTime();
         double sequentialTime = (endTime - startTime) / 1000000.0;

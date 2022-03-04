@@ -2,6 +2,7 @@ package com.vinhderful.raytracer.utils;
 
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.min;
 
 /**
@@ -23,22 +24,22 @@ public class Color {
 
     public static Float4 add(Float4 a, Float4 b) {
         return new Float4(
-                min(1F, a.getX() + b.getX()),
-                min(1F, a.getY() + b.getY()),
-                min(1F, a.getZ() + b.getZ()),
-                min(1F, a.getW() + b.getW()));
+                min(1F, max(0F, a.getX() + b.getX())),
+                min(1F, max(0F, a.getY() + b.getY())),
+                min(1F, max(0F, a.getZ() + b.getZ())),
+                min(1F, max(0F, a.getW() + b.getW())));
     }
 
     public static Float4 mult(Float4 a, Float4 b) {
         return new Float4(
-                min(1F, a.getX() * b.getX()),
-                min(1F, a.getY() * b.getY()),
-                min(1F, a.getZ() * b.getZ()),
-                min(1F, a.getW() * b.getW()));
+                min(1F, max(0F, a.getX() * b.getX())),
+                min(1F, max(0F, a.getY() * b.getY())),
+                min(1F, max(0F, a.getZ() * b.getZ())),
+                min(1F, max(0F, a.getW() * b.getW())));
     }
 
     public static Float4 mult(Float4 a, float b) {
-        b = min(1F, b);
+        b = min(1F, max(0F, b));
         return new Float4(a.getX() * b, a.getY() * b, a.getZ() * b, a.getW() * b);
     }
 

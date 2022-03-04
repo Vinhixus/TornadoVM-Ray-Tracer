@@ -33,7 +33,7 @@
                 </VBox.margin>
             </Separator>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Camera FOV"/>
-            <Slider id="camFOV" fx:id="camFOV" majorTickUnit="10.0" max="90.0" min="30.0" minorTickCount="5"
+            <Slider id="camFOV" fx:id="cameraFOV" majorTickUnit="10.0" max="90.0" min="30.0" minorTickCount="5"
                     showTickLabels="true" showTickMarks="true" value="60.0"/>
             <Separator layoutX="30.0" layoutY="232.0" prefWidth="200.0">
                 <VBox.margin>
@@ -41,7 +41,8 @@
                 </VBox.margin>
             </Separator>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Soft Shadow Sample Size"/>
-            <Slider id="ssSample" fx:id="ssSample" blockIncrement="1.0" majorTickUnit="50.0" max="400.0" min="1.0"
+            <Slider id="ssSample" fx:id="shadowSampleSize" blockIncrement="1.0" majorTickUnit="50.0" max="400.0"
+                    min="1.0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
             <Separator prefWidth="200.0">
                 <VBox.margin>
@@ -49,7 +50,8 @@
                 </VBox.margin>
             </Separator>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Ray Bounces"/>
-            <Slider id="rBounce" fx:id="rBounce" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" minorTickCount="0"
+            <Slider id="rBounce" fx:id="reflectionBounceLimit" blockIncrement="1.0" majorTickUnit="1.0" max="10.0"
+                    minorTickCount="0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
             <Separator prefWidth="200.0">
                 <VBox.margin>
@@ -73,7 +75,7 @@
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </VBox.margin>
             </Separator>
-            <Button fx:id="animBtn" mnemonicParsing="false" onAction="#setAnimation" text="Animate"/>
+            <Button fx:id="animateButton" mnemonicParsing="false" onAction="#setAnimationStatus" text="Animate"/>
             <Separator prefWidth="200.0">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
