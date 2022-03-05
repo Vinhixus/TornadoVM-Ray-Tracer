@@ -1,6 +1,5 @@
 package com.vinhderful.raytracer;
 
-import com.vinhderful.raytracer.misc.TornadoDeviceInfo;
 import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
 import javafx.animation.AnimationTimer;
@@ -148,8 +147,7 @@ public class Controller {
     private float moveSpeed = 0.2F;
 
     // Tornado elements
-    private ArrayList<TornadoDeviceInfo> devices;
-    private TornadoRuntimeCI runtimeCI;
+    private ArrayList<TornadoDevice> devices;
     private TaskSchedule ts;
     private GridScheduler grid;
     private boolean renderWithTornado;
@@ -272,30 +270,23 @@ public class Controller {
         devices = new ArrayList<>();
 
         // Add sequential execution to devices list
-        TornadoDeviceInfo cpu = new TornadoDeviceInfo("Pure Java", "CPU", false);
-        devices.add(cpu);
-        deviceDropdown.getItems().add(cpu.getName());
+        devices.add(null);
+        deviceDropdown.getItems().add("(Pure Java) - CPU");
 
         // Get Tornado drivers
-        runtimeCI = TornadoRuntime.getTornadoRuntime();
+        TornadoRuntimeCI runtimeCI = TornadoRuntime.getTornadoRuntime();
         int numTornadoDrivers = runtimeCI.getNumDrivers();
 
-        for (int driverIndex = 0; driverIndex < numTornadoDrivers; driverIndex++) {
+        for (int i = 0; i < numTornadoDrivers; i++) {
 
-            TornadoDriver driver = runtimeCI.getDriver(driverIndex);
+            TornadoDriver driver = runtimeCI.getDriver(i);
             int numDevices = driver.getDeviceCount();
 
             // Add Tornado devices, perform initial mapping
-            for (int deviceIndex = 0; deviceIndex < numDevices; deviceIndex++) {
-
-                TornadoDevice device = driver.getDevice(deviceIndex);
-                TornadoDeviceInfo deviceInfo = new TornadoDeviceInfo(
-                        driverIndex, deviceIndex,
-                        driver.getName(), device.getPhysicalDevice().getDeviceName(),
-                        true);
-
-                devices.add(deviceInfo);
-                deviceDropdown.getItems().add(deviceInfo.getName());
+            for (int j = 0; j < numDevices; j++) {
+                TornadoDevice device = driver.getDevice(j);
+                devices.add(device);
+                deviceDropdown.getItems().add("(" + driver.getName() + ") " + device.getPhysicalDevice().getDeviceName());
 
                 // Perform an initial mapping to avoid runtime lag
                 ts.mapAllTo(device);
@@ -502,12 +493,12 @@ public class Controller {
 
         // Get selection from dropdown box
         selectedDeviceIndex = deviceDropdown.getSelectionModel().getSelectedIndex();
-        TornadoDeviceInfo deviceInfo = devices.get(selectedDeviceIndex);
+        TornadoDevice device = devices.get(selectedDeviceIndex);
 
         // Map task schedule to selected device if selected device is tornado device
-        if (deviceInfo.isTornadoDevice()) {
+        if (selectedDeviceIndex > 0) {
             renderWithTornado = true;
-            ts.mapAllTo(runtimeCI.getDriver(deviceInfo.getDriverIndex()).getDevice(deviceInfo.getDeviceIndex()));
+            ts.mapAllTo(device);
         } else
             renderWithTornado = false;
     }
