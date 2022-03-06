@@ -12,8 +12,8 @@ public class Sphere extends Body {
     private final float radius;
 
     /**
-     * Constructs a Sphere object given its position, radius and color. Reflectivity
-     * will be set to the default value
+     * Constructs a Sphere object given its position, radius and color.
+     * Reflectivity will be set to the default Body value
      *
      * @param position the position
      * @param radius   the radius

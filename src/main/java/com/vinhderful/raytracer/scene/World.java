@@ -17,21 +17,21 @@ public class World {
     private final Camera camera;
     private final Light light;
     private final Plane plane;
-    private final Color backgroundColor;
+    private final Skybox skybox;
 
     /**
      * Construct a World object. Camera defaults to position {0, 0, 0} with FOV of
      * 60, plane defaults to height of -1, light source defaults to a WHITE light at
-     * {-1, 0.8, -1}, background color defaults to BLACK
+     * {2, 1.5, -1.5F}, background color defaults to BLACK
      */
     public World() {
         this.bodies = new ArrayList<>();
         this.camera = new Camera();
         this.plane = new Plane(-1F);
-        this.light = new Light(new Vector3f(-1F, 0.8F, -1F), Color.WHITE);
+        this.light = new Light(new Vector3f(2F, 1.5F, -1.5F), Color.WHITE);
         this.bodies.add(light);
         this.bodies.add(plane);
-        this.backgroundColor = Color.BLACK;
+        this.skybox = new Skybox("Sky.jpg");
     }
 
     /**
@@ -62,15 +62,6 @@ public class World {
     }
 
     /**
-     * Get the plane
-     *
-     * @return the plane
-     */
-    public Plane getPlane() {
-        return plane;
-    }
-
-    /**
      * Get the light source
      *
      * @return the light source
@@ -80,29 +71,20 @@ public class World {
     }
 
     /**
-     * Set the x attribute of the position of the light source to an x value
+     * Get the plane
      *
-     * @param x the x value to set the light's position.x to
+     * @return the plane
      */
-    public void setLightX(float x) {
-        light.setX(x);
+    public Plane getPlane() {
+        return plane;
     }
 
     /**
-     * Set the z attribute of the position of the light source to an z value
+     * Get the world's skybox
      *
-     * @param z the z value to set the light's position.z to
+     * @return the world's skybox
      */
-    public void setLightZ(float z) {
-        light.setZ(z);
-    }
-
-    /**
-     * Get the world's background color
-     *
-     * @return the world's background color
-     */
-    public Color getBackgroundColor() {
-        return backgroundColor;
+    public Skybox getSkybox() {
+        return skybox;
     }
 }

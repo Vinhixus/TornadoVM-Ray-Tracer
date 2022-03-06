@@ -15,6 +15,7 @@ public class Color {
     public static final Color BLUE = new Color(0, 0, 1F);
     public static final Color GRAY = new Color(0.5F, 0.5F, 0.5F);
     public static final Color DARK_GRAY = new Color(0.2F, 0.2F, 0.2F);
+    public static final Color MAGENTA = new Color(1F, 0, 1F);
 
     private final float red;
     private final float green;
@@ -31,6 +32,43 @@ public class Color {
         this.red = red;
         this.green = green;
         this.blue = blue;
+    }
+
+    /**
+     * Return the red value of the color
+     *
+     * @return the red value
+     */
+    public float getRed() {
+        return red;
+    }
+
+    /**
+     * Return the green value of the color
+     *
+     * @return the green value
+     */
+    public float getGreen() {
+        return green;
+    }
+
+    /**
+     * Return the blue value of the color
+     *
+     * @return the blue value
+     */
+    public float getBlue() {
+        return blue;
+    }
+
+    /**
+     * Add this color to a given scalar
+     *
+     * @param scalar the scalar
+     * @return the resulting color
+     */
+    public Color add(float scalar) {
+        return new Color(Math.min(1F, this.red + scalar), Math.min(1F, this.green + scalar), Math.min(1F, this.blue + scalar));
     }
 
     /**
@@ -62,6 +100,44 @@ public class Color {
      */
     public Color multiply(Color other) {
         return new Color(Math.min(1F, this.red * other.red), Math.min(1F, this.green * other.green), Math.min(1F, this.blue * other.blue));
+    }
+
+    /**
+     * Linear interpolation of three values
+     *
+     * @param a first value
+     * @param b second value
+     * @param t third value
+     * @return result
+     */
+    private static float lerp(float a, float b, float t) {
+        return a + t * (b - a);
+    }
+
+    /**
+     * Linear interpolation of this and another color with a given scalar
+     *
+     * @param other  the other color
+     * @param scalar scalar
+     * @return result
+     */
+    public Color lerp(Color other, float scalar) {
+        return new Color(
+                lerp(red, other.getRed(), scalar),
+                lerp(green, other.getGreen(), scalar),
+                lerp(blue, other.getBlue(), scalar));
+    }
+
+    /**
+     * Get a Color object from an ARGB value
+     *
+     * @return the Color object
+     */
+    public static Color fromInt(int argb) {
+        int b = (argb) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int r = (argb >> 16) & 0xFF;
+        return new Color(r / 255F, g / 255F, b / 255F);
     }
 
     /**

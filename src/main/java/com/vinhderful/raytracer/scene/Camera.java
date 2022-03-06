@@ -14,14 +14,16 @@ public class Camera {
     private float fieldOfVision;
 
     /**
-     * Construct a Camera object. Position defaults to {0, 0, 0}, yaw and pitch
-     * defaults to 0, FOV defaults to 60
+     * Construct a default Camera object.
+     * Position defaults to {0, 0.5, -4},
+     * yaw and pitch default to 0 and 5,
+     * field of view defaults to 60
      */
     public Camera() {
-        this.position = new Vector3f(0, 0, -4F);
+        this.position = new Vector3f(0, 0.4F, -5F);
         this.yaw = 0;
-        this.pitch = 0;
-        this.fieldOfVision = 60;
+        this.pitch = 5;
+        this.fieldOfVision = 50;
     }
 
     /**

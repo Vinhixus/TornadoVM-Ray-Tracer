@@ -19,24 +19,17 @@ public class Plane extends Body {
     }
 
     /**
-     * Get the color of the plane at a given 3D point
+     * Get the color of the plane at a given 3D point - checkerboard pattern
      *
      * @param point the 3D point
      * @return the color of the plane at the given point
      */
     @Override
     public Color getColor(Vector3f point) {
-        if ((point.getX() > 0 & point.getZ() > 0) || (point.getX() < 0 & point.getZ() < 0)) {
-            if ((int) point.getX() % 2 == 0 ^ (int) point.getZ() % 2 != 0)
-                return Color.GRAY;
-            else
-                return Color.DARK_GRAY;
-        } else {
-            if ((int) point.getX() % 2 == 0 ^ (int) point.getZ() % 2 != 0)
-                return Color.DARK_GRAY;
-            else
-                return Color.GRAY;
-        }
+        if ((int) (Math.floor(point.getX()) + Math.floor(point.getZ())) % 2 == 0)
+            return Color.GRAY;
+        else
+            return Color.DARK_GRAY;
     }
 
     /**
