@@ -1,5 +1,6 @@
 package com.vinhderful.raytracer.renderer;
 
+import com.vinhderful.raytracer.bodies.Body;
 import com.vinhderful.raytracer.scene.Light;
 import com.vinhderful.raytracer.scene.World;
 import com.vinhderful.raytracer.utils.Color;
@@ -15,60 +16,36 @@ public class Shader {
     /**
      * Constant values to tweak the strengths of ambient and specular lighting
      */
-    public static final float AMBIENT_STRENGTH = 0.05F;
+    public static final float AMBIENT_STRENGTH = 0.08F;
     public static final float SPECULAR_STRENGTH = 0.5F;
-    public static final float MAX_REFLECTIVITY = 256F;
+    public static final float MAX_REFLECTIVITY = 64F;
 
     /**
-     * Get the full Phong color of an object given a hit event and the world
+     * PHI value for shadow sampling with sunflower seed arrangement
+     */
+    public static final float PHI = (float) (Math.PI * (3 - Math.sqrt(5)));
+
+    /**
+     * Get the diffuse brightness of a body given a hit event and the world
      *
      * @param hit   the hit event
      * @param world the world
-     * @return the result of the Phong shading
+     * @return the diffuse brightness
      */
-    public static Color getPhong(Hit hit, World world) {
-        return getAmbient(hit, world).add(getDiffuse(hit, world)).add(getSpecular(hit, world));
-    }
-
-    /**
-     * Get the ambient color of a body given a hit event and the world
-     *
-     * @param hit   the hit event
-     * @param world the world
-     * @return the result of the ambient lighting
-     */
-    public static Color getAmbient(Hit hit, World world) {
-        Color shapeColor = hit.getColor();
-        Color lightColor = world.getLight().getColor();
-        return shapeColor.multiply(lightColor).multiply(AMBIENT_STRENGTH);
-    }
-
-    /**
-     * Get the diffuse color of a body given a hit event and the world
-     *
-     * @param hit   the hit event
-     * @param world the world
-     * @return the result of the diffuse lighting
-     */
-    public static Color getDiffuse(Hit hit, World world) {
+    public static float getDiffuse(Hit hit, World world) {
         Light light = world.getLight();
-        Color lightColor = light.getColor();
-        Color shapeColor = hit.getColor();
-
-        float diffuseBrightness = Math.max(0F, hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition()).normalize()));
-        return shapeColor.multiply(lightColor).multiply(diffuseBrightness);
+        return Math.max(0F, hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition()).normalize()));
     }
 
     /**
-     * Get the specular highlights of a body given a hit event and the world
+     * Get the specular brightness of a body given a hit event and the world
      *
      * @param hit   the hit event
      * @param world the world
-     * @return the result of the specular highlights
+     * @return the specular brightness
      */
-    public static Color getSpecular(Hit hit, World world) {
+    public static float getSpecular(Hit hit, World world) {
         Light light = world.getLight();
-        Color lightColor = light.getColor();
         Vector3f hitPos = hit.getPosition();
         Vector3f rayDirection = hit.getRay().getDirection();
         Vector3f lightDirection = light.getPosition().subtract(hitPos).normalize();
@@ -76,77 +53,86 @@ public class Shader {
 
         float specularFactor = Math.max(0F, reflectionVector.dotProduct(rayDirection));
         float specularBrightness = (float) Math.pow(specularFactor, hit.getBody().getReflectivity());
-        return lightColor.multiply(specularBrightness).multiply(SPECULAR_STRENGTH);
+        return specularBrightness * SPECULAR_STRENGTH;
     }
 
     /**
      * Get the factor that defines if a spot should be in shadow
+     * Light is sampled using the sunflower seed arrangement
      *
      * @param hit   the hit event
      * @param world the world
      * @return the shadow factor
      */
-    public static float getShadowFactor(Hit hit, World world) {
+    public static float getShadowFactor(Hit hit, World world, int sampleSize) {
         Light light = world.getLight();
         float lightScale = light.getScale();
         Vector3f lightPos = light.getPosition();
         Vector3f hitPos = hit.getPosition();
 
-        int sample = 10;
-        float uniform = lightScale * 2 / (sample - 1);
+        Vector3f n = hitPos.subtract(lightPos).normalize();
+        Vector3f u = n.perpVector();
+        Vector3f v = n.crossProduct(u);
 
         int raysHit = 0;
-        float totalRays = (float) (sample * sample * 1.3);
 
-        for (float i = lightPos.getX() - lightScale; i <= lightPos.getX() + lightScale + 0.01F; i += uniform) {
-            for (float j = lightPos.getZ() - lightScale; j <= lightPos.getZ() + lightScale + 0.01F; j += uniform) {
-                Vector3f samplePoint = new Vector3f(i, lightPos.getY(), j);
-                Vector3f rayDir = samplePoint.subtract(hitPos).normalize();
-                Vector3f rayOrigin = hitPos.add(rayDir.multiply(0.001F));
-                Ray ray = new Ray(rayOrigin, rayDir);
+        for (int i = 0; i < sampleSize; i++) {
 
-                Hit closestHit = Renderer.getClosestHit(ray, world);
+            float t = PHI * i;
+            float r = (float) Math.sqrt((float) i / sampleSize);
 
-                if (closestHit != null && closestHit.getBody() != light)
-                    raysHit++;
-            }
+            float x = (float) (2 * lightScale * r * Math.cos(t));
+            float y = (float) (2 * lightScale * r * Math.sin(t));
+
+            Vector3f samplePoint = lightPos.add(u.multiply(x)).add(v.multiply(y));
+            Vector3f rayDir = samplePoint.subtract(hitPos).normalize();
+            Vector3f rayOrigin = hitPos.add(rayDir.multiply(0.001F));
+            Ray sampleRay = new Ray(rayOrigin, rayDir);
+
+            Hit sampleHit = Renderer.getClosestHit(sampleRay, world);
+
+            if (sampleHit != null && sampleHit.getBody() != light)
+                raysHit++;
         }
 
-        if (raysHit == 0)
-            return 1;
-        else
-            return (1 + ((float) -raysHit / totalRays));
+        if (raysHit == 0) return 1;
+        else return 1 - (float) raysHit / (sampleSize * (1 + AMBIENT_STRENGTH));
+
     }
 
     /**
      * Recursively bounce ray in the given world and compute colors according to the
      * reflectivities of the hit objects until the recursion limit is reached
      *
-     * @param hit                     the hit event
-     * @param world                   the world
-     * @param recursionLimit          the limit of how many times the ray is bounced
-     * @param accumulatedReflectivity the total reflection from the previous iterations of the recursion
-     * @return the resulting color of the reflections
+     * @param hit                   the hit event
+     * @param world                 the world
+     * @param shadowSampleSize      number of samples for soft shadow sampling
+     * @param reflectionBounceLimit the limit of how many times the ray is bounced
+     * @return the resulting final pixel color
      */
-    public static Color getReflection(Hit hit, World world, int recursionLimit, float accumulatedReflectivity) {
+    public static Color getPixelColor(Hit hit, World world, int shadowSampleSize, int reflectionBounceLimit) {
+
         Vector3f hitPos = hit.getPosition();
         Vector3f rayDir = hit.getRay().getDirection();
+        Body hitBody = hit.getBody();
+
+        Color hitColor = hitBody.getColor(hitPos);
+
+        float diffuse = Math.max(AMBIENT_STRENGTH, getDiffuse(hit, world));
+        float specular = getSpecular(hit, world);
+        float reflectivity = hitBody.getReflectivity() / MAX_REFLECTIVITY;
+        float shadow = getShadowFactor(hit, world, shadowSampleSize);
+
+        Color reflection;
         Vector3f reflectionDir = rayDir.subtract(hit.getNormal().multiply(2 * rayDir.dotProduct(hit.getNormal())));
         Vector3f reflectionOrigin = hitPos.add(reflectionDir.multiply(0.001F));
-        float reflectivity = (hit.getBody().getReflectivity() / MAX_REFLECTIVITY) * accumulatedReflectivity;
+        Hit reflectionHit = reflectionBounceLimit > 0 ? Renderer.getClosestHit(new Ray(reflectionOrigin, reflectionDir), world) : null;
 
-        Ray reflectionRay = new Ray(reflectionOrigin, reflectionDir);
-        Hit closestHit = Renderer.getClosestHit(reflectionRay, world);
+        if (reflectionHit != null)
+            reflection = getPixelColor(reflectionHit, world, shadowSampleSize, reflectionBounceLimit - 1);
+        else
+            reflection = world.getBackgroundColor();
 
-        if (closestHit != null) {
-            Color finalColor;
-            finalColor = getPhong(closestHit, world).multiply(reflectivity);
-
-            if (recursionLimit != 0)
-                finalColor = finalColor.add(getReflection(closestHit, world, recursionLimit - 1, reflectivity));
-
-            return finalColor;
-        } else
-            return world.getBackgroundColor().multiply(reflectivity);
+        return hitColor.lerp(reflection, reflectivity).multiply(diffuse).add(specular).multiply(shadow);
     }
 }

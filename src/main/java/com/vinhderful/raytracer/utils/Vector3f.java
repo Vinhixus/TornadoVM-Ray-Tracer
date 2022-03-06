@@ -181,6 +181,20 @@ public class Vector3f {
     }
 
     /**
+     * Get the cross product of this vector and another given vector
+     *
+     * @param other the other vector
+     * @return the resulting cross product
+     */
+    public Vector3f crossProduct(Vector3f other) {
+        return new Vector3f(
+                y * other.getZ() - z * other.getY(),
+                z * other.getX() - x * other.getZ(),
+                x * other.getY() - y * other.getX());
+    }
+
+
+    /**
      * Get the distance between this vector and another given vector
      *
      * @param vec the other vector
@@ -190,8 +204,30 @@ public class Vector3f {
         return (float) Math.sqrt(Math.pow(x - vec.x, 2) + Math.pow(y - vec.y, 2) + Math.pow(z - vec.z, 2));
     }
 
+    /**
+     * Get the array representation of the vector
+     *
+     * @return the array representation of the vector
+     */
     public float[] toArray() {
         return new float[]{x, y, z};
+    }
+
+    /**
+     * Get an arbitrary perpendicular vector to this vector
+     *
+     * @return an arbitrary perpendicular vector
+     */
+    public Vector3f perpVector() {
+
+        // Make sure vector is not 0 vector
+        if (x == 0 && y == 0 && z == 0) return null;
+
+        if (y == 0 && z == 0)
+            return crossProduct(new Vector3f(0, 1, 0));
+
+        return crossProduct(new Vector3f(1, 0, 0));
+
     }
 
     /**

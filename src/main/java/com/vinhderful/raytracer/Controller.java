@@ -31,14 +31,14 @@ public class Controller {
         Renderer renderer = new Renderer(canvas.getGraphicsContext2D());
         World world = new World();
 
-        Sphere sphere3 = new Sphere(new Vector3f(-1.5F, 0, 0), 0.5f, Color.RED, 8F);
-        Sphere sphere1 = new Sphere(new Vector3f(0, 0, 0), 0.5f, Color.GREEN, 16F);
-        Sphere sphere2 = new Sphere(new Vector3f(1.5F, 0, 0), 0.5f, Color.BLUE, 32F);
+        Sphere sphere1 = new Sphere(new Vector3f(-1.5F, -0.5F, 0), 0.5F, Color.RED, 8F);
+        Sphere sphere2 = new Sphere(new Vector3f(0, -0.5F, 0), 0.5F, Color.GREEN, 16F);
+        Sphere sphere3 = new Sphere(new Vector3f(1.5F, -0.5F, 0), 0.5F, Color.BLUE, 32F);
         world.addBody(sphere1);
         world.addBody(sphere2);
         world.addBody(sphere3);
 
-        Cube cube = new Cube(new Vector3f(1.5F, 0, 2.5F), 2F, new Color(0.35F, 0.35F, 0.35F), 64F);
+        Cube cube = new Cube(new Vector3f(1.5F, 0, 2.5F), 2F, new Color(0.35F, 0.35F, 0.35F), 32F);
         world.addBody(cube);
 
         renderer.render(world);

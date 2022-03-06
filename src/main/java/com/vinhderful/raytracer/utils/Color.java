@@ -34,6 +34,43 @@ public class Color {
     }
 
     /**
+     * Return the red value of the color
+     *
+     * @return the red value
+     */
+    public float getRed() {
+        return red;
+    }
+
+    /**
+     * Return the green value of the color
+     *
+     * @return the green value
+     */
+    public float getGreen() {
+        return green;
+    }
+
+    /**
+     * Return the blue value of the color
+     *
+     * @return the blue value
+     */
+    public float getBlue() {
+        return blue;
+    }
+
+    /**
+     * Add this color to a given scalar
+     *
+     * @param scalar the scalar
+     * @return the resulting color
+     */
+    public Color add(float scalar) {
+        return new Color(Math.min(1F, this.red + scalar), Math.min(1F, this.green + scalar), Math.min(1F, this.blue + scalar));
+    }
+
+    /**
      * Add this color to another given color
      *
      * @param other the other color
@@ -62,6 +99,32 @@ public class Color {
      */
     public Color multiply(Color other) {
         return new Color(Math.min(1F, this.red * other.red), Math.min(1F, this.green * other.green), Math.min(1F, this.blue * other.blue));
+    }
+
+    /**
+     * Linear interpolation of three values
+     *
+     * @param a first value
+     * @param b second value
+     * @param t third value
+     * @return result
+     */
+    private static float lerp(float a, float b, float t) {
+        return a + t * (b - a);
+    }
+
+    /**
+     * Linear interpolation of this and another color with a given scalar
+     *
+     * @param other  the other color
+     * @param scalar scalar
+     * @return result
+     */
+    public Color lerp(Color other, float scalar) {
+        return new Color(
+                lerp(red, other.getRed(), scalar),
+                lerp(green, other.getGreen(), scalar),
+                lerp(blue, other.getBlue(), scalar));
     }
 
     /**
