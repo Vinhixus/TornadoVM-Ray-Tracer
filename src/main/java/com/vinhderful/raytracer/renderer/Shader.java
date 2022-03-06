@@ -16,7 +16,7 @@ public class Shader {
     /**
      * Constant values to tweak the strengths of ambient and specular lighting
      */
-    public static final float AMBIENT_STRENGTH = 0.08F;
+    public static final float AMBIENT_STRENGTH = 0.15F;
     public static final float SPECULAR_STRENGTH = 0.5F;
     public static final float MAX_REFLECTIVITY = 64F;
 
@@ -65,6 +65,7 @@ public class Shader {
      * @return the shadow factor
      */
     public static float getShadowFactor(Hit hit, World world, int sampleSize) {
+
         Light light = world.getLight();
         float lightScale = light.getScale();
         Vector3f lightPos = light.getPosition();
@@ -90,14 +91,12 @@ public class Shader {
             Ray sampleRay = new Ray(rayOrigin, rayDir);
 
             Hit sampleHit = Renderer.getClosestHit(sampleRay, world);
-
-            if (sampleHit != null && sampleHit.getBody() != light)
+            if (sampleHit != null && !sampleHit.getBody().equals(light))
                 raysHit++;
         }
 
         if (raysHit == 0) return 1;
         else return 1 - (float) raysHit / (sampleSize * (1 + AMBIENT_STRENGTH));
-
     }
 
     /**
@@ -131,8 +130,11 @@ public class Shader {
         if (reflectionHit != null)
             reflection = getPixelColor(reflectionHit, world, shadowSampleSize, reflectionBounceLimit - 1);
         else
-            reflection = world.getBackgroundColor();
+            reflection = world.getSkybox().getColor(reflectionDir);
 
-        return hitColor.lerp(reflection, reflectivity).multiply(diffuse).add(specular).multiply(shadow);
+        if (hitBody.equals(world.getPlane()))
+            return hitColor.lerp(reflection, reflectivity).add(specular).multiply(shadow);
+        else
+            return hitColor.lerp(reflection, reflectivity).multiply(diffuse).add(specular).multiply(shadow);
     }
 }

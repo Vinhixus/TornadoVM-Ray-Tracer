@@ -15,6 +15,7 @@ public class Color {
     public static final Color BLUE = new Color(0, 0, 1F);
     public static final Color GRAY = new Color(0.5F, 0.5F, 0.5F);
     public static final Color DARK_GRAY = new Color(0.2F, 0.2F, 0.2F);
+    public static final Color MAGENTA = new Color(1F, 0, 1F);
 
     private final float red;
     private final float green;
@@ -125,6 +126,18 @@ public class Color {
                 lerp(red, other.getRed(), scalar),
                 lerp(green, other.getGreen(), scalar),
                 lerp(blue, other.getBlue(), scalar));
+    }
+
+    /**
+     * Get a Color object from an ARGB value
+     *
+     * @return the Color object
+     */
+    public static Color fromInt(int argb) {
+        int b = (argb) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int r = (argb >> 16) & 0xFF;
+        return new Color(r / 255F, g / 255F, b / 255F);
     }
 
     /**

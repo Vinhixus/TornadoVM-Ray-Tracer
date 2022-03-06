@@ -110,7 +110,7 @@ public class Renderer {
                     else
                         pixels[x + y * width] = Shader.getPixelColor(hit, world, 200, 4).toARGB();
                 } else {
-                    pixels[x + y * width] = world.getBackgroundColor().toARGB();
+                    pixels[x + y * width] = world.getSkybox().getColor(rayDir).toARGB();
                 }
             }
 

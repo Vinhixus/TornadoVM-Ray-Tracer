@@ -16,21 +16,22 @@ public class World {
     private final ArrayList<Body> bodies;
     private final Camera camera;
     private final Light light;
-    private final Color backgroundColor;
+    private final Plane plane;
+    private final Skybox skybox;
 
     /**
      * Construct a World object. Camera defaults to position {0, 0, 0} with FOV of
      * 60, plane defaults to height of -1, light source defaults to a WHITE light at
-     * {-1, 0.8, -1}, background color defaults to BLACK
+     * {2, 1.5, -1.5F}, background color defaults to BLACK
      */
     public World() {
         this.bodies = new ArrayList<>();
         this.camera = new Camera();
-        Plane plane = new Plane(-1F);
+        this.plane = new Plane(-1F);
         this.light = new Light(new Vector3f(2F, 1.5F, -1.5F), Color.WHITE);
         this.bodies.add(light);
         this.bodies.add(plane);
-        this.backgroundColor = Color.BLACK;
+        this.skybox = new Skybox("Sky.jpg");
     }
 
     /**
@@ -70,11 +71,20 @@ public class World {
     }
 
     /**
-     * Get the world's background color
+     * Get the plane
      *
-     * @return the world's background color
+     * @return the plane
      */
-    public Color getBackgroundColor() {
-        return backgroundColor;
+    public Plane getPlane() {
+        return plane;
+    }
+
+    /**
+     * Get the world's skybox
+     *
+     * @return the world's skybox
+     */
+    public Skybox getSkybox() {
+        return skybox;
     }
 }

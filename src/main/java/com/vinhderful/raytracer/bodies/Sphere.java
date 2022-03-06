@@ -12,8 +12,8 @@ public class Sphere extends Body {
     private final float radius;
 
     /**
-     * Constructs a Sphere object given its position, radius and color. Reflectivity
-     * will be set to the default value
+     * Constructs a Sphere object given its position, radius and color.
+     * Reflectivity will be set to the default Body value
      *
      * @param position the position
      * @param radius   the radius
@@ -71,9 +71,5 @@ public class Sphere extends Body {
     @Override
     public Vector3f getNormalAt(Vector3f point) {
         return point.subtract(position).normalize();
-    }
-
-    public float getRadius() {
-        return radius;
     }
 }
