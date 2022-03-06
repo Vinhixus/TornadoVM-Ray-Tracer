@@ -16,27 +16,22 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>11</version>
+            <version>17.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11</version>
+            <version>17.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>11</version>
-        </dependency>
-        <dependency>
-            <groupId>tornado</groupId>
-            <artifactId>tornado-api</artifactId>
-            <version>0.11</version>
+            <version>17.0.2</version>
         </dependency>
     </dependencies>
 
     <groupId>com.vinhderful</groupId>
-    <artifactId>tornadovm-ray-tracer</artifactId>
+    <artifactId>tornadovm-path-tracer</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
