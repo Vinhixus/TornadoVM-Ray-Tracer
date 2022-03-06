@@ -183,16 +183,15 @@ public class Vector3f {
     /**
      * Get the cross product of this vector and another given vector
      *
-     * @param other the other vector
+     * @param vec the other vector
      * @return the resulting cross product
      */
-    public Vector3f crossProduct(Vector3f other) {
+    public Vector3f crossProduct(Vector3f vec) {
         return new Vector3f(
-                y * other.getZ() - z * other.getY(),
-                z * other.getX() - x * other.getZ(),
-                x * other.getY() - y * other.getX());
+                y * vec.getZ() - z * vec.getY(),
+                z * vec.getX() - x * vec.getZ(),
+                x * vec.getY() - y * vec.getX());
     }
-
 
     /**
      * Get the distance between this vector and another given vector
