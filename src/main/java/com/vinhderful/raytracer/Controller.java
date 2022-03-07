@@ -76,5 +76,6 @@ public class Controller {
 
         System.out.println("Done!");
         System.out.println("---------------------------------------");
+        System.exit(0);
     }
 }

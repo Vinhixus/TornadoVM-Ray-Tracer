@@ -62,22 +62,37 @@ public class Cube extends Body {
     @Override
     public Vector3f getIntersection(Ray ray) {
 
-        float t1 = (min.getX() - ray.getOrigin().getX()) / ray.getDirection().getX();
-        float t2 = (max.getX() - ray.getOrigin().getX()) / ray.getDirection().getX();
-        float t3 = (min.getY() - ray.getOrigin().getY()) / ray.getDirection().getY();
-        float t4 = (max.getY() - ray.getOrigin().getY()) / ray.getDirection().getY();
-        float t5 = (min.getZ() - ray.getOrigin().getZ()) / ray.getDirection().getZ();
-        float t6 = (max.getZ() - ray.getOrigin().getZ()) / ray.getDirection().getZ();
+        float t1, t2, tNear = Float.NEGATIVE_INFINITY, tFar = Float.POSITIVE_INFINITY;
+        boolean intersects = true;
 
-        float tMin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
-        float tMax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
+        float[] rayDirection = ray.getDirection().toArray();
+        float[] rayOrigin = ray.getOrigin().toArray();
+        float[] b1 = min.toArray();
+        float[] b2 = max.toArray();
 
-        if (tMax < 0 || tMin > tMax) return null;
+        for (int i = 0; i < 3; i++) {
+            if (rayDirection[i] == 0) {
+                if (rayOrigin[i] < b1[i] || rayOrigin[i] > b2[i])
+                    intersects = false;
+            } else {
+                t1 = (b1[i] - rayOrigin[i]) / rayDirection[i];
+                t2 = (b2[i] - rayOrigin[i]) / rayDirection[i];
 
-        if (tMin < 0)
-            return ray.getOrigin().add(ray.getDirection().multiply(tMax));
-        else
-            return ray.getOrigin().add(ray.getDirection().multiply(tMin));
+
+                if (t1 > t2) {
+                    float temp = t1;
+                    t1 = t2;
+                    t2 = temp;
+                }
+
+                if (t1 > tNear) tNear = t1;
+                if (t2 < tFar) tFar = t2;
+                if (tNear > tFar || tFar < 0) intersects = false;
+            }
+        }
+
+        if (intersects) return ray.getOrigin().add(ray.getDirection().multiply(tNear));
+        else return null;
     }
 
     /**

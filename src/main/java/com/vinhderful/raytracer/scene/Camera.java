@@ -15,15 +15,15 @@ public class Camera {
 
     /**
      * Construct a default Camera object.
-     * Position defaults to {0, 0.5, -4},
+     * Position defaults to {0, 0.4, -6},
      * yaw and pitch default to 0 and 5,
-     * field of view defaults to 60
+     * field of view defaults to 40
      */
     public Camera() {
-        this.position = new Vector3f(0, 0.4F, -5F);
+        this.position = new Vector3f(0, 0.4F, -6F);
         this.yaw = 0;
         this.pitch = 5;
-        this.fieldOfVision = 50;
+        this.fieldOfVision = 40;
     }
 
     /**

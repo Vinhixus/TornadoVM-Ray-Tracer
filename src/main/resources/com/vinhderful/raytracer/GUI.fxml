@@ -7,7 +7,7 @@
             fx:controller="com.vinhderful.raytracer.Controller">
     <center>
         <Pane fx:id="pane" BorderPane.alignment="CENTER">
-            <Canvas fx:id="canvas" height="1080" width="1920"/>
+            <Canvas fx:id="canvas" width="1920" height="1080"/>
         </Pane>
     </center>
 </BorderPane>
