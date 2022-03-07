@@ -21,11 +21,9 @@ public class Renderer {
                                      Float4 rayOrigin, Float4 rayDirection) {
 
         boolean intersects = false;
-
         for (int i = 2; i < bodyPositions.getLength(); i++)
             if (BodyOps.getIntersection(i, bodyPositions.get(i), bodySizes.get(i), rayOrigin, rayDirection).getW() == 0)
                 intersects = true;
-
         return intersects;
     }
 
@@ -86,20 +84,12 @@ public class Renderer {
                     if (hitIndex == 0)
                         pixels[x + y * width] = Color.toARGB(bodyColors.get(LIGHT_INDEX));
                     else {
-                        Float4 lightPosition = bodyPositions.get(LIGHT_INDEX);
-                        Float4 lightColor = bodyColors.get(LIGHT_INDEX);
-                        float lightSize = bodySizes.get(LIGHT_INDEX);
-
                         Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
-                        Float4 bodyPosition = bodyPositions.get(hitIndex);
-                        float bodyReflectivity = bodyReflectivities.get(hitIndex);
+                        Float4 pixelColor = Shader.getPixelColor(hitIndex, hitPosition, rayDirection,
+                                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                                shadowSampleSize, reflectionBounceLimit);
 
-                        Float4 bodyColor = BodyOps.getColor(hitIndex, hitPosition, bodyColors);
-                        bodyColor = Float4.add(bodyColor, Shader.getReflection(reflectionBounceLimit, hitIndex, hitPosition, rayDirection, bodyPositions, bodySizes, bodyColors, bodyReflectivities, lightPosition, lightSize, lightColor, shadowSampleSize));
-
-                        pixels[x + y * width] = Color.toARGB(Color.mult(
-                                Shader.getPhong(camPos, hitPosition, hitIndex, bodyPosition, bodyColor, bodyReflectivity, lightPosition, lightColor),
-                                Shader.getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize)));
+                        pixels[x + y * width] = Color.toARGB(pixelColor);
                     }
 
                 } else
