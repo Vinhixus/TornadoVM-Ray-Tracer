@@ -133,8 +133,8 @@ public class Shader {
             reflection = world.getSkybox().getColor(reflectionDir);
 
         if (hitBody.equals(world.getPlane()))
-            return hitColor.lerp(reflection, reflectivity).add(specular).multiply(shadow);
+            return hitColor.mix(reflection, reflectivity).add(specular).multiply(shadow);
         else
-            return hitColor.lerp(reflection, reflectivity).multiply(diffuse).add(specular).multiply(shadow);
+            return hitColor.mix(reflection, reflectivity).multiply(diffuse).add(specular).multiply(shadow);
     }
 }

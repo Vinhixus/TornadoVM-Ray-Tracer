@@ -103,29 +103,17 @@ public class Color {
     }
 
     /**
-     * Linear interpolation of three values
+     * Mix this color with another color given a ratio t
      *
-     * @param a first value
-     * @param b second value
-     * @param t third value
+     * @param other the other color
+     * @param r     the ratio
      * @return result
      */
-    private static float lerp(float a, float b, float t) {
-        return a + t * (b - a);
-    }
-
-    /**
-     * Linear interpolation of this and another color with a given scalar
-     *
-     * @param other  the other color
-     * @param scalar scalar
-     * @return result
-     */
-    public Color lerp(Color other, float scalar) {
+    public Color mix(Color other, float r) {
         return new Color(
-                lerp(red, other.getRed(), scalar),
-                lerp(green, other.getGreen(), scalar),
-                lerp(blue, other.getBlue(), scalar));
+                r * other.getRed() + (1F - r) * red,
+                r * other.getGreen() + (1F - r) * green,
+                r * other.getBlue() + (1F - r) * blue);
     }
 
     /**
