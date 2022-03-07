@@ -13,10 +13,10 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 public class Shader {
 
-    public static final float AMBIENT_STRENGTH = 0.05F;
+    public static final float AMBIENT_STRENGTH = 0.15F;
     public static final float SPECULAR_STRENGTH = 0.5F;
     public static final float MAX_REFLECTIVITY = 96F;
-    public static final float SHADOW_STRENGTH = 1.1F;
+    public static final float SHADOW_STRENGTH = 1.15F;
 
     public static final float PHI = floatPI() * (3 - floatSqrt(5));
 
@@ -81,6 +81,7 @@ public class Shader {
     public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
                                        Float4 lightPosition, float lightSize,
+                                       int[] skybox, int[] skyboxDimensions,
                                        int shadowSampleSize, int reflectionBounceLimit) {
 
         Float4 reflectionColor = new Float4(0, 0, 0, 0);
@@ -103,16 +104,21 @@ public class Shader {
                 Float4 bodyPosition = bodyPositions.get(hitIndex);
                 float bodyReflectivity = bodyReflectivities.get(hitIndex);
 
-                Float4 bodyColor = BodyOps.getColor(hitIndex, hitPosition, bodyColors);
-                Float4 phongColor = getPhong(hitIndex, hitPosition, reflectionDir, bodyPosition, bodyColor, bodyReflectivity, lightPosition);
+                Float4 color = BodyOps.getColor(hitIndex, hitPosition, bodyColors);
+                if (hitIndex > PLANE_INDEX)
+                    color = getPhong(hitIndex, hitPosition, reflectionDir, bodyPosition, color, bodyReflectivity, lightPosition);
+
                 float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
-                Float4 color = Color.mult(phongColor, shadow);
+                color = Color.mult(color, shadow);
 
                 reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity * (1 - t)));
                 reflectivity *= t;
                 rayDirection = reflectionDir;
-            } else
+            } else {
+                Float4 color = BodyOps.getSkyboxColor(skybox, skyboxDimensions, reflectionDir);
+                reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity * (1 - t)));
                 break;
+            }
         }
 
         return reflectionColor;
@@ -120,6 +126,7 @@ public class Shader {
 
     public static Float4 getPixelColor(int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
+                                       int[] skybox, int[] skyboxDimensions,
                                        int shadowSampleSize, int reflectionBounceLimit) {
 
         Float4 lightPosition = bodyPositions.get(LIGHT_INDEX);
@@ -131,10 +138,15 @@ public class Shader {
 
         Float4 reflectionColor = getReflection(hitIndex, hitPosition, rayDirection,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                lightPosition, lightSize, shadowSampleSize, reflectionBounceLimit);
+                lightPosition, lightSize,
+                skybox, skyboxDimensions,
+                shadowSampleSize, reflectionBounceLimit);
         Float4 color = Color.mix(bodyColor, reflectionColor, bodyReflectivity / MAX_REFLECTIVITY);
-        Float4 phongColor = getPhong(hitIndex, hitPosition, rayDirection, bodyPosition, color, bodyReflectivity, lightPosition);
+
+        if (hitIndex > PLANE_INDEX)
+            color = getPhong(hitIndex, hitPosition, rayDirection, bodyPosition, color, bodyReflectivity, lightPosition);
+
         float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
-        return Color.mult(phongColor, shadow);
+        return Color.mult(color, shadow);
     }
 }

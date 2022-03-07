@@ -77,9 +77,10 @@ public class Controller {
 
 
     /**
-     * Color of the global background
+     * Skybox
      **/
-    private static Float4 worldBGColor;
+    private static int[] skybox;
+    private static int[] skyboxDimensions;
 
     /**
      * The following 4 vectors define the objects in the scene.
@@ -165,7 +166,8 @@ public class Controller {
 
         // Build world
         World world = new World();
-        worldBGColor = world.getBackgroundColor();
+        skybox = world.getSkybox();
+        skyboxDimensions = world.getSkyboxDimensions();
         bodyPositions = world.getBodyPositions();
         bodySizes = world.getBodySizes();
         bodyColors = world.getBodyColors();
@@ -250,7 +252,7 @@ public class Controller {
         ts.streamIn(bodyPositions, camera, pathTracingProperties);
         ts.task("t0", Renderer::render, pixels, dimensions, camera,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                worldBGColor, pathTracingProperties);
+                skybox, skyboxDimensions, pathTracingProperties);
         ts.streamOut(pixels);
 
         // Define worker grid
@@ -336,7 +338,7 @@ public class Controller {
         else
             Renderer.render(pixels, dimensions, camera,
                     bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    worldBGColor, pathTracingProperties);
+                    skybox, skyboxDimensions, pathTracingProperties);
 
         // Set the pixels on the canvas
         pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);

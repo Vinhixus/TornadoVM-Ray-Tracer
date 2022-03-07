@@ -60,12 +60,17 @@ public class Color {
         );
     }
 
-    public static int toARGB(Float4 color) {
+    public static Float4 fromInt(int argb) {
+        int b = (argb) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int r = (argb >> 16) & 0xFF;
+        return new Float4(r / 255F, g / 255F, b / 255F, 0);
+    }
 
-        int r = (int) (color.getX() * 255);
-        int g = (int) (color.getY() * 255);
-        int b = (int) (color.getZ() * 255);
-
+    public static int toARGB(Float4 c) {
+        int r = (int) (c.getX() * 255);
+        int g = (int) (c.getY() * 255);
+        int b = (int) (c.getZ() * 255);
         return 0xFF000000 | (r << 16) | (g << 8) | b;
     }
 }

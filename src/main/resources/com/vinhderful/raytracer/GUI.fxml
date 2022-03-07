@@ -9,8 +9,8 @@
             fx:controller="com.vinhderful.raytracer.Controller">
     <center>
         <Pane fx:id="pane" BorderPane.alignment="CENTER">
-            <Canvas fx:id="canvas" height="720" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed"
-                    onMouseReleased="#mouseReleased" width="1280"/>
+            <Canvas fx:id="canvas" height="240" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed"
+                    onMouseReleased="#mouseReleased" width="240"/>
         </Pane>
     </center>
     <right>
@@ -50,7 +50,7 @@
             </Separator>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Ray Bounces"/>
             <Slider id="reflectionBounceLimit" fx:id="reflectionBounceLimit" blockIncrement="1.0" majorTickUnit="1.0"
-                    max="10.0"
+                    max="6.0"
                     minorTickCount="0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
             <Separator prefWidth="200.0">

@@ -49,7 +49,7 @@ public class Renderer {
 
     public static void render(int[] pixels, int[] dimensions, float[] camera,
                               VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              Float4 worldBGColor, int[] pathTracingProperties) {
+                              int[] skybox, int[] skyboxDimensions, int[] pathTracingProperties) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * 0.5F * TO_RADIANS), 0);
         Float4 camPos = new Float4(camera[0], camera[1], camera[2], 0);
@@ -70,18 +70,20 @@ public class Renderer {
                 int hitIndex = (int) hit.getW();
 
                 if (hitIndex != -1) {
-                    if (hitIndex == 0)
+                    if (hitIndex == LIGHT_INDEX)
                         pixels[x + y * width] = Color.toARGB(bodyColors.get(LIGHT_INDEX));
                     else {
                         Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
                         Float4 pixelColor = Shader.getPixelColor(hitIndex, hitPosition, rayDirection,
                                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                                skybox, skyboxDimensions,
                                 shadowSampleSize, reflectionBounceLimit);
 
                         pixels[x + y * width] = Color.toARGB(pixelColor);
                     }
-                } else
-                    pixels[x + y * width] = Color.toARGB(worldBGColor);
+                } else {
+                    pixels[x + y * width] = Color.toARGB(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection));
+                }
             }
     }
 }

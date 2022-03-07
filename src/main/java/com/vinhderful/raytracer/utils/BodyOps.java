@@ -4,8 +4,7 @@ import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatSqrt;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floor;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
  * Represent a sphere in a 3D scene using its position, radius and color
@@ -65,5 +64,16 @@ public class BodyOps {
 
         // Else simply return body color
         else return bodyColors.get(hitIndex);
+    }
+
+    public static Float4 getSkyboxColor(int[] skybox, int[] skyBoxDimensions, Float4 d) {
+
+        // Convert unit vector to texture coordinates
+        float u = (float) (0.5 + Math.atan2(d.getZ(), d.getX()) / (2 * floatPI()));
+        float v = (float) (0.5 - Math.asin(d.getY()) / floatPI());
+
+        int x = (int) (u * (skyBoxDimensions[0] - 1));
+        int y = (int) (v * (skyBoxDimensions[1] - 1));
+        return Color.fromInt(skybox[x + y * skyBoxDimensions[0]]);
     }
 }

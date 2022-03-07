@@ -6,7 +6,6 @@ import uk.ac.manchester.tornado.api.GridScheduler;
 import uk.ac.manchester.tornado.api.TaskSchedule;
 import uk.ac.manchester.tornado.api.WorkerGrid;
 import uk.ac.manchester.tornado.api.WorkerGrid2D;
-import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
@@ -38,7 +37,8 @@ public class Test {
         setRenderingProperties();
 
         World world = new World();
-        Float4 worldBGColor = world.getBackgroundColor();
+        int[] skybox = world.getSkybox();
+        int[] skyboxDimensions = world.getSkyboxDimensions();
         VectorFloat4 bodyPositions = world.getBodyPositions();
         VectorFloat bodySizes = world.getBodySizes();
         VectorFloat4 bodyColors = world.getBodyColors();
@@ -49,7 +49,7 @@ public class Test {
         ts.streamIn(bodyPositions, camera, pathTracingProperties);
         ts.task("t0", Renderer::render, pixels, dimensions, camera,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                worldBGColor, pathTracingProperties);
+                skybox, skyboxDimensions, pathTracingProperties);
         ts.streamOut(pixels);
 
         WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
@@ -82,7 +82,7 @@ public class Test {
         for (int i = 0; i < TEST_LOOP_ITERATIONS; i++)
             Renderer.render(pixels, dimensions, camera,
                     bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    worldBGColor, pathTracingProperties);
+                    skybox, skyboxDimensions, pathTracingProperties);
 
         endTime = System.nanoTime();
         double sequentialTime = (endTime - startTime) / 1000000.0;

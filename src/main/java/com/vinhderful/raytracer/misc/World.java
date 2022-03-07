@@ -16,7 +16,7 @@ public class World {
     public static final int LIGHT_INDEX = 0;
     public static final int PLANE_INDEX = 1;
 
-    private Float4 backgroundColor;
+    private Skybox skybox;
     private final ArrayList<Body> bodies;
 
     private VectorFloat4 bodyPositions;
@@ -44,8 +44,8 @@ public class World {
 
     public void generateDefaultWorld() {
 
-        // Background Color
-        backgroundColor = Color.BLACK;
+        // Skybox
+        skybox = new Skybox("Sky.jpg");
 
         // Sphere light
         Light light = new Light(new Float4(1F, 3F, -1.5F, 0), 0.4F, Color.WHITE);
@@ -57,10 +57,10 @@ public class World {
 
         // Spheres in the scene
         addBody(new Sphere(new Float4(0, 1F, 0, 0), 1F, Color.GRAY, 32F));
-        addBody(new Sphere(new Float4(3F, 0.5F, 0, 0), 0.5F, Color.RED, 8F));
+        addBody(new Sphere(new Float4(0, 0.5F, 3F, 0), 0.5F, Color.RED, 8F));
         addBody(new Sphere(new Float4(4.5F, 0.5F, 0, 0), 0.5F, Color.GREEN, 16F));
         addBody(new Sphere(new Float4(6F, 0.5F, 0, 0), 0.5F, Color.BLUE, 32F));
-        addBody(new Sphere(new Float4(7.5F, 0.5F, 0, 0), 0.5F, Color.BLACK, 64F));
+        addBody(new Sphere(new Float4(0, 0.5F, 7.5F, 0), 0.5F, Color.BLACK, 48F));
     }
 
     private void generateTornadoCompatibleData() {
@@ -85,10 +85,6 @@ public class World {
         bodies.add(body);
     }
 
-    public Float4 getBackgroundColor() {
-        return backgroundColor;
-    }
-
     public VectorFloat4 getBodyPositions() {
         return bodyPositions;
     }
@@ -103,5 +99,13 @@ public class World {
 
     public VectorFloat getBodyReflectivities() {
         return bodyReflectivities;
+    }
+
+    public int[] getSkybox() {
+        return skybox.getARGB();
+    }
+
+    public int[] getSkyboxDimensions() {
+        return skybox.getDimensions();
     }
 }
