@@ -510,10 +510,10 @@ public class Controller {
      */
     private void animate() {
         t = (t + 0.017453292F) % 6.2831855F;
-        bodyPositions.set(3, new Float4(3 * floatCos(t), bodyPositions.get(3).getY(), 3 * floatSin(t), 0));
-        bodyPositions.set(4, new Float4(4.5F * floatCos(-t), bodyPositions.get(4).getY(), 4.5F * floatSin(-t), 0));
-        bodyPositions.set(5, new Float4(6 * floatCos(t), bodyPositions.get(5).getY(), 6 * floatSin(t), 0));
-        bodyPositions.set(6, new Float4(7.5F * floatCos(-t), bodyPositions.get(6).getY(), 7.5F * floatSin(-t), 0));
+        bodyPositions.set(3, new Float4(3 * floatSin(t), bodyPositions.get(3).getY(), 3 * floatCos(t), 0));
+        bodyPositions.set(4, new Float4(4.5F * floatCos(t), bodyPositions.get(4).getY(), 4.5F * floatSin(t), 0));
+        bodyPositions.set(5, new Float4(6 * floatCos(-t), bodyPositions.get(5).getY(), 6 * floatSin(-t), 0));
+        bodyPositions.set(6, new Float4(7.5F * floatSin(-t), bodyPositions.get(6).getY(), 7.5F * floatCos(-t), 0));
     }
 
     /**

@@ -8,6 +8,7 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import static com.vinhderful.raytracer.misc.World.LIGHT_INDEX;
+import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 public class Shader {
@@ -69,7 +70,7 @@ public class Shader {
             Float4 rayDir = Float4.normalise(Float4.sub(samplePoint, hitPosition));
             Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDir, 0.001F));
 
-            if (Renderer.intersects(bodyPositions, bodySizes, rayOrigin, rayDir))
+            if (Renderer.getClosestHit(bodyPositions, bodySizes, rayOrigin, rayDir).getW() > PLANE_INDEX)
                 raysHit++;
         }
 
@@ -93,27 +94,23 @@ public class Shader {
 
             float t = bodyReflectivities.get(hitIndex) / MAX_REFLECTIVITY;
 
-            Float4 closestHit = Renderer.getClosestHit(bodyPositions, bodySizes, reflectionOrigin, reflectionDir);
-            int closestHitIndex = (int) closestHit.getW();
+            Float4 hit = Renderer.getClosestHit(bodyPositions, bodySizes, reflectionOrigin, reflectionDir);
+            hitIndex = (int) hit.getW();
 
-            if (closestHitIndex != -1) {
+            if (hitIndex != -1) {
+                hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
 
-                Float4 closestHitPosition = new Float4(closestHit.getX(), closestHit.getY(), closestHit.getZ(), 0);
+                Float4 bodyPosition = bodyPositions.get(hitIndex);
+                float bodyReflectivity = bodyReflectivities.get(hitIndex);
 
-                Float4 bodyPosition = bodyPositions.get(closestHitIndex);
-                float bodyReflectivity = bodyReflectivities.get(closestHitIndex);
-
-                Float4 bodyColor = BodyOps.getColor(closestHitIndex, closestHitPosition, bodyColors);
-                Float4 phongColor = getPhong(closestHitIndex, closestHitPosition, reflectionDir, bodyPosition, bodyColor, bodyReflectivity, lightPosition);
-                float shadow = getShadow(closestHitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
+                Float4 bodyColor = BodyOps.getColor(hitIndex, hitPosition, bodyColors);
+                Float4 phongColor = getPhong(hitIndex, hitPosition, reflectionDir, bodyPosition, bodyColor, bodyReflectivity, lightPosition);
+                float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
                 Float4 color = Color.mult(phongColor, shadow);
 
                 reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity * (1 - t)));
-
-                rayDirection = reflectionDir;
-                hitPosition = closestHitPosition;
-                hitIndex = closestHitIndex;
                 reflectivity *= t;
+                rayDirection = reflectionDir;
             } else
                 break;
         }

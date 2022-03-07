@@ -17,16 +17,6 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatTan
  */
 public class Renderer {
 
-    public static boolean intersects(VectorFloat4 bodyPositions, VectorFloat bodySizes,
-                                     Float4 rayOrigin, Float4 rayDirection) {
-
-        boolean intersects = false;
-        for (int i = 2; i < bodyPositions.getLength(); i++)
-            if (BodyOps.getIntersection(i, bodyPositions.get(i), bodySizes.get(i), rayOrigin, rayDirection).getW() == 0)
-                intersects = true;
-        return intersects;
-    }
-
     public static Float4 getClosestHit(VectorFloat4 bodyPositions, VectorFloat bodySizes,
                                        Float4 rayOrigin, Float4 rayDirection) {
 
@@ -80,7 +70,6 @@ public class Renderer {
                 int hitIndex = (int) hit.getW();
 
                 if (hitIndex != -1) {
-
                     if (hitIndex == 0)
                         pixels[x + y * width] = Color.toARGB(bodyColors.get(LIGHT_INDEX));
                     else {
@@ -91,7 +80,6 @@ public class Renderer {
 
                         pixels[x + y * width] = Color.toARGB(pixelColor);
                     }
-
                 } else
                     pixels[x + y * width] = Color.toARGB(worldBGColor);
             }
