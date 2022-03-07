@@ -23,18 +23,15 @@ public class Shader {
                                   Float4 bodyPosition, Float4 bodyColor, float bodyReflectivity,
                                   Float4 lightPosition) {
 
-        float specular = getSpecular(hitIndex, hitPosition, rayDirection, bodyPosition, bodyReflectivity, lightPosition);
         float diffuse = max(AMBIENT_STRENGTH, getDiffuse(hitIndex, hitPosition, bodyPosition, lightPosition));
-
+        float specular = getSpecular(hitIndex, hitPosition, rayDirection, bodyPosition, bodyReflectivity, lightPosition);
         return Color.add(Color.mult(bodyColor, diffuse), specular);
     }
 
-    public static Float4 getAmbient(Float4 bodyColor, Float4 lightColor) {
-        return Color.mult(Color.mult(bodyColor, lightColor), AMBIENT_STRENGTH);
-    }
-
     public static float getDiffuse(int hitIndex, Float4 hitPosition, Float4 bodyPosition, Float4 lightPosition) {
-        return max(0, Float4.dot(BodyOps.getNormal(hitIndex, hitPosition, bodyPosition), Float4.normalise(Float4.sub(lightPosition, hitPosition))));
+        Float4 hitNormal = BodyOps.getNormal(hitIndex, hitPosition, bodyPosition);
+        Float4 lightDirection = Float4.normalise(Float4.sub(lightPosition, hitPosition));
+        return max(0, Float4.dot(hitNormal, lightDirection));
     }
 
     public static float getSpecular(int hitIndex, Float4 hitPosition, Float4 rayDirection,
@@ -42,11 +39,9 @@ public class Shader {
                                     Float4 lightPosition) {
 
         Float4 lightDirection = Float4.normalise(Float4.sub(lightPosition, hitPosition));
+        Float4 hitNormal = BodyOps.getNormal(hitIndex, hitPosition, bodyPosition);
 
-        Float4 reflectionVector = Float4.sub(lightDirection,
-                Float4.mult(BodyOps.getNormal(hitIndex, hitPosition, bodyPosition),
-                        2 * Float4.dot(lightDirection, BodyOps.getNormal(hitIndex, hitPosition, bodyPosition))));
-
+        Float4 reflectionVector = Float4.sub(lightDirection, Float4.mult(hitNormal, 2 * Float4.dot(lightDirection, hitNormal)));
         float specularFactor = max(0, Float4.dot(reflectionVector, rayDirection));
         float specularBrightness = pow(specularFactor, bodyReflectivity);
 
@@ -84,7 +79,7 @@ public class Shader {
 
     public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                                       Float4 lightPosition, float lightSize, Float4 lightColor,
+                                       Float4 lightPosition, float lightSize,
                                        int shadowSampleSize, int reflectionBounceLimit) {
 
         Float4 reflectionColor = new Float4(0, 0, 0, 0);
@@ -131,7 +126,6 @@ public class Shader {
                                        int shadowSampleSize, int reflectionBounceLimit) {
 
         Float4 lightPosition = bodyPositions.get(LIGHT_INDEX);
-        Float4 lightColor = bodyColors.get(LIGHT_INDEX);
         float lightSize = bodySizes.get(LIGHT_INDEX);
 
         Float4 bodyPosition = bodyPositions.get(hitIndex);
@@ -140,8 +134,7 @@ public class Shader {
 
         Float4 reflectionColor = getReflection(hitIndex, hitPosition, rayDirection,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                lightPosition, lightSize, lightColor,
-                shadowSampleSize, reflectionBounceLimit);
+                lightPosition, lightSize, shadowSampleSize, reflectionBounceLimit);
         Float4 color = Color.mix(bodyColor, reflectionColor, bodyReflectivity / MAX_REFLECTIVITY);
         Float4 phongColor = getPhong(hitIndex, hitPosition, rayDirection, bodyPosition, color, bodyReflectivity, lightPosition);
         float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
