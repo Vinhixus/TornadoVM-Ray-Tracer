@@ -40,13 +40,11 @@ public class Main extends Application {
         }
 
         Scene scene = null;
-        if (root != null)
-            scene = new Scene(root);
+        if (root != null) scene = new Scene(root);
 
         stage.setTitle("TornadoVM Path Tracer");
         stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("icon.png"))));
         stage.setResizable(false);
         stage.setScene(scene);
-        stage.show();
     }
 }
