@@ -27,7 +27,7 @@ public class Color {
                 min(1F, max(0F, a.getX() + b.getX())),
                 min(1F, max(0F, a.getY() + b.getY())),
                 min(1F, max(0F, a.getZ() + b.getZ())),
-                min(1F, max(0F, a.getW() + b.getW())));
+                0);
     }
 
     public static Float4 add(Float4 a, float b) {
@@ -35,7 +35,7 @@ public class Color {
                 min(1F, max(0F, a.getX() + b)),
                 min(1F, max(0F, a.getY() + b)),
                 min(1F, max(0F, a.getZ() + b)),
-                min(1F, max(0F, a.getW() + b)));
+                0);
     }
 
     public static Float4 mult(Float4 a, Float4 b) {
@@ -43,7 +43,7 @@ public class Color {
                 min(1F, max(0F, a.getX() * b.getX())),
                 min(1F, max(0F, a.getY() * b.getY())),
                 min(1F, max(0F, a.getZ() * b.getZ())),
-                min(1F, max(0F, a.getW() * b.getW())));
+                0);
     }
 
     public static Float4 mult(Float4 a, float b) {
@@ -58,13 +58,6 @@ public class Color {
                 t * b.getZ() + (1F - t) * a.getZ(),
                 0
         );
-    }
-
-    public static Float4 fromInt(int argb) {
-        int b = (argb) & 0xFF;
-        int g = (argb >> 8) & 0xFF;
-        int r = (argb >> 16) & 0xFF;
-        return new Float4(r / 255F, g / 255F, b / 255F, 0);
     }
 
     public static int toARGB(Float4 c) {

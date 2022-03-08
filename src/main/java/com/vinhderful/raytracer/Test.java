@@ -37,7 +37,7 @@ public class Test {
         setRenderingProperties();
 
         World world = new World();
-        int[] skybox = world.getSkybox();
+        VectorFloat4 skybox = world.getSkybox();
         int[] skyboxDimensions = world.getSkyboxDimensions();
         VectorFloat4 bodyPositions = world.getBodyPositions();
         VectorFloat bodySizes = world.getBodySizes();

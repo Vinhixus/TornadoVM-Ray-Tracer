@@ -81,7 +81,7 @@ public class Shader {
     public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
                                        Float4 lightPosition, float lightSize,
-                                       int[] skybox, int[] skyboxDimensions,
+                                       VectorFloat4 skybox, int[] skyboxDimensions,
                                        int shadowSampleSize, int reflectionBounceLimit) {
 
         Float4 reflectionColor = new Float4(0, 0, 0, 0);
@@ -126,7 +126,7 @@ public class Shader {
 
     public static Float4 getPixelColor(int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                                       int[] skybox, int[] skyboxDimensions,
+                                       VectorFloat4 skybox, int[] skyboxDimensions,
                                        int shadowSampleSize, int reflectionBounceLimit) {
 
         Float4 lightPosition = bodyPositions.get(LIGHT_INDEX);

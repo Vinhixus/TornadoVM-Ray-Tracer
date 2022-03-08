@@ -66,7 +66,7 @@ public class BodyOps {
         else return bodyColors.get(hitIndex);
     }
 
-    public static Float4 getSkyboxColor(int[] skybox, int[] skyBoxDimensions, Float4 d) {
+    public static Float4 getSkyboxColor(VectorFloat4 skybox, int[] skyBoxDimensions, Float4 d) {
 
         // Convert unit vector to texture coordinates
         float u = (float) (0.5 + Math.atan2(d.getZ(), d.getX()) / (2 * floatPI()));
@@ -74,6 +74,6 @@ public class BodyOps {
 
         int x = (int) (u * (skyBoxDimensions[0] - 1));
         int y = (int) (v * (skyBoxDimensions[1] - 1));
-        return Color.fromInt(skybox[x + y * skyBoxDimensions[0]]);
+        return skybox.get(x + y * skyBoxDimensions[0]);
     }
 }

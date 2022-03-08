@@ -49,7 +49,7 @@ public class Renderer {
 
     public static void render(int[] pixels, int[] dimensions, float[] camera,
                               VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              int[] skybox, int[] skyboxDimensions, int[] pathTracingProperties) {
+                              VectorFloat4 skybox, int[] skyboxDimensions, int[] pathTracingProperties) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * 0.5F * TO_RADIANS), 0);
         Float4 camPos = new Float4(camera[0], camera[1], camera[2], 0);

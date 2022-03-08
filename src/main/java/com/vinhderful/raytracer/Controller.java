@@ -79,7 +79,7 @@ public class Controller {
     /**
      * Skybox
      **/
-    private static int[] skybox;
+    private static VectorFloat4 skybox;
     private static int[] skyboxDimensions;
 
     /**

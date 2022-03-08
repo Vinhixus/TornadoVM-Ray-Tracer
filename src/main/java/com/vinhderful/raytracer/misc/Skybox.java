@@ -1,5 +1,8 @@
 package com.vinhderful.raytracer.misc;
 
+import uk.ac.manchester.tornado.api.collections.types.Float4;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -31,18 +34,25 @@ public class Skybox {
         }
     }
 
-    public int[] getARGB() {
+    public static Float4 fromARGB(int argb) {
+        int b = (argb) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int r = (argb >> 16) & 0xFF;
+        return new Float4(r / 255F, g / 255F, b / 255F, 0);
+    }
+
+    public VectorFloat4 getVectorFloat4() {
 
         int width = sphereImage.getWidth();
         int height = sphereImage.getHeight();
 
-        int[] argb = new int[width * height];
+        VectorFloat4 colors = new VectorFloat4(width * height);
 
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
-                argb[x + y * width] = sphereImage.getRGB(x, y);
+                colors.set(x + y * width, fromARGB(sphereImage.getRGB(x, y)));
 
-        return argb;
+        return colors;
     }
 
     public int[] getDimensions() {

@@ -101,8 +101,8 @@ public class World {
         return bodyReflectivities;
     }
 
-    public int[] getSkybox() {
-        return skybox.getARGB();
+    public VectorFloat4 getSkybox() {
+        return skybox.getVectorFloat4();
     }
 
     public int[] getSkyboxDimensions() {
