@@ -14,7 +14,31 @@ public class Renderer {
 
     private final int width;
     private final int height;
+
+    private final int shadowSampleSize;
+    private final int reflectionBounceLimit;
+
     private final int[] pixels;
+
+    /**
+     * Construct a Renderer object given the width and height of output and the World to render
+     *
+     * @param width                 width of output
+     * @param height                height of output
+     * @param world                 world to render
+     * @param shadowSampleSize      number of shadow samples to take for soft shadows
+     * @param reflectionBounceLimit number of recursive reflection bounces
+     */
+    public Renderer(int width, int height, World world, int shadowSampleSize, int reflectionBounceLimit) {
+        this.width = width;
+        this.height = height;
+        this.pixels = new int[width * height];
+
+        this.shadowSampleSize = shadowSampleSize;
+        this.reflectionBounceLimit = reflectionBounceLimit;
+
+        render(world);
+    }
 
     /**
      * Construct a Renderer object given the width and height of output and the World to render
@@ -27,6 +51,9 @@ public class Renderer {
         this.width = width;
         this.height = height;
         this.pixels = new int[width * height];
+
+        this.shadowSampleSize = 200;
+        this.reflectionBounceLimit = 5;
 
         render(world);
     }
@@ -101,7 +128,7 @@ public class Renderer {
                     if (hit.getBody().equals(world.getLight()))
                         pixels[x + y * width] = hit.getColor().toARGB();
                     else
-                        pixels[x + y * width] = Shader.getPixelColor(hit, world, 200, 4).toARGB();
+                        pixels[x + y * width] = Shader.getPixelColor(hit, world, shadowSampleSize, reflectionBounceLimit).toARGB();
                 } else
                     pixels[x + y * width] = world.getSkybox().getColor(rayDir).toARGB();
             }

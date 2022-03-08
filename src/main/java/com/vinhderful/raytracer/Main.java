@@ -37,13 +37,20 @@ public class Main {
         world.addBody(cube);
 
         // Dimensions of output
-        int width = 1280;
-        int height = 720;
+        int width = 1920;
+        int height = 1080;
+
+        // Path tracing properties
+        int shadowSampleSize = 250;
+        int reflectionBounceLimit = 5;
 
         // Render world
         System.out.println("---------------------------------------");
         System.out.println("Rendering scene...");
-        int[] pixels = new Renderer(width, height, world).getPixels();
+
+        Renderer renderer = new Renderer(width, height, world, shadowSampleSize, reflectionBounceLimit);
+        int[] pixels = renderer.getPixels();
+
         System.out.println("Scene rendered.");
         System.out.println("---------------------------------------");
 
