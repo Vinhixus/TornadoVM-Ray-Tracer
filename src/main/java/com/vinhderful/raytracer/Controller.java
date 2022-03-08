@@ -7,15 +7,12 @@ import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import uk.ac.manchester.tornado.api.*;
 import uk.ac.manchester.tornado.api.collections.types.Float3;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
@@ -106,8 +103,10 @@ public class Controller {
     @FXML
 
     // Main pane and canvas encapsulating the viewport
-    public Pane pane;
     public Canvas canvas;
+
+    public VBox settingsPanel;
+    public MenuItem settingsPanelToggle;
 
     // Adjustable light position
     public Slider lightX;
@@ -446,6 +445,7 @@ public class Controller {
                 break;
             case D:
                 strafeR = false;
+                toggleSettingsPanel();
                 break;
             case SHIFT:
                 moveSpeed = 0.2F;
@@ -526,13 +526,19 @@ public class Controller {
     /**
      * Define action on clicking "Animate" button
      */
-    public void setAnimationStatus() {
-        if (animating) {
-            animateButton.setText("Animate");
-            animating = false;
-        } else {
-            animateButton.setText("Stop");
-            animating = true;
-        }
+    public void toggleAnimation() {
+        animating = !animating;
+        animateButton.setText(animating ? "Stop" : "Animate");
+    }
+
+    /**
+     * Toggle right-side setting panel
+     */
+    public void toggleSettingsPanel() {
+        boolean isVisible = settingsPanel.isVisible();
+        settingsPanel.setVisible(!isVisible);
+        settingsPanel.setManaged(!isVisible);
+        settingsPanelToggle.setText(isVisible ? "Show Settings Panel" : "Hide Settings Panel");
+        settingsPanel.getParent().getScene().getWindow().sizeToScene();
     }
 }

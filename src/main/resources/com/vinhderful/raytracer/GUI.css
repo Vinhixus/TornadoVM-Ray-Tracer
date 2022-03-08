@@ -1,15 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Cantarell&display=swap');
+
 /* Redefine base colors */
 .root {
-    -fx-font-family: "Ubuntu Mono";
+    -fx-font-family: "Cantarell";
+    -fx-font-size: 14;
 
-    -fx-base: rgb(50, 50, 50);
-    -fx-background: rgb(50, 50, 50);
+    -fx-base: rgb(45, 45, 45);
+    -fx-background: rgb(45, 45, 45);
 
     /* make controls (buttons, thumb, etc.) slightly lighter */
     -fx-color: derive(-fx-base, 10%);
 
     /* text fields and table rows background */
-    -fx-control-inner-background: rgb(20, 20, 20);
+    -fx-control-inner-background: rgb(49, 49, 49);
     /* version of -fx-control-inner-background for alternative rows */
     -fx-control-inner-background-alt: derive(-fx-control-inner-background, 2.5%);
 
@@ -50,4 +53,15 @@
 .scroll-bar > .increment-button:pressed > .increment-arrow,
 .scroll-bar > .decrement-button:pressed > .decrement-arrow {
     -fx-background-color: -fx-mark-highlight-color, rgb(255, 255, 255);
+}
+
+/* Menu bar */
+.menu-bar {
+    -fx-background-color: rgb(40, 40, 40);
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: rgb(28, 28, 28);
+}
+
+.slider {
+    -fx-control-inner-background: rgb(28, 28, 28);
 }

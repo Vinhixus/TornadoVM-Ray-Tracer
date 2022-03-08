@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Java-based Ray Tracer using JavaFX
+ * Java-based Path Tracer using JavaFX
  */
 public class Main extends Application {
 
@@ -44,7 +44,6 @@ public class Main extends Application {
 
         stage.setTitle("TornadoVM Path Tracer");
         stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("icon.png"))));
-        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
