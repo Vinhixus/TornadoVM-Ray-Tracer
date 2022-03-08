@@ -16,7 +16,7 @@ public class Shader {
     public static final float AMBIENT_STRENGTH = 0.15F;
     public static final float SPECULAR_STRENGTH = 0.5F;
     public static final float MAX_REFLECTIVITY = 96F;
-    public static final float SHADOW_STRENGTH = 1.15F;
+    public static final float SHADOW_STRENGTH = 0.25F;
 
     public static final float PHI = floatPI() * (3 - floatSqrt(5));
 
@@ -75,7 +75,7 @@ public class Shader {
         }
 
         if (raysHit == 0) return 1;
-        else return 1 - (float) raysHit / (sampleSize * SHADOW_STRENGTH);
+        else return 1 - (float) raysHit / (sampleSize * (1 + SHADOW_STRENGTH));
     }
 
     public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
