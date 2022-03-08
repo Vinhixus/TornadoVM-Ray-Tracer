@@ -25,17 +25,10 @@ public class Skybox {
         sphereImage = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
 
         try {
-            System.out.println("Loading skybox " + resourceName + "...");
+            System.out.println("Loading skybox image '" + resourceName + "'...");
             sphereImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(resourceName)));
             System.out.println("Skybox ready.");
         } catch (IOException | IllegalArgumentException ex) {
-            try {
-                sphereImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("error_skybox.jpg")));
-            } catch (IOException | IllegalArgumentException ex2) {
-                ex2.printStackTrace();
-                System.exit(-1);
-            }
-
             ex.printStackTrace();
         }
     }

@@ -6,36 +6,29 @@ import com.vinhderful.raytracer.scene.World;
 import com.vinhderful.raytracer.utils.Hit;
 import com.vinhderful.raytracer.utils.Ray;
 import com.vinhderful.raytracer.utils.Vector3f;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritablePixelFormat;
-
-import java.nio.IntBuffer;
 
 /**
  * Implements functions to draw the scene on the canvas
  */
 public class Renderer {
 
-    private final PixelWriter pixelWriter;
     private final int width;
     private final int height;
-
     private final int[] pixels;
-    private final WritablePixelFormat<IntBuffer> format;
 
     /**
-     * Construct a Renderer object given the graphics context to draw to
+     * Construct a Renderer object given the width and height of output and the World to render
      *
-     * @param g the graphics context to draw to
+     * @param width  width of output
+     * @param height height of output
+     * @param world  world to render
      */
-    public Renderer(GraphicsContext g) {
-        this.pixelWriter = g.getPixelWriter();
-        this.width = (int) g.getCanvas().getWidth();
-        this.height = (int) g.getCanvas().getHeight();
-
-        this.format = WritablePixelFormat.getIntArgbInstance();
+    public Renderer(int width, int height, World world) {
+        this.width = width;
+        this.height = height;
         this.pixels = new int[width * height];
+
+        render(world);
     }
 
     /**
@@ -109,11 +102,17 @@ public class Renderer {
                         pixels[x + y * width] = hit.getColor().toARGB();
                     else
                         pixels[x + y * width] = Shader.getPixelColor(hit, world, 200, 4).toARGB();
-                } else {
+                } else
                     pixels[x + y * width] = world.getSkybox().getColor(rayDir).toARGB();
-                }
             }
+    }
 
-        pixelWriter.setPixels(0, 0, width, height, format, pixels, 0, width);
+    /**
+     * Return the ARGB pixel array
+     *
+     * @return the ARGB pixel array
+     */
+    public int[] getPixels() {
+        return pixels;
     }
 }

@@ -1,45 +1,70 @@
 package com.vinhderful.raytracer;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
+import com.vinhderful.raytracer.bodies.Cube;
+import com.vinhderful.raytracer.bodies.Sphere;
+import com.vinhderful.raytracer.renderer.Renderer;
+import com.vinhderful.raytracer.scene.World;
+import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.Vector3f;
 
+import javax.imageio.ImageIO;
+import java.awt.image.*;
+import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 
 /**
- * Java-based Path Tracer using JavaFX
+ * Java-based Path Tracer
  */
-public class Main extends Application {
+public class Main {
 
-    /**
-     * Launch application window
-     *
-     * @param args program arguments
-     */
     public static void main(String[] args) {
-        launch(args);
-    }
 
-    /**
-     * Initialise application window
-     *
-     * @param stage the stage to show
-     */
-    @Override
-    public void start(Stage stage) {
+        // Build world
+        World world = new World();
 
-        BorderPane root = null;
+        Sphere sphereWhite = new Sphere(new Vector3f(-3F, -0.5F, 0), 0.5F, Color.WHITE, 4F);
+        Sphere sphereRed = new Sphere(new Vector3f(-1.5F, -0.5F, 0), 0.5F, Color.RED, 8F);
+        Sphere sphereGreen = new Sphere(new Vector3f(0, -0.5F, 0), 0.5F, Color.GREEN, 16F);
+        Sphere sphereBlue = new Sphere(new Vector3f(1.5F, -0.5F, 0), 0.5F, Color.BLUE, 32F);
+        Sphere sphereBlack = new Sphere(new Vector3f(3F, -0.5F, 0), 0.5F, Color.BLACK, 48F);
+        world.addBody(sphereWhite);
+        world.addBody(sphereRed);
+        world.addBody(sphereGreen);
+        world.addBody(sphereBlue);
+        world.addBody(sphereBlack);
+
+        Cube cube = new Cube(new Vector3f(1.5F, 0, 2.5F), 2F, new Color(0.35F, 0.35F, 0.35F), 32F);
+        world.addBody(cube);
+
+        // Dimensions of output
+        int width = 1280;
+        int height = 720;
+
+        // Render world
+        System.out.println("---------------------------------------");
+        System.out.println("Rendering scene...");
+        int[] pixels = new Renderer(width, height, world).getPixels();
+        System.out.println("Scene rendered.");
+        System.out.println("---------------------------------------");
+
+        // Write to image
+        ColorModel cm = new DirectColorModel(24, 0xFF0000, 0xFF00, 0xFF);
+        WritableRaster raster = Raster.createPackedRaster(
+                new DataBufferInt(pixels, pixels.length), width, height, width,
+                new int[]{0xFF0000, 0xFF00, 0xFF},
+                null);
+        BufferedImage img = new BufferedImage(cm, raster, false, null);
+
+        String name = "Render.png";
+        System.out.println("Writing to image'" + name + "'...");
         try {
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("GUI.fxml")));
+            ImageIO.write(img, "png", new File(name));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Wrote to " + name);
 
-        Scene scene = null;
-        if (root != null) scene = new Scene(root);
-        stage.setScene(scene);
+        // Exit
+        System.out.println("---------------------------------------");
     }
 }
