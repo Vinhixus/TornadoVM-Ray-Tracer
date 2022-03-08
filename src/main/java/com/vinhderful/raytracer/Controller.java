@@ -445,7 +445,6 @@ public class Controller {
                 break;
             case D:
                 strafeR = false;
-                toggleSettingsPanel();
                 break;
             case SHIFT:
                 moveSpeed = 0.2F;
