@@ -14,11 +14,12 @@ import com.vinhderful.raytracer.utils.Vector3f;
 public class Shader {
 
     /**
-     * Constant values to tweak the strengths of ambient and specular lighting
+     * Constant values to tweak lighting and shadows
      */
     public static final float AMBIENT_STRENGTH = 0.15F;
     public static final float SPECULAR_STRENGTH = 0.5F;
     public static final float MAX_REFLECTIVITY = 64F;
+    public static final float SHADOW_STRENGTH = 0.25F;
 
     /**
      * PHI value for shadow sampling with sunflower seed arrangement
@@ -96,7 +97,7 @@ public class Shader {
         }
 
         if (raysHit == 0) return 1;
-        else return 1 - (float) raysHit / (sampleSize * (1 + AMBIENT_STRENGTH));
+        else return 1 - (float) raysHit / (sampleSize * (1 + SHADOW_STRENGTH));
     }
 
     /**
