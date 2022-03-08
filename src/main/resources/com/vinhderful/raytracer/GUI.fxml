@@ -19,13 +19,14 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
             </padding>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Light X"/>
-            <Slider id="lightX" fx:id="lightX" majorTickUnit="1.0" max="4.0" min="-4.0" minorTickCount="1"
+            <Slider id="lightX" fx:id="lightX" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true" value="1"/>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Light Y"/>
-            <Slider id="lightY" fx:id="lightY" majorTickUnit="1.0" max="8.0" minorTickCount="1" showTickLabels="true"
+            <Slider id="lightY" fx:id="lightY" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="1"
+                    showTickLabels="true"
                     showTickMarks="true" value="3"/>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Light Z"/>
-            <Slider id="lightZ" fx:id="lightZ" majorTickUnit="1.0" max="4.0" min="-4.0" minorTickCount="1"
+            <Slider id="lightZ" fx:id="lightZ" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true" value="-1.5"/>
             <Separator prefWidth="200.0">
                 <VBox.margin>

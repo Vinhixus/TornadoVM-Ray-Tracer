@@ -27,6 +27,7 @@ import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
@@ -481,6 +482,10 @@ public class Controller {
         if (strafeR) cameraPosition = Float3.add(cameraPosition, Float3.mult(rightVector, moveSpeed));
         if (up) cameraPosition = Float3.add(cameraPosition, Float3.mult(upVector, moveSpeed));
         if (down) cameraPosition = Float3.sub(cameraPosition, Float3.mult(upVector, moveSpeed));
+
+        // Limit camera to above plane
+        float planeHeight = bodyPositions.get(PLANE_INDEX).getY() + 0.001F;
+        if (cameraPosition.getY() < planeHeight) cameraPosition.setY(planeHeight);
 
         // Write result back to camera properties
         camera[0] = cameraPosition.get(0);
