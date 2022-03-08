@@ -186,7 +186,7 @@ public class Controller {
         fpsLastUpdate = 0;
 
         // Define main animation loop - gets called every frame
-        AnimationTimer timer = new AnimationTimer() {
+        new AnimationTimer() {
 
             @Override
             public void handle(long now) {
@@ -204,10 +204,7 @@ public class Controller {
                 fps.setText(String.format("FPS: %.2f", 1_000_000_000.0 / (now - fpsLastUpdate)));
                 fpsLastUpdate = now;
             }
-        };
-
-        // Start animation loop
-        timer.start();
+        }.start();
     }
 
 
@@ -539,5 +536,9 @@ public class Controller {
         settingsPanel.setManaged(!isVisible);
         settingsPanelToggle.setText(isVisible ? "Show Settings Panel" : "Hide Settings Panel");
         settingsPanel.getParent().getScene().getWindow().sizeToScene();
+    }
+
+    public void exit() {
+        System.exit(0);
     }
 }

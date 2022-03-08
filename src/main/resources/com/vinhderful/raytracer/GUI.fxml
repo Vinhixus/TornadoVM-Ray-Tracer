@@ -91,13 +91,14 @@
     <top>
         <MenuBar>
             <Menu mnemonicParsing="false" text="File">
-                <MenuItem mnemonicParsing="false" text="Close"/>
+                <MenuItem mnemonicParsing="false" text="Exit" onAction="#exit"/>
             </Menu>
             <Menu mnemonicParsing="false" text="View">
                 <MenuItem fx:id="settingsPanelToggle" mnemonicParsing="false" onAction="#toggleSettingsPanel"
                           text="Hide Settings Panel"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Help">
+                <MenuItem mnemonicParsing="false" text="Controls"/>
                 <MenuItem mnemonicParsing="false" text="About"/>
             </Menu>
         </MenuBar>
