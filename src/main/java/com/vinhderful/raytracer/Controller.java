@@ -538,6 +538,9 @@ public class Controller {
         settingsPanel.getParent().getScene().getWindow().sizeToScene();
     }
 
+    /**
+     * Exit handler
+     */
     public void exit() {
         System.exit(0);
     }

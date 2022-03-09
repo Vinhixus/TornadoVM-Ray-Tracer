@@ -47,4 +47,12 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+    /**
+     * Exit handler
+     */
+    @Override
+    public void stop() {
+        System.exit(0);
+    }
 }
