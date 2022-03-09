@@ -165,6 +165,9 @@ public class Controller {
     public void initialize() throws Exception {
 
         // Build world
+        System.out.println("------------------------------------");
+        System.out.println("Building World:");
+
         World world = new World();
         skybox = world.getSkybox();
         skyboxDimensions = world.getSkyboxDimensions();
@@ -173,9 +176,14 @@ public class Controller {
         bodyColors = world.getBodyColors();
         bodyReflectivities = world.getBodyReflectivities();
 
+        System.out.println("------------------------------------");
+
         // Initialise settings
+        System.out.println("Allocating buffers, initialising rendering properties...");
         setRenderingProperties();
+        System.out.println("Setting up Tornado Task Schedule...");
         setTornadoTaskSchedule();
+        System.out.println("Getting Available Tornado Devices...");
         setAvailableDevices();
         setSliderListeners();
 
@@ -205,6 +213,9 @@ public class Controller {
                 fpsLastUpdate = now;
             }
         }.start();
+
+        System.out.println("------------------------------------");
+        System.out.println("Opening Application...");
     }
 
 
@@ -285,7 +296,10 @@ public class Controller {
             for (int j = 0; j < numDevices; j++) {
                 TornadoDevice device = driver.getDevice(j);
                 devices.add(device);
-                deviceDropdown.getItems().add("(" + driver.getName() + ") " + device.getPhysicalDevice().getDeviceName());
+
+                String listingName = "(" + driver.getName() + ") " + device.getPhysicalDevice().getDeviceName();
+                System.out.println("-> Found: " + listingName);
+                deviceDropdown.getItems().add(listingName);
 
                 // Perform an initial mapping to avoid runtime lag
                 ts.mapAllTo(device);

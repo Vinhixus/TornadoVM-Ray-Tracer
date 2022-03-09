@@ -45,8 +45,11 @@ public class World {
     public void generateDefaultWorld() {
 
         // Skybox
-        skybox = new Skybox("Sky.jpg");
+        String skyboxFileName = "Sky.jpg";
+        System.out.println("-> Loading Skybox Image '" + skyboxFileName + "'...");
+        skybox = new Skybox(skyboxFileName);
 
+        System.out.println("-> Adding object to the scene...");
         // Sphere light
         Light light = new Light(new Float4(1F, 3F, -1.5F, 0), 0.4F, Color.WHITE);
         addBody(light);
@@ -64,6 +67,8 @@ public class World {
     }
 
     private void generateTornadoCompatibleData() {
+        System.out.println("-> Generating Tornado compatible representation of world...");
+
         int numBodies = bodies.size();
 
         bodyPositions = new VectorFloat4(numBodies);

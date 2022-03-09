@@ -25,9 +25,7 @@ public class Skybox {
         sphereImage = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
 
         try {
-            System.out.println("Loading Skybox Image '" + resourceName + "'...");
             sphereImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(resourceName)));
-            System.out.println("Skybox Ready!");
         } catch (IOException | IllegalArgumentException ex) {
             ex.printStackTrace();
             System.exit(-1);
