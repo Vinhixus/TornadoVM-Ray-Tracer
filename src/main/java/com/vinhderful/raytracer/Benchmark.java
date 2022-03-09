@@ -10,7 +10,7 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
-public class Test {
+public class Benchmark {
 
     public static final int TEST_LOOP_ITERATIONS = 10;
 

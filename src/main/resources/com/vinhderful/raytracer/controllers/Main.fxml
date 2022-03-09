@@ -4,9 +4,9 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane onKeyPressed="#keyPressed" onKeyReleased="#keyReleased" stylesheets="@GUI.css"
+<BorderPane onKeyPressed="#keyPressed" onKeyReleased="#keyReleased" stylesheets="@../GUI.css"
             xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.vinhderful.raytracer.Controller">
+            fx:controller="com.vinhderful.raytracer.controllers.Main">
     <center>
         <Pane BorderPane.alignment="CENTER">
             <Canvas fx:id="canvas" height="720" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed"

@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer;
+package com.vinhderful.raytracer.controllers;
 
 import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
@@ -29,10 +29,10 @@ import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
- * Initialises JavaFX FXML elements together with GUI.fxml, contains driver code
+ * Initialises JavaFX FXML elements together with Main.fxml, contains driver code
  */
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
-public class Controller {
+public class Main {
 
     /**
      * Pixel buffer containing ARGB values of pixel colors

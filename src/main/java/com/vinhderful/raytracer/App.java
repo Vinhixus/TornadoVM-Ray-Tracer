@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * Java-based Path Tracer using JavaFX
  */
-public class Main extends Application {
+public class App extends Application {
 
     /**
      * Launch application window
@@ -34,7 +34,7 @@ public class Main extends Application {
 
         StackPane root = null;
         try {
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Loading.fxml")));
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("controllers/Loading.fxml")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,7 +43,7 @@ public class Main extends Application {
         if (root != null) scene = new Scene(root);
 
         stage.setTitle("TornadoVM Path Tracer");
-        stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("icon.png"))));
+        stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("icon.png"))));
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();

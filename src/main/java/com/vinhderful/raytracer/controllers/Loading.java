@@ -1,5 +1,6 @@
-package com.vinhderful.raytracer;
+package com.vinhderful.raytracer.controllers;
 
+import com.vinhderful.raytracer.App;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,7 +31,7 @@ public class Loading {
 
                 BorderPane root = null;
                 try {
-                    root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("GUI.fxml")));
+                    root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Main.fxml")));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -46,7 +47,7 @@ public class Loading {
 
             Stage stage = new Stage();
             stage.setTitle("TornadoVM Path Tracer");
-            stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("icon.png"))));
+            stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("icon.png"))));
             stage.setResizable(false);
             stage.setScene(scene);
             stage.show();
