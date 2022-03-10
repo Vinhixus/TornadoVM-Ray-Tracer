@@ -4,6 +4,7 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <BorderPane onKeyPressed="#keyPressed" onKeyReleased="#keyReleased" stylesheets="@../GUI.css"
             xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.vinhderful.raytracer.controllers.Main">
@@ -14,17 +15,47 @@
         </Pane>
     </center>
     <right>
-        <VBox fx:id="settingsPanel" BorderPane.alignment="CENTER" prefWidth="320.0">
+        <VBox fx:id="settingsPanel" prefWidth="320.0" BorderPane.alignment="CENTER">
             <padding>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
             </padding>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Light X"/>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Light X"/>
+                <Text fx:id="lightXText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
+            </GridPane>
             <Slider id="lightX" fx:id="lightX" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true" value="1"/>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Light Y"/>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Light Y"/>
+                <Text fx:id="lightYText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
+            </GridPane>
             <Slider id="lightY" fx:id="lightY" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true" value="3"/>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Light Z"/>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Light Z"/>
+                <Text fx:id="lightZText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
+            </GridPane>
             <Slider id="lightZ" fx:id="lightZ" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true" value="-1.5"/>
             <Separator>
@@ -32,23 +63,51 @@
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </VBox.margin>
             </Separator>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Camera FOV"/>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Camera Field of View"/>
+                <Text fx:id="cameraFOVText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0"
+                      GridPane.columnIndex="1"/>
+            </GridPane>
             <Slider id="camFOV" fx:id="cameraFOV" majorTickUnit="10.0" max="90.0" min="30.0" minorTickCount="5"
                     showTickLabels="true" showTickMarks="true" value="60.0"/>
-            <Separator layoutX="30.0" layoutY="232.0" prefWidth="200.0">
-                <VBox.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-                </VBox.margin>
-            </Separator>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Shadow Sample Size"/>
-            <Slider id="shadowSampleSize" fx:id="shadowSampleSize" blockIncrement="1.0" majorTickUnit="50.0" max="400.0"
-                    showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
             <Separator>
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </VBox.margin>
             </Separator>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Reflection Bounces"/>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Shadow Sample Size"/>
+                <Text fx:id="shadowSampleSizeText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0"
+                      GridPane.columnIndex="1"/>
+            </GridPane>
+            <Slider id="shadowSampleSize" fx:id="shadowSampleSize" blockIncrement="1.0" majorTickUnit="50.0" max="400.0"
+                    showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Reflection Bounces"/>
+                <Text fx:id="reflectionBouncesText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0"
+                      GridPane.columnIndex="1"/>
+            </GridPane>
             <Slider id="reflectionBounceLimit" fx:id="reflectionBounceLimit" blockIncrement="1.0" majorTickUnit="1.0"
                     max="6.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"
                     value="1.0"/>
@@ -57,49 +116,60 @@
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </VBox.margin>
             </Separator>
-            <Label fx:id="fps" text="FPS: 0.00"/>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="FPS"/>
+                <Text fx:id="fps" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
+            </GridPane>
             <Separator>
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </VBox.margin>
             </Separator>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Device:">
+            <StackPane>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Device:"/>
                 <VBox.margin>
-                    <Insets bottom="5.0"/>
+                    <Insets bottom="10.0"/>
                 </VBox.margin>
-            </Label>
+            </StackPane>
             <ComboBox fx:id="deviceDropdown" onAction="#selectDevice"/>
             <Separator>
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </VBox.margin>
             </Separator>
-            <Button fx:id="animateButton" mnemonicParsing="false" onAction="#toggleAnimation" text="Animate"/>
-            <Separator>
-                <VBox.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-                </VBox.margin>
-            </Separator>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Debug Output:">
-                <VBox.margin>
-                    <Insets bottom="5.0"/>
-                </VBox.margin>
-            </Label>
-            <Label fx:id="debugOutput"/>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Animation"/>
+                <Button fx:id="animateButton" mnemonicParsing="false" onAction="#toggleAnimation" text="Play"
+                        GridPane.columnIndex="1"/>
+            </GridPane>
         </VBox>
     </right>
     <top>
         <MenuBar>
             <Menu mnemonicParsing="false" text="File">
-                <MenuItem mnemonicParsing="false" text="Exit" onAction="#exit"/>
+                <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit"/>
             </Menu>
             <Menu mnemonicParsing="false" text="View">
                 <MenuItem fx:id="settingsPanelToggle" mnemonicParsing="false" onAction="#toggleSettingsPanel"
                           text="Hide Settings Panel"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Help">
-                <MenuItem mnemonicParsing="false" text="Controls"/>
-                <MenuItem mnemonicParsing="false" text="About"/>
+                <MenuItem mnemonicParsing="false" onAction="#showControls" text="Controls"/>
+                <MenuItem mnemonicParsing="false" onAction="#showAboutInfo" text="About"/>
             </Menu>
         </MenuBar>
     </top>

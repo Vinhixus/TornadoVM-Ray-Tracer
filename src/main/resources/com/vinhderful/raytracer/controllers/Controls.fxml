@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<StackPane stylesheets="@../GUI.css" xmlns="http://javafx.com/javafx/17">
+    <VBox>
+        <StackPane.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        </StackPane.margin>
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Mouse: Look around">
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+            </VBox.margin>
+        </Text>
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="W, A, S, D: Move">
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+            </VBox.margin>
+        </Text>
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Q, E: Up, Down">
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+            </VBox.margin>
+        </Text>
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Shift: Run">
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+            </VBox.margin>
+        </Text>
+    </VBox>
+</StackPane>

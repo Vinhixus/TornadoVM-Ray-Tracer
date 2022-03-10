@@ -1,18 +1,31 @@
 package com.vinhderful.raytracer.controllers;
 
+import com.vinhderful.raytracer.App;
 import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import uk.ac.manchester.tornado.api.*;
 import uk.ac.manchester.tornado.api.collections.types.Float3;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
@@ -21,8 +34,10 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
+import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
@@ -112,20 +127,23 @@ public class Main {
     public Slider lightX;
     public Slider lightY;
     public Slider lightZ;
+    public Text lightXText;
+    public Text lightYText;
+    public Text lightZText;
 
     // Adjustable camera field of view
     public Slider cameraFOV;
+    public Text cameraFOVText;
 
     // Adjustable soft shadow sample size and reflection bounce limit
     public Slider shadowSampleSize;
+    public Text shadowSampleSizeText;
     public Slider reflectionBounceLimit;
+    public Text reflectionBouncesText;
 
     // Frames per second text output and helper variables
-    public Label fps;
+    public Text fps;
     private static long fpsLastUpdate = 0;
-
-    // Debug text output
-    public Label debugOutput;
 
     // Device selection dropdown
     public ComboBox<String> deviceDropdown;
@@ -156,6 +174,10 @@ public class Main {
     // PixelWriter and it's format
     private PixelWriter pixelWriter;
     private WritablePixelFormat<IntBuffer> format;
+
+    // Control and com.vinhderful.raytracer.controllers.About windows
+    private boolean controlsShown = false;
+    private boolean aboutShown = false;
 
 
     /**
@@ -209,7 +231,7 @@ public class Main {
                 if (animating) animate();
 
                 // Record and output fps
-                fps.setText(String.format("FPS: %.2f", 1_000_000_000.0 / (now - fpsLastUpdate)));
+                fps.setText(String.format("%.2f", 1_000_000_000.0 / (now - fpsLastUpdate)));
                 fpsLastUpdate = now;
             }
         }.start();
@@ -321,20 +343,26 @@ public class Main {
         // Adjustable light position
         lightX.valueProperty().addListener((observable, oldValue, newValue)
                 -> bodyPositions.set(0, new Float4(newValue.floatValue(), bodyPositions.get(0).getY(), bodyPositions.get(0).getZ(), 0)));
+        lightXText.textProperty().bind(lightX.valueProperty().asString("%.2f"));
         lightY.valueProperty().addListener((observable, oldValue, newValue)
                 -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), newValue.floatValue(), bodyPositions.get(0).getZ(), 0)));
+        lightYText.textProperty().bind(lightY.valueProperty().asString("%.2f"));
         lightZ.valueProperty().addListener((observable, oldValue, newValue)
                 -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), bodyPositions.get(0).getY(), newValue.floatValue(), 0)));
+        lightZText.textProperty().bind(lightZ.valueProperty().asString("%.2f"));
 
         // Adjustable camera field of view
         cameraFOV.valueProperty().addListener((observable, oldValue, newValue)
                 -> camera[5] = newValue.floatValue());
+        cameraFOVText.textProperty().bind(cameraFOV.valueProperty().asString("%.2f"));
 
         // Adjustable path tracing rendering properties
         shadowSampleSize.valueProperty().addListener((observable, oldValue, newValue)
                 -> pathTracingProperties[0] = newValue.intValue());
+        shadowSampleSizeText.textProperty().bind(shadowSampleSize.valueProperty().asString("%.0f"));
         reflectionBounceLimit.valueProperty().addListener((observable, oldValue, newValue)
                 -> pathTracingProperties[1] = newValue.intValue());
+        reflectionBouncesText.textProperty().bind(reflectionBounceLimit.valueProperty().asString("%.0f"));
     }
 
 
@@ -538,7 +566,7 @@ public class Main {
      */
     public void toggleAnimation() {
         animating = !animating;
-        animateButton.setText(animating ? "Stop" : "Animate");
+        animateButton.setText(animating ? "Pause" : "Play");
     }
 
     /**
@@ -557,5 +585,81 @@ public class Main {
      */
     public void exit() {
         System.exit(0);
+    }
+
+    public void showControls() {
+        if (!controlsShown) {
+            Task<Parent> createControlsWindow = new Task<>() {
+
+                @Override
+                protected Parent call() {
+
+                    StackPane root = null;
+                    try {
+                        root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Controls.fxml")));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    return root;
+                }
+            };
+
+            createControlsWindow.setOnSucceeded(e -> {
+                StackPane root = (StackPane) createControlsWindow.getValue();
+                Scene scene = null;
+                if (root != null) scene = new Scene(root);
+
+                Stage stage = new Stage();
+                stage.setTitle("Controls");
+                stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("icon.png"))));
+                stage.setResizable(false);
+                stage.setScene(scene);
+
+                stage.show();
+                controlsShown = true;
+                stage.setOnCloseRequest(event -> Platform.runLater(() -> controlsShown = false));
+            });
+
+            new Thread(createControlsWindow).start();
+        }
+    }
+
+    public void showAboutInfo() {
+        if (!aboutShown) {
+            Task<Parent> createAboutWindow = new Task<>() {
+
+                @Override
+                protected Parent call() {
+
+                    StackPane root = null;
+                    try {
+                        root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("About.fxml")));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    return root;
+                }
+            };
+
+            createAboutWindow.setOnSucceeded(e -> {
+                StackPane root = (StackPane) createAboutWindow.getValue();
+                Scene scene = null;
+                if (root != null) scene = new Scene(root);
+
+                Stage stage = new Stage();
+                stage.setTitle("About");
+                stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("icon.png"))));
+                stage.setResizable(false);
+                stage.setScene(scene);
+
+                stage.show();
+                aboutShown = true;
+                stage.setOnCloseRequest(event -> Platform.runLater(() -> aboutShown = false));
+            });
+
+            new Thread(createAboutWindow).start();
+        }
     }
 }
