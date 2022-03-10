@@ -401,7 +401,7 @@ public class Main {
 
         // Add mouse displacement in y direction to camera pitch
         // Limit y direction lookaround to a 180-degree angle
-        camera[4] = (float) min(90, max(-90, camera[4] + (mousePosY - mouseOldY) * MOUSE_SENSITIVITY));
+        camera[4] = (float) min(89.99, max(-89.99, camera[4] + (mousePosY - mouseOldY) * MOUSE_SENSITIVITY));
     }
 
     /**
@@ -510,8 +510,8 @@ public class Main {
                 floatCos(yaw) * floatCos(pitch)));
 
         // Calculate left and right pointing vector from forward and up vectors
-        Float3 leftVector = Float3.cross(fwdVector, upVector);
-        Float3 rightVector = Float3.cross(upVector, fwdVector);
+        Float3 leftVector = Float3.normalise(Float3.cross(fwdVector, upVector));
+        Float3 rightVector = Float3.normalise(Float3.cross(upVector, fwdVector));
 
         // Depending on key pressed, update camera position
         if (fwd) cameraPosition = Float3.add(cameraPosition, Float3.mult(fwdVector, moveSpeed));
@@ -587,6 +587,9 @@ public class Main {
         System.exit(0);
     }
 
+    /**
+     * Show Controls Window
+     */
     public void showControls() {
         if (!controlsShown) {
             Task<Parent> createControlsWindow = new Task<>() {
@@ -600,7 +603,6 @@ public class Main {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                     return root;
                 }
             };
@@ -625,6 +627,9 @@ public class Main {
         }
     }
 
+    /**
+     * Show About Window
+     */
     public void showAboutInfo() {
         if (!aboutShown) {
             Task<Parent> createAboutWindow = new Task<>() {
