@@ -37,7 +37,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
             <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="- Email"/>
-            <Hyperlink fx:id="email" text="phamvvinh1998@gmail.com" GridPane.columnIndex="1"/>
+            <Hyperlink fx:id="email" textFill="WHITE" text="phamvvinh1998@gmail.com" GridPane.columnIndex="1"/>
         </GridPane>
         <GridPane>
             <columnConstraints>
@@ -48,7 +48,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
             <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="- LinkedIn"/>
-            <Hyperlink fx:id="linkedIn" text="vinh-pham-van" GridPane.columnIndex="1"/>
+            <Hyperlink fx:id="linkedIn" textFill="WHITE" text="vinh-pham-van" GridPane.columnIndex="1"/>
         </GridPane>
         <Separator>
             <VBox.margin>
