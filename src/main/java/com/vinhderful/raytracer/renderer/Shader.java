@@ -87,7 +87,7 @@ public class Shader {
         Float4 reflectionColor = new Float4(0, 0, 0, 0);
         float reflectivity = 1F;
 
-        for (int i = 0; i < reflectionBounceLimit; i++) {
+        for (int i = 0; i < reflectionBounceLimit && hitIndex != -1; i++) {
 
             Float4 hitNormal = BodyOps.getNormal(hitIndex, hitPosition, bodyPositions.get(hitIndex));
             Float4 reflectionDir = Float4.sub(rayDirection, Float4.mult(hitNormal, 2 * Float4.dot(rayDirection, hitNormal)));
@@ -111,13 +111,17 @@ public class Shader {
                 float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
                 color = Color.mult(color, shadow);
 
-                reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity * (1 - t)));
+                if (i == reflectionBounceLimit - 1)
+                    reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity));
+                else
+                    reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity * (1 - t)));
+
                 reflectivity *= t;
                 rayDirection = reflectionDir;
             } else {
-                Float4 color = BodyOps.getSkyboxColor(skybox, skyboxDimensions, reflectionDir);
-                reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity * (1 - t)));
-                break;
+                Float4 color = new Float4(0, 0, 0, 0);
+                // Float4 color = BodyOps.getSkyboxColor(skybox, skyboxDimensions, reflectionDir);
+                reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity));
             }
         }
 
