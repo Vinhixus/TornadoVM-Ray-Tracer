@@ -48,4 +48,13 @@ public class App extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+    /**
+     * Exit handler
+     */
+    @Override
+    public void stop() {
+        System.out.println("Exiting application...");
+        System.exit(0);
+    }
 }

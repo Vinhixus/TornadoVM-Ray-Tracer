@@ -30,8 +30,8 @@
                 <Label alignment="CENTER" contentDisplay="CENTER" text="Light X"/>
                 <Text fx:id="lightXText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="lightX" fx:id="lightX" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
-                    showTickLabels="true" showTickMarks="true" value="1"/>
+            <Slider id="lightX" fx:id="lightXSlider" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
+                    showTickLabels="true" showTickMarks="true"/>
             <GridPane>
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
@@ -43,8 +43,8 @@
                 <Label alignment="CENTER" contentDisplay="CENTER" text="Light Y"/>
                 <Text fx:id="lightYText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="lightY" fx:id="lightY" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="1"
-                    showTickLabels="true" showTickMarks="true" value="3"/>
+            <Slider id="lightY" fx:id="lightYSlider" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="1"
+                    showTickLabels="true" showTickMarks="true"/>
             <GridPane>
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
@@ -56,8 +56,8 @@
                 <Label alignment="CENTER" contentDisplay="CENTER" text="Light Z"/>
                 <Text fx:id="lightZText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="lightZ" fx:id="lightZ" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
-                    showTickLabels="true" showTickMarks="true" value="-1.5"/>
+            <Slider id="lightZ" fx:id="lightZSlider" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
+                    showTickLabels="true" showTickMarks="true"/>
             <Separator>
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
@@ -75,8 +75,8 @@
                 <Text fx:id="cameraFOVText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0"
                       GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="camFOV" fx:id="cameraFOV" majorTickUnit="10.0" max="90.0" min="30.0" minorTickCount="5"
-                    showTickLabels="true" showTickMarks="true" value="60.0"/>
+            <Slider id="camFOV" fx:id="cameraFOVSlider" majorTickUnit="10.0" max="90.0" min="30.0" minorTickCount="5"
+                    showTickLabels="true" showTickMarks="true"/>
             <Separator>
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
@@ -94,8 +94,9 @@
                 <Text fx:id="shadowSampleSizeText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0"
                       GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="shadowSampleSize" fx:id="shadowSampleSize" blockIncrement="1.0" majorTickUnit="50.0" max="400.0"
-                    showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0"/>
+            <Slider id="shadowSampleSize" fx:id="shadowSampleSizeSlider" blockIncrement="1.0" majorTickUnit="50.0"
+                    max="400.0"
+                    showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             <GridPane>
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
@@ -108,9 +109,8 @@
                 <Text fx:id="reflectionBouncesText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0"
                       GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="reflectionBounceLimit" fx:id="reflectionBounceLimit" blockIncrement="1.0" majorTickUnit="1.0"
-                    max="6.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"
-                    value="1.0"/>
+            <Slider id="reflectionBounceLimit" fx:id="reflectionBouncesSlider" blockIncrement="1.0" majorTickUnit="1.0"
+                    max="6.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             <Separator>
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
@@ -125,7 +125,7 @@
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
                 <Label alignment="CENTER" contentDisplay="CENTER" text="FPS"/>
-                <Text fx:id="fps" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
+                <Text fx:id="fpsText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
             </GridPane>
             <Separator>
                 <VBox.margin>
@@ -168,8 +168,8 @@
                           text="Hide Settings Panel"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Help">
-                <MenuItem mnemonicParsing="false" onAction="#showControls" text="Controls"/>
-                <MenuItem mnemonicParsing="false" onAction="#showAboutInfo" text="About"/>
+                <MenuItem mnemonicParsing="false" onAction="#showControlsWindow" text="Controls"/>
+                <MenuItem mnemonicParsing="false" onAction="#showAboutWindow" text="About"/>
             </Menu>
         </MenuBar>
     </top>

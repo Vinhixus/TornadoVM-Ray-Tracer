@@ -1,31 +1,24 @@
 package com.vinhderful.raytracer.controllers;
 
-import com.vinhderful.raytracer.App;
+import com.vinhderful.raytracer.Settings;
 import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
+import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import uk.ac.manchester.tornado.api.*;
 import uk.ac.manchester.tornado.api.collections.types.Float3;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
@@ -34,12 +27,12 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
-import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
@@ -50,21 +43,17 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 public class Main {
 
     /**
-     * Pixel buffer containing ARGB values of pixel colors
+     * OUTPUT BUFFER
+     * -------------
+     * Pixel buffer containing ARGB values of pixel colors for renderer to write to
      * Size = width * height of canvas resolution
      **/
-    private static int[] pixels;
+    private static int[] OB_pixels;
 
     /**
-     * Resolution of the canvas
-     * ------------------------
-     * dimensions[0]: width
-     * dimensions[1]: height
-     **/
-    private static int[] dimensions;
-
-    /**
-     * Camera properties
+     * INPUT BUFFER
+     * ------------
+     * The buffer containing camera properties for the renderer to read from
      * -----------------
      * camera[0]: x coordinate of position
      * camera[1]: y coordinate of position
@@ -73,29 +62,21 @@ public class Main {
      * camera[4]: pitch of rotation
      * camera[5]: field of view (FOV)
      **/
-    private static float[] camera;
+    private static float[] IB_camera;
 
     /**
-     * Define up direction (only needed for camera movement controls)
+     * INPUT BUFFER
+     * ------------
+     * Resolution of the canvas
+     * ------------------------
+     * dimensions[0]: width
+     * dimensions[1]: height
      **/
-    private Float3 upVector;
+    private static int[] IB_dimensions;
 
     /**
-     * Path tracing properties
-     * -----------------------
-     * pathTracingProperties[0]: Sample size of soft shadows
-     * pathTracingProperties[1]: Bounce limit for reflection rays
-     **/
-    private static int[] pathTracingProperties;
-
-
-    /**
-     * Skybox
-     **/
-    private static VectorFloat4 skybox;
-    private static int[] skyboxDimensions;
-
-    /**
+     * INPUT BUFFER
+     * ------------
      * The following 4 vectors define the objects in the scene.
      * Example:
      * bodyPositions.get(2), bodySizes.get(2), bodyColors.get(2), bodyReflectivities.get(2)
@@ -103,13 +84,68 @@ public class Main {
      * -----------------------------------------
      * bodyPosition: position of the body in 3D space
      * bodySize: size of the body (e.g. radius of sphere)
-     * bodyColor: color of the sphere defined by R, G, B float values
+     * bodyColor: color of the sphere defined by R, G, B float values in the range of [0, 1]
      * bodyReflectivity: reflectivity of the object, higher is more reflective
      */
-    private static VectorFloat4 bodyPositions;
-    private static VectorFloat bodySizes;
-    private static VectorFloat4 bodyColors;
-    private static VectorFloat bodyReflectivities;
+    private static VectorFloat4 IB_bodyPositions;
+    private static VectorFloat IB_bodySizes;
+    private static VectorFloat4 IB_bodyColors;
+    private static VectorFloat IB_bodyReflectivities;
+
+
+    /**
+     * INPUT BUFFER
+     * ------------
+     * Skybox represented by a vector of Float4 values containing R, G, B values as floats in the range of [0, 1]
+     **/
+    private static VectorFloat4 IB_skybox;
+    private static int[] IB_skyboxDimensions;
+
+    /**
+     * INPUT BUFFER
+     * ------------
+     * Path tracing properties buffer for the renderer to read from
+     * -----------------------
+     * pathTracingProperties[0]: Sample size of soft shadows
+     * pathTracingProperties[1]: Bounce limit for reflection rays
+     **/
+    private static int[] IB_pathTracingProperties;
+
+
+    /**
+     * Resolution of the canvas
+     */
+    private int width;
+    private int height;
+
+
+    /**
+     * Camera properties
+     */
+    private Float3 cameraPosition;
+    private float cameraYaw;
+    private float cameraPitch;
+    private float cameraFOV;
+
+    // Up direction
+    private Float3 upVector;
+
+    /**
+     * Path tracing properties
+     */
+    private int shadowSampleSize;
+    private int reflectionBounces;
+
+    /**
+     * The world containing the objects in the scene, the skybox and the defined animation
+     */
+    private World world;
+
+
+    /**
+     * Multithreading helper variable - indicator of when rendered has finished rendering frame
+     */
+    private volatile boolean renderReady = false;
 
 
     /**
@@ -124,26 +160,26 @@ public class Main {
     public MenuItem settingsPanelToggle;
 
     // Adjustable light position
-    public Slider lightX;
-    public Slider lightY;
-    public Slider lightZ;
+    public Slider lightXSlider;
+    public Slider lightYSlider;
+    public Slider lightZSlider;
     public Text lightXText;
     public Text lightYText;
     public Text lightZText;
 
     // Adjustable camera field of view
-    public Slider cameraFOV;
+    public Slider cameraFOVSlider;
     public Text cameraFOVText;
 
     // Adjustable soft shadow sample size and reflection bounce limit
-    public Slider shadowSampleSize;
+    public Slider shadowSampleSizeSlider;
     public Text shadowSampleSizeText;
-    public Slider reflectionBounceLimit;
+    public Slider reflectionBouncesSlider;
     public Text reflectionBouncesText;
 
     // Frames per second text output and helper variables
-    public Text fps;
-    private static long fpsLastUpdate = 0;
+    public Text fpsText;
+    private volatile double fps;
 
     // Device selection dropdown
     public ComboBox<String> deviceDropdown;
@@ -151,8 +187,6 @@ public class Main {
 
     // Button to play predefined animation, helper variables for animation
     public Button animateButton;
-    private boolean animating;
-    private static float t = 0;
 
     // Camera control
     private static final float MOUSE_SENSITIVITY = 0.5F;
@@ -162,8 +196,9 @@ public class Main {
     private double mouseOldY;
 
     // Movement
+    private static final float MOVE_SPEED = 0.1F;
     private boolean fwd, strafeL, strafeR, back, up, down;
-    private float moveSpeed = 0.2F;
+    private float moveSpeed = MOVE_SPEED;
 
     // Tornado elements
     private ArrayList<TornadoDevice> devices;
@@ -173,11 +208,11 @@ public class Main {
 
     // PixelWriter and it's format
     private PixelWriter pixelWriter;
-    private WritablePixelFormat<IntBuffer> format;
+    private PixelFormat<IntBuffer> format;
 
-    // Control and com.vinhderful.raytracer.controllers.About windows
-    private boolean controlsShown = false;
-    private boolean aboutShown = false;
+    // Control and About windows
+    private Window controls;
+    private Window about;
 
 
     /**
@@ -189,104 +224,98 @@ public class Main {
         // Build world
         System.out.println("------------------------------------");
         System.out.println("Building World:");
-
-        World world = new World();
-        skybox = world.getSkybox();
-        skyboxDimensions = world.getSkyboxDimensions();
-        bodyPositions = world.getBodyPositions();
-        bodySizes = world.getBodySizes();
-        bodyColors = world.getBodyColors();
-        bodyReflectivities = world.getBodyReflectivities();
-
+        world = new World();
         System.out.println("------------------------------------");
 
         // Initialise settings
-        System.out.println("Allocating buffers, initialising rendering properties...");
-        setRenderingProperties();
+        System.out.println("Setting up rendering environment...");
+        setupRenderingEnvironment();
+        System.out.println("Allocating buffers...");
+        allocateBuffers();
         System.out.println("Setting up Tornado Task Schedule...");
-        setTornadoTaskSchedule();
+        setupTornadoTaskSchedule();
         System.out.println("Getting Available Tornado Devices...");
         setAvailableDevices();
-        setSliderListeners();
+        System.out.println("Setting up operating loops...");
+        setupOperatingLoops();
+        System.out.println("Setting up GUI elements...");
+        setupGUIElements();
 
-        // Start with no animation
-        animating = false;
-
-        // Initialise fps last update
-        fpsLastUpdate = 0;
-
-        // Define main animation loop - gets called every frame
-        new AnimationTimer() {
-
-            @Override
-            public void handle(long now) {
-
-                // Update frame
-                render();
-
-                // Camera movement
-                updateCameraPosition();
-
-                // Play animation if button is pressed
-                if (animating) animate();
-
-                // Record and output fps
-                fps.setText(String.format("%.2f", 1_000_000_000.0 / (now - fpsLastUpdate)));
-                fpsLastUpdate = now;
-            }
-        }.start();
-
+        // Finish initialization
         System.out.println("------------------------------------");
         System.out.println("Opening Application...");
     }
 
 
     /**
-     * Initialise canvas, up vector, dimensions, pixel buffer, pixel writer, format, camera and path tracing properties
+     * Initialise canvas, dimensions, pixel writer, format, camera and path tracing properties
      */
-    private void setRenderingProperties() {
+    private void setupRenderingEnvironment() {
 
-        // Get graphics context and dimensions
+        // Set viewport (canvas) dimensions
+        width = Settings.WIDTH;
+        height = Settings.HEIGHT;
+
+        // Setup canvas and graphics context
         GraphicsContext g = canvas.getGraphicsContext2D();
-        int width = (int) g.getCanvas().getWidth();
-        int height = (int) g.getCanvas().getHeight();
-
-        dimensions = new int[]{width, height};
-        pixels = new int[width * height];
-
         pixelWriter = g.getPixelWriter();
-        format = WritablePixelFormat.getIntArgbInstance();
+        format = PixelFormat.getIntArgbPreInstance();
 
-        // camera position: {0, 1, -4}
-        // camera yaw: 0
-        // camera pitch: 0
-        // camera FOV: 60
-        camera = new float[]{0, 1F, -4F, 0, 0, 60};
-
-        // shadow sample size = 1
-        // reflection bounces = 1
-        pathTracingProperties = new int[]{1, 1};
+        // Camera settings
+        cameraPosition = Settings.INITIAL_CAMERA_POSITION;
+        cameraYaw = Settings.INITIAL_CAMERA_YAW;
+        cameraPitch = Settings.INITIAL_CAMERA_PITCH;
+        cameraFOV = Settings.INITIAL_CAMERA_FOV;
 
         // Up direction is positive y direction
         upVector = new Float3(0, 1F, 0);
+
+        // Path tracing properties
+        shadowSampleSize = Settings.INITIAL_SHADOW_SAMPLE_SIZE;
+        reflectionBounces = Settings.INITIAL_REFLECTION_BOUNCES;
+    }
+
+    /**
+     * Allocate input and output buffers for the renderer
+     */
+    private void allocateBuffers() {
+
+        // Output buffer
+        OB_pixels = new int[width * height];
+
+        // Input buffers
+        IB_dimensions = new int[]{width, height};
+        IB_camera = new float[]{cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(),
+                cameraYaw, cameraPitch, cameraFOV};
+
+        IB_pathTracingProperties = new int[]{shadowSampleSize, reflectionBounces};
+
+        IB_skybox = world.getSkybox();
+        IB_skyboxDimensions = world.getSkyboxDimensions();
+
+        IB_bodyPositions = world.getBodyPositions();
+        IB_bodySizes = world.getBodySizes();
+        IB_bodyColors = world.getBodyColors();
+        IB_bodyReflectivities = world.getBodyReflectivities();
     }
 
 
     /**
      * Define Tornado task schedule for Parallel Renderer.render method
      */
-    private void setTornadoTaskSchedule() {
+    private void setupTornadoTaskSchedule() {
 
         // Define task schedule
         ts = new TaskSchedule("s0");
-        ts.streamIn(bodyPositions, camera, pathTracingProperties);
-        ts.task("t0", Renderer::render, pixels, dimensions, camera,
-                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                skybox, skyboxDimensions, pathTracingProperties);
-        ts.streamOut(pixels);
+        ts.streamIn(IB_camera, IB_bodyPositions, IB_pathTracingProperties);
+        ts.task("t0", Renderer::render, OB_pixels,
+                IB_dimensions, IB_camera,
+                IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
+                IB_skybox, IB_skyboxDimensions, IB_pathTracingProperties);
+        ts.streamOut(OB_pixels);
 
         // Define worker grid
-        WorkerGrid worker = new WorkerGrid2D(dimensions[0], dimensions[1]);
+        WorkerGrid worker = new WorkerGrid2D(IB_dimensions[0], IB_dimensions[1]);
         worker.setLocalWork(16, 16, 1);
         grid = new GridScheduler();
         grid.setWorkerGrid("s0.t0", worker);
@@ -336,33 +365,89 @@ public class Main {
     }
 
     /**
+     * Set up the logic and rendering loops
+     */
+    private void setupOperatingLoops() {
+
+        // Define main animation loop - gets called every frame
+        new AnimationTimer() {
+
+            @Override
+            public void handle(long now) {
+
+                // Update camera Position
+                updateCameraPosition();
+
+                // Set the pixels on the canvas when render is ready
+                if (renderReady) {
+                    pixelWriter.setPixels(0, 0, IB_dimensions[0], IB_dimensions[1], format, OB_pixels, 0, IB_dimensions[0]);
+                    renderReady = false;
+                }
+            }
+        }.start();
+
+        // Define rendering loop on separate thread, record fps
+        new Thread(() -> {
+            long lastUpdate = System.currentTimeMillis();
+
+            while (true) {
+                if (!renderReady) {
+                    render();
+                    renderReady = true;
+
+                    // Record fps
+                    long now = System.currentTimeMillis();
+                    fps = 1000.0 / (now - lastUpdate);
+                    lastUpdate = System.currentTimeMillis();
+                }
+            }
+        }).start();
+
+        // Output fps every half seconds
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+        Runnable fpsTextSetter = () -> Platform.runLater(() -> fpsText.setText(String.format("%.2f", fps)));
+        ses.scheduleAtFixedRate(fpsTextSetter, 0, 100, TimeUnit.MILLISECONDS);
+    }
+
+    /**
      * Set up slider listeners and define actions on change
      */
-    private void setSliderListeners() {
+    private void setupGUIElements() {
 
         // Adjustable light position
-        lightX.valueProperty().addListener((observable, oldValue, newValue)
-                -> bodyPositions.set(0, new Float4(newValue.floatValue(), bodyPositions.get(0).getY(), bodyPositions.get(0).getZ(), 0)));
-        lightXText.textProperty().bind(lightX.valueProperty().asString("%.2f"));
-        lightY.valueProperty().addListener((observable, oldValue, newValue)
-                -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), newValue.floatValue(), bodyPositions.get(0).getZ(), 0)));
-        lightYText.textProperty().bind(lightY.valueProperty().asString("%.2f"));
-        lightZ.valueProperty().addListener((observable, oldValue, newValue)
-                -> bodyPositions.set(0, new Float4(bodyPositions.get(0).getX(), bodyPositions.get(0).getY(), newValue.floatValue(), 0)));
-        lightZText.textProperty().bind(lightZ.valueProperty().asString("%.2f"));
+        Float4 lightPosition = world.getLight().getPosition();
+
+        lightXSlider.setValue(lightPosition.getX());
+        lightXSlider.valueProperty().addListener((observable, oldValue, newValue) -> lightPosition.setX(newValue.floatValue()));
+        lightXText.textProperty().bind(lightXSlider.valueProperty().asString("%.2f"));
+
+        lightYSlider.setValue(lightPosition.getY());
+        lightYSlider.valueProperty().addListener((observable, oldValue, newValue) -> lightPosition.setY(newValue.floatValue()));
+        lightYText.textProperty().bind(lightYSlider.valueProperty().asString("%.2f"));
+
+        lightZSlider.setValue(lightPosition.getZ());
+        lightZSlider.valueProperty().addListener((observable, oldValue, newValue) -> lightPosition.setZ(newValue.floatValue()));
+        lightZText.textProperty().bind(lightZSlider.valueProperty().asString("%.2f"));
 
         // Adjustable camera field of view
-        cameraFOV.valueProperty().addListener((observable, oldValue, newValue)
-                -> camera[5] = newValue.floatValue());
-        cameraFOVText.textProperty().bind(cameraFOV.valueProperty().asString("%.2f"));
+        cameraFOVSlider.setValue(cameraFOV);
+        cameraFOVSlider.valueProperty().addListener((observable, oldValue, newValue) -> cameraFOV = newValue.floatValue());
+        cameraFOVText.textProperty().bind(cameraFOVSlider.valueProperty().asString("%.2f"));
 
-        // Adjustable path tracing rendering properties
-        shadowSampleSize.valueProperty().addListener((observable, oldValue, newValue)
-                -> pathTracingProperties[0] = newValue.intValue());
-        shadowSampleSizeText.textProperty().bind(shadowSampleSize.valueProperty().asString("%.0f"));
-        reflectionBounceLimit.valueProperty().addListener((observable, oldValue, newValue)
-                -> pathTracingProperties[1] = newValue.intValue());
-        reflectionBouncesText.textProperty().bind(reflectionBounceLimit.valueProperty().asString("%.0f"));
+        // Adjustable path tracing properties
+        shadowSampleSizeSlider.setValue(shadowSampleSize);
+        shadowSampleSizeSlider.setMax(Settings.MAX_SHADOW_SAMPLE_SIZE);
+        shadowSampleSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> shadowSampleSize = newValue.intValue());
+        shadowSampleSizeText.textProperty().bind(shadowSampleSizeSlider.valueProperty().asString("%.0f"));
+
+        reflectionBouncesSlider.setValue(reflectionBounces);
+        reflectionBouncesSlider.setMin(Settings.MAX_REFLECTION_BOUNCES);
+        reflectionBouncesSlider.valueProperty().addListener((observable, oldValue, newValue) -> reflectionBounces = newValue.intValue());
+        reflectionBouncesText.textProperty().bind(reflectionBouncesSlider.valueProperty().asString("%.0f"));
+
+        // Setup Controls and About windows
+        controls = new Window("Controls", "Controls.fxml", "icon.png");
+        about = new Window("About", "About.fxml", "icon.png");
     }
 
 
@@ -371,16 +456,58 @@ public class Main {
      */
     private void render() {
 
-        // Populate pixels array depending on selected device
+        // Copy data to input buffers
+        IB_camera[0] = cameraPosition.getX();
+        IB_camera[1] = cameraPosition.getY();
+        IB_camera[2] = cameraPosition.getZ();
+        IB_camera[3] = cameraYaw;
+        IB_camera[4] = cameraPitch;
+        IB_camera[5] = cameraFOV;
+
+        world.updateBodyPositionBuffer();
+
+        IB_pathTracingProperties[0] = shadowSampleSize;
+        IB_pathTracingProperties[1] = reflectionBounces;
+
+        // Render to output buffer
         if (renderWithTornado)
             ts.execute(grid);
         else
-            Renderer.render(pixels, dimensions, camera,
-                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    skybox, skyboxDimensions, pathTracingProperties);
+            Renderer.render(OB_pixels, IB_dimensions, IB_camera,
+                    IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
+                    IB_skybox, IB_skyboxDimensions, IB_pathTracingProperties);
+    }
 
-        // Set the pixels on the canvas
-        pixelWriter.setPixels(0, 0, dimensions[0], dimensions[1], format, pixels, 0, dimensions[0]);
+    /**
+     * Update camera position on movement
+     */
+    public void updateCameraPosition() {
+
+        // Get yaw and pitch in radians
+        float yaw = cameraYaw * TO_RADIANS;
+        float pitch = -cameraPitch * TO_RADIANS;
+
+        // Calculate forward pointing vector from yaw and pitch
+        Float3 fwdVector = Float3.normalise(new Float3(
+                floatSin(yaw) * floatCos(pitch),
+                floatSin(pitch),
+                floatCos(yaw) * floatCos(pitch)));
+
+        // Calculate left and right pointing vector from forward and up vectors
+        Float3 leftVector = Float3.normalise(Float3.cross(fwdVector, upVector));
+        Float3 rightVector = Float3.normalise(Float3.cross(upVector, fwdVector));
+
+        // Depending on key pressed, update camera position
+        if (fwd) cameraPosition = Float3.add(cameraPosition, Float3.mult(fwdVector, moveSpeed));
+        if (back) cameraPosition = Float3.sub(cameraPosition, Float3.mult(fwdVector, moveSpeed));
+        if (strafeL) cameraPosition = Float3.add(cameraPosition, Float3.mult(leftVector, moveSpeed));
+        if (strafeR) cameraPosition = Float3.add(cameraPosition, Float3.mult(rightVector, moveSpeed));
+        if (up) cameraPosition = Float3.add(cameraPosition, Float3.mult(upVector, moveSpeed));
+        if (down) cameraPosition = Float3.sub(cameraPosition, Float3.mult(upVector, moveSpeed));
+
+        // Limit camera to above plane
+        float planeHeight = world.getPlane().getPosition().getY() + 0.001F;
+        if (cameraPosition.getY() < planeHeight) cameraPosition.setY(planeHeight);
     }
 
     /**
@@ -397,11 +524,11 @@ public class Main {
         mousePosY = mouseEvent.getY();
 
         // Add mouse displacement in x direction to camera yaw
-        camera[3] += (mousePosX - mouseOldX) * MOUSE_SENSITIVITY;
+        cameraYaw += (mousePosX - mouseOldX) * MOUSE_SENSITIVITY;
 
         // Add mouse displacement in y direction to camera pitch
         // Limit y direction lookaround to a 180-degree angle
-        camera[4] = (float) min(89.99, max(-89.99, camera[4] + (mousePosY - mouseOldY) * MOUSE_SENSITIVITY));
+        cameraPitch = (float) min(89.99, max(-89.99, cameraPitch + (mousePosY - mouseOldY) * MOUSE_SENSITIVITY));
     }
 
     /**
@@ -455,7 +582,7 @@ public class Main {
                 strafeR = true;
                 break;
             case SHIFT:
-                moveSpeed = 0.4F;
+                moveSpeed = MOVE_SPEED * 2;
                 break;
         }
     }
@@ -486,49 +613,9 @@ public class Main {
                 strafeR = false;
                 break;
             case SHIFT:
-                moveSpeed = 0.2F;
+                moveSpeed = MOVE_SPEED;
                 break;
         }
-    }
-
-    /**
-     * Update camera position on movement
-     */
-    public void updateCameraPosition() {
-
-        // Get current camera position from camera properties
-        Float3 cameraPosition = new Float3(camera[0], camera[1], camera[2]);
-
-        // Get yaw and pitch in radians
-        float yaw = camera[3] * TO_RADIANS;
-        float pitch = -camera[4] * TO_RADIANS;
-
-        // Calculate forward pointing vector from yaw and pitch
-        Float3 fwdVector = Float3.normalise(new Float3(
-                floatSin(yaw) * floatCos(pitch),
-                floatSin(pitch),
-                floatCos(yaw) * floatCos(pitch)));
-
-        // Calculate left and right pointing vector from forward and up vectors
-        Float3 leftVector = Float3.normalise(Float3.cross(fwdVector, upVector));
-        Float3 rightVector = Float3.normalise(Float3.cross(upVector, fwdVector));
-
-        // Depending on key pressed, update camera position
-        if (fwd) cameraPosition = Float3.add(cameraPosition, Float3.mult(fwdVector, moveSpeed));
-        if (back) cameraPosition = Float3.sub(cameraPosition, Float3.mult(fwdVector, moveSpeed));
-        if (strafeL) cameraPosition = Float3.add(cameraPosition, Float3.mult(leftVector, moveSpeed));
-        if (strafeR) cameraPosition = Float3.add(cameraPosition, Float3.mult(rightVector, moveSpeed));
-        if (up) cameraPosition = Float3.add(cameraPosition, Float3.mult(upVector, moveSpeed));
-        if (down) cameraPosition = Float3.sub(cameraPosition, Float3.mult(upVector, moveSpeed));
-
-        // Limit camera to above plane
-        float planeHeight = bodyPositions.get(PLANE_INDEX).getY() + 0.001F;
-        if (cameraPosition.getY() < planeHeight) cameraPosition.setY(planeHeight);
-
-        // Write result back to camera properties
-        camera[0] = cameraPosition.get(0);
-        camera[1] = cameraPosition.get(1);
-        camera[2] = cameraPosition.get(2);
     }
 
     /**
@@ -549,24 +636,11 @@ public class Main {
     }
 
     /**
-     * Predefined simple animation
-     * ---------------------------
-     * Spheres move around in a circle
-     */
-    private void animate() {
-        t = (t + 0.017453292F) % 6.2831855F;
-        bodyPositions.set(3, new Float4(3 * floatSin(t), bodyPositions.get(3).getY(), 3 * floatCos(t), 0));
-        bodyPositions.set(4, new Float4(4.5F * floatCos(t), bodyPositions.get(4).getY(), 4.5F * floatSin(t), 0));
-        bodyPositions.set(5, new Float4(6 * floatCos(-t), bodyPositions.get(5).getY(), 6 * floatSin(-t), 0));
-        bodyPositions.set(6, new Float4(7.5F * floatSin(-t), bodyPositions.get(6).getY(), 7.5F * floatCos(-t), 0));
-    }
-
-    /**
      * Define action on clicking "Animate" button
      */
     public void toggleAnimation() {
-        animating = !animating;
-        animateButton.setText(animating ? "Pause" : "Play");
+        world.toggleAnimation();
+        animateButton.setText(world.isAnimating() ? "Pause" : "Play");
     }
 
     /**
@@ -581,90 +655,23 @@ public class Main {
     }
 
     /**
+     * Show Controls window
+     */
+    public void showControlsWindow() {
+        controls.show();
+    }
+
+    /**
+     * Show About window
+     */
+    public void showAboutWindow() {
+        about.show();
+    }
+
+    /**
      * Exit handler
      */
     public void exit() {
         System.exit(0);
-    }
-
-    /**
-     * Show Controls Window
-     */
-    public void showControls() {
-        if (!controlsShown) {
-            Task<Parent> createControlsWindow = new Task<>() {
-
-                @Override
-                protected Parent call() {
-
-                    StackPane root = null;
-                    try {
-                        root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Controls.fxml")));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return root;
-                }
-            };
-
-            createControlsWindow.setOnSucceeded(e -> {
-                StackPane root = (StackPane) createControlsWindow.getValue();
-                Scene scene = null;
-                if (root != null) scene = new Scene(root);
-
-                Stage stage = new Stage();
-                stage.setTitle("Controls");
-                stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("icon.png"))));
-                stage.setResizable(false);
-                stage.setScene(scene);
-
-                stage.show();
-                controlsShown = true;
-                stage.setOnCloseRequest(event -> Platform.runLater(() -> controlsShown = false));
-            });
-
-            new Thread(createControlsWindow).start();
-        }
-    }
-
-    /**
-     * Show About Window
-     */
-    public void showAboutInfo() {
-        if (!aboutShown) {
-            Task<Parent> createAboutWindow = new Task<>() {
-
-                @Override
-                protected Parent call() {
-
-                    StackPane root = null;
-                    try {
-                        root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("About.fxml")));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    return root;
-                }
-            };
-
-            createAboutWindow.setOnSucceeded(e -> {
-                StackPane root = (StackPane) createAboutWindow.getValue();
-                Scene scene = null;
-                if (root != null) scene = new Scene(root);
-
-                Stage stage = new Stage();
-                stage.setTitle("About");
-                stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("icon.png"))));
-                stage.setResizable(false);
-                stage.setScene(scene);
-
-                stage.show();
-                aboutShown = true;
-                stage.setOnCloseRequest(event -> Platform.runLater(() -> aboutShown = false));
-            });
-
-            new Thread(createAboutWindow).start();
-        }
     }
 }
