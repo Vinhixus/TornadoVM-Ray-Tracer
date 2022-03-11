@@ -361,7 +361,7 @@ public class Main {
 
                 // Set the pixels on the canvas when render is ready
                 if (renderReady) {
-                    pixelWriter.setPixels(0, 0, IB_dimensions[0], IB_dimensions[1], format, OB_pixels, 0, IB_dimensions[0]);
+                    pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
                     renderReady = false;
                 }
             }
