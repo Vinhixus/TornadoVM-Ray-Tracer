@@ -61,7 +61,7 @@ public class World {
             throw new Exception("A plane needs to be at index " + PLANE_INDEX + "!");
 
         // Generate the tornado compatible vector representations of the bodies
-        allocateBuffers();
+        allocateAndInitializeBuffers();
     }
 
     private void generateDefaultWorld() {
@@ -125,7 +125,7 @@ public class World {
         else startAnimation();
     }
 
-    private void allocateBuffers() {
+    private void allocateAndInitializeBuffers() {
         System.out.println("-> Allocating object representation buffers...");
 
         int numBodies = bodies.size();
@@ -166,27 +166,27 @@ public class World {
         return plane;
     }
 
-    public VectorFloat4 getBodyPositions() {
+    public VectorFloat4 getBodyPositionsBuffer() {
         return bodyPositions;
     }
 
-    public VectorFloat getBodySizes() {
+    public VectorFloat getBodySizesBuffer() {
         return bodySizes;
     }
 
-    public VectorFloat4 getBodyColors() {
+    public VectorFloat4 getBodyColorsBuffer() {
         return bodyColors;
     }
 
-    public VectorFloat getBodyReflectivities() {
+    public VectorFloat getBodyReflectivitiesBuffer() {
         return bodyReflectivities;
     }
 
-    public VectorFloat4 getSkybox() {
+    public VectorFloat4 getSkyboxBuffer() {
         return skybox.getVectorFloat4();
     }
 
-    public int[] getSkyboxDimensions() {
+    public int[] getSkyboxDimensionsBuffer() {
         return skybox.getDimensions();
     }
 }

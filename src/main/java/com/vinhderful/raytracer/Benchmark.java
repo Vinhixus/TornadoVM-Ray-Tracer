@@ -43,12 +43,12 @@ public class Benchmark {
         System.out.println("-----------------------------------------");
         System.out.println("Building world...");
         World world = new World();
-        VectorFloat4 skybox = world.getSkybox();
-        int[] skyboxDimensions = world.getSkyboxDimensions();
-        VectorFloat4 bodyPositions = world.getBodyPositions();
-        VectorFloat bodySizes = world.getBodySizes();
-        VectorFloat4 bodyColors = world.getBodyColors();
-        VectorFloat bodyReflectivities = world.getBodyReflectivities();
+        VectorFloat4 skybox = world.getSkyboxBuffer();
+        int[] skyboxDimensions = world.getSkyboxDimensionsBuffer();
+        VectorFloat4 bodyPositions = world.getBodyPositionsBuffer();
+        VectorFloat bodySizes = world.getBodySizesBuffer();
+        VectorFloat4 bodyColors = world.getBodyColorsBuffer();
+        VectorFloat bodyReflectivities = world.getBodyReflectivitiesBuffer();
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");

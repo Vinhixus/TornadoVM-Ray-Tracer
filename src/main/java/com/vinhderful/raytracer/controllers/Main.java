@@ -1,6 +1,7 @@
 package com.vinhderful.raytracer.controllers;
 
 import com.vinhderful.raytracer.Settings;
+import com.vinhderful.raytracer.misc.Camera;
 import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
 import javafx.animation.AnimationTimer;
@@ -20,7 +21,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import uk.ac.manchester.tornado.api.*;
-import uk.ac.manchester.tornado.api.collections.types.Float3;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
@@ -32,9 +32,6 @@ import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
  * Initialises JavaFX FXML elements together with Main.fxml, contains driver code
@@ -120,15 +117,9 @@ public class Main {
 
 
     /**
-     * Camera properties
+     * Camera
      */
-    private Float3 cameraPosition;
-    private float cameraYaw;
-    private float cameraPitch;
-    private float cameraFOV;
-
-    // Up direction
-    private Float3 upVector;
+    private Camera camera;
 
     /**
      * Path tracing properties
@@ -189,16 +180,13 @@ public class Main {
     public Button animateButton;
 
     // Camera control
-    private static final float MOUSE_SENSITIVITY = 0.5F;
     private double mousePosX;
     private double mousePosY;
     private double mouseOldX;
     private double mouseOldY;
 
     // Movement
-    private static final float MOVE_SPEED = 0.1F;
     private boolean fwd, strafeL, strafeR, back, up, down;
-    private float moveSpeed = MOVE_SPEED;
 
     // Tornado elements
     private ArrayList<TornadoDevice> devices;
@@ -261,14 +249,8 @@ public class Main {
         pixelWriter = g.getPixelWriter();
         format = PixelFormat.getIntArgbPreInstance();
 
-        // Camera settings
-        cameraPosition = Settings.INITIAL_CAMERA_POSITION;
-        cameraYaw = Settings.INITIAL_CAMERA_YAW;
-        cameraPitch = Settings.INITIAL_CAMERA_PITCH;
-        cameraFOV = Settings.INITIAL_CAMERA_FOV;
-
-        // Up direction is positive y direction
-        upVector = new Float3(0, 1F, 0);
+        // Camera
+        camera = new Camera(world);
 
         // Path tracing properties
         shadowSampleSize = Settings.INITIAL_SHADOW_SAMPLE_SIZE;
@@ -285,18 +267,17 @@ public class Main {
 
         // Input buffers
         IB_dimensions = new int[]{width, height};
-        IB_camera = new float[]{cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(),
-                cameraYaw, cameraPitch, cameraFOV};
+        IB_camera = camera.getBuffer();
 
         IB_pathTracingProperties = new int[]{shadowSampleSize, reflectionBounces};
 
-        IB_skybox = world.getSkybox();
-        IB_skyboxDimensions = world.getSkyboxDimensions();
+        IB_bodyPositions = world.getBodyPositionsBuffer();
+        IB_bodySizes = world.getBodySizesBuffer();
+        IB_bodyColors = world.getBodyColorsBuffer();
+        IB_bodyReflectivities = world.getBodyReflectivitiesBuffer();
 
-        IB_bodyPositions = world.getBodyPositions();
-        IB_bodySizes = world.getBodySizes();
-        IB_bodyColors = world.getBodyColors();
-        IB_bodyReflectivities = world.getBodyReflectivities();
+        IB_skybox = world.getSkyboxBuffer();
+        IB_skyboxDimensions = world.getSkyboxDimensionsBuffer();
     }
 
 
@@ -376,7 +357,7 @@ public class Main {
             public void handle(long now) {
 
                 // Update camera Position
-                updateCameraPosition();
+                camera.updatePositionOnMovement(fwd, back, strafeL, strafeR, up, down);
 
                 // Set the pixels on the canvas when render is ready
                 if (renderReady) {
@@ -430,8 +411,8 @@ public class Main {
         lightZText.textProperty().bind(lightZSlider.valueProperty().asString("%.2f"));
 
         // Adjustable camera field of view
-        cameraFOVSlider.setValue(cameraFOV);
-        cameraFOVSlider.valueProperty().addListener((observable, oldValue, newValue) -> cameraFOV = newValue.floatValue());
+        cameraFOVSlider.setValue(camera.getFov());
+        cameraFOVSlider.valueProperty().addListener((observable, oldValue, newValue) -> camera.setFov(newValue.floatValue()));
         cameraFOVText.textProperty().bind(cameraFOVSlider.valueProperty().asString("%.2f"));
 
         // Adjustable path tracing properties
@@ -441,7 +422,7 @@ public class Main {
         shadowSampleSizeText.textProperty().bind(shadowSampleSizeSlider.valueProperty().asString("%.0f"));
 
         reflectionBouncesSlider.setValue(reflectionBounces);
-        reflectionBouncesSlider.setMin(Settings.MAX_REFLECTION_BOUNCES);
+        reflectionBouncesSlider.setMax(Settings.MAX_REFLECTION_BOUNCES);
         reflectionBouncesSlider.valueProperty().addListener((observable, oldValue, newValue) -> reflectionBounces = newValue.intValue());
         reflectionBouncesText.textProperty().bind(reflectionBouncesSlider.valueProperty().asString("%.0f"));
 
@@ -457,13 +438,7 @@ public class Main {
     private void render() {
 
         // Copy data to input buffers
-        IB_camera[0] = cameraPosition.getX();
-        IB_camera[1] = cameraPosition.getY();
-        IB_camera[2] = cameraPosition.getZ();
-        IB_camera[3] = cameraYaw;
-        IB_camera[4] = cameraPitch;
-        IB_camera[5] = cameraFOV;
-
+        camera.updateBuffer();
         world.updateBodyPositionBuffer();
 
         IB_pathTracingProperties[0] = shadowSampleSize;
@@ -479,38 +454,6 @@ public class Main {
     }
 
     /**
-     * Update camera position on movement
-     */
-    public void updateCameraPosition() {
-
-        // Get yaw and pitch in radians
-        float yaw = cameraYaw * TO_RADIANS;
-        float pitch = -cameraPitch * TO_RADIANS;
-
-        // Calculate forward pointing vector from yaw and pitch
-        Float3 fwdVector = Float3.normalise(new Float3(
-                floatSin(yaw) * floatCos(pitch),
-                floatSin(pitch),
-                floatCos(yaw) * floatCos(pitch)));
-
-        // Calculate left and right pointing vector from forward and up vectors
-        Float3 leftVector = Float3.normalise(Float3.cross(fwdVector, upVector));
-        Float3 rightVector = Float3.normalise(Float3.cross(upVector, fwdVector));
-
-        // Depending on key pressed, update camera position
-        if (fwd) cameraPosition = Float3.add(cameraPosition, Float3.mult(fwdVector, moveSpeed));
-        if (back) cameraPosition = Float3.sub(cameraPosition, Float3.mult(fwdVector, moveSpeed));
-        if (strafeL) cameraPosition = Float3.add(cameraPosition, Float3.mult(leftVector, moveSpeed));
-        if (strafeR) cameraPosition = Float3.add(cameraPosition, Float3.mult(rightVector, moveSpeed));
-        if (up) cameraPosition = Float3.add(cameraPosition, Float3.mult(upVector, moveSpeed));
-        if (down) cameraPosition = Float3.sub(cameraPosition, Float3.mult(upVector, moveSpeed));
-
-        // Limit camera to above plane
-        float planeHeight = world.getPlane().getPosition().getY() + 0.001F;
-        if (cameraPosition.getY() < planeHeight) cameraPosition.setY(planeHeight);
-    }
-
-    /**
      * Define action on mouse drag
      *
      * @param mouseEvent mouse event
@@ -523,12 +466,7 @@ public class Main {
         mousePosX = mouseEvent.getX();
         mousePosY = mouseEvent.getY();
 
-        // Add mouse displacement in x direction to camera yaw
-        cameraYaw += (mousePosX - mouseOldX) * MOUSE_SENSITIVITY;
-
-        // Add mouse displacement in y direction to camera pitch
-        // Limit y direction lookaround to a 180-degree angle
-        cameraPitch = (float) min(89.99, max(-89.99, cameraPitch + (mousePosY - mouseOldY) * MOUSE_SENSITIVITY));
+        camera.updatePositionOnMouseDragged(mousePosX, mousePosY, mouseOldX, mouseOldY);
     }
 
     /**
@@ -582,7 +520,7 @@ public class Main {
                 strafeR = true;
                 break;
             case SHIFT:
-                moveSpeed = MOVE_SPEED * 2;
+                camera.run();
                 break;
         }
     }
@@ -613,7 +551,7 @@ public class Main {
                 strafeR = false;
                 break;
             case SHIFT:
-                moveSpeed = MOVE_SPEED;
+                camera.walk();
                 break;
         }
     }

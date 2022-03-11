@@ -95,7 +95,6 @@
                       GridPane.columnIndex="1"/>
             </GridPane>
             <Slider id="shadowSampleSize" fx:id="shadowSampleSizeSlider" blockIncrement="1.0" majorTickUnit="50.0"
-                    max="400.0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             <GridPane>
                 <columnConstraints>
@@ -110,7 +109,7 @@
                       GridPane.columnIndex="1"/>
             </GridPane>
             <Slider id="reflectionBounceLimit" fx:id="reflectionBouncesSlider" blockIncrement="1.0" majorTickUnit="1.0"
-                    max="6.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
+                    minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             <Separator>
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
