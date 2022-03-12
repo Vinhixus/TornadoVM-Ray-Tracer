@@ -42,6 +42,7 @@ public class Renderer {
 
     /**
      * Construct a Renderer object given the width and height of output and the World to render
+     * Shadow sample size defaults to 200, reflection bounce limits defaults to 5
      *
      * @param width  width of output
      * @param height height of output
@@ -125,7 +126,7 @@ public class Renderer {
 
                 Hit hit = getClosestHit(ray, world);
                 if (hit != null) {
-                    if (hit.getBody().equals(world.getLight()))
+                    if (hit.getBody() == world.getLight())
                         pixels[x + y * width] = hit.getColor().toARGB();
                     else
                         pixels[x + y * width] = Shader.getPixelColor(hit, world, shadowSampleSize, reflectionBounceLimit).toARGB();

@@ -17,8 +17,7 @@ public class Shader {
      * Constant values to tweak lighting and shadows
      */
     public static final float AMBIENT_STRENGTH = 0.15F;
-    public static final float SPECULAR_STRENGTH = 0.5F;
-    public static final float MAX_REFLECTIVITY = 64F;
+    public static final float MAX_REFLECTIVITY = 96F;
     public static final float SHADOW_STRENGTH = 0.25F;
 
     /**
@@ -35,7 +34,7 @@ public class Shader {
      */
     public static float getDiffuse(Hit hit, World world) {
         Light light = world.getLight();
-        return Math.max(0F, hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition()).normalize()));
+        return hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition()).normalize());
     }
 
     /**
@@ -48,13 +47,17 @@ public class Shader {
     public static float getSpecular(Hit hit, World world) {
         Light light = world.getLight();
         Vector3f hitPos = hit.getPosition();
-        Vector3f rayDirection = hit.getRay().getDirection();
-        Vector3f lightDirection = light.getPosition().subtract(hitPos).normalize();
-        Vector3f reflectionVector = lightDirection.subtract(hit.getNormal().multiply(2 * lightDirection.dotProduct(hit.getNormal())));
+        float bodyReflectivity = hit.getBody().getReflectivity();
 
-        float specularFactor = Math.max(0F, reflectionVector.dotProduct(rayDirection));
-        float specularBrightness = (float) Math.pow(specularFactor, hit.getBody().getReflectivity());
-        return specularBrightness * SPECULAR_STRENGTH;
+        Vector3f lightDirection = light.getPosition().subtract(hitPos).normalize();
+        Vector3f rayDirection = hit.getRay().getOrigin().subtract(hitPos).normalize();
+
+        Vector3f halfwayDirection = lightDirection.add(rayDirection).normalize();
+        float specularFactor = Math.max(0F, hit.getNormal().dotProduct(halfwayDirection));
+
+        // Specular energy conservation
+        float k = (float) ((8.0 + bodyReflectivity) / (8.0 * Math.PI));
+        return (float) (k * Math.pow(specularFactor, bodyReflectivity) * (bodyReflectivity / MAX_REFLECTIVITY));
     }
 
     /**
@@ -92,7 +95,7 @@ public class Shader {
             Ray sampleRay = new Ray(rayOrigin, rayDir);
 
             Hit sampleHit = Renderer.getClosestHit(sampleRay, world);
-            if (sampleHit != null && !sampleHit.getBody().equals(light))
+            if (sampleHit != null && sampleHit.getBody() != light)
                 raysHit++;
         }
 
@@ -129,11 +132,14 @@ public class Shader {
         Hit reflectionHit = reflectionBounceLimit > 0 ? Renderer.getClosestHit(new Ray(reflectionOrigin, reflectionDir), world) : null;
 
         if (reflectionHit != null)
-            reflection = getPixelColor(reflectionHit, world, shadowSampleSize, reflectionBounceLimit - 1);
+            if (reflectionHit.getBody() == world.getLight())
+                reflection = world.getLight().getColor();
+            else
+                reflection = getPixelColor(reflectionHit, world, shadowSampleSize, reflectionBounceLimit - 1);
         else
             reflection = world.getSkybox().getColor(reflectionDir);
 
-        if (hitBody.equals(world.getPlane()))
+        if (hitBody == world.getPlane())
             return hitColor.mix(reflection, reflectivity).add(specular).multiply(shadow);
         else
             return hitColor.mix(reflection, reflectivity).multiply(diffuse).add(specular).multiply(shadow);
