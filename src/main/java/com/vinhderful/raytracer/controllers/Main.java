@@ -288,11 +288,11 @@ public class Main {
 
         // Define task schedule
         ts = new TaskSchedule("s0");
-        ts.streamIn(IB_camera, IB_bodyPositions, IB_pathTracingProperties);
+        ts.streamIn(IB_camera, IB_pathTracingProperties, IB_bodyPositions);
         ts.task("t0", Renderer::render, OB_pixels,
-                IB_dimensions, IB_camera,
+                IB_dimensions, IB_camera, IB_pathTracingProperties,
                 IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
-                IB_skybox, IB_skyboxDimensions, IB_pathTracingProperties);
+                IB_skybox, IB_skyboxDimensions);
         ts.streamOut(OB_pixels);
 
         // Define worker grid
@@ -448,9 +448,9 @@ public class Main {
         if (renderWithTornado)
             ts.execute(grid);
         else
-            Renderer.render(OB_pixels, IB_dimensions, IB_camera,
+            Renderer.render(OB_pixels, IB_dimensions, IB_camera, IB_pathTracingProperties,
                     IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
-                    IB_skybox, IB_skyboxDimensions, IB_pathTracingProperties);
+                    IB_skybox, IB_skyboxDimensions);
     }
 
     /**

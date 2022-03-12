@@ -52,10 +52,11 @@ public class Benchmark {
 
         // ==============================================================
         TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(bodyPositions, camera, pathTracingProperties);
-        ts.task("t0", Renderer::render, pixels, dimensions, camera,
+        ts.streamIn(camera, pathTracingProperties, bodyPositions);
+        ts.task("t0", Renderer::render, pixels,
+                dimensions, camera, pathTracingProperties,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                skybox, skyboxDimensions, pathTracingProperties);
+                skybox, skyboxDimensions);
         ts.streamOut(pixels);
 
         WorkerGrid worker = new WorkerGrid2D(WIDTH, HEIGHT);
@@ -131,9 +132,9 @@ public class Benchmark {
         startTime = System.nanoTime();
 
         for (int i = 0; i < FRAMES_TO_GENERATE; i++)
-            Renderer.render(pixels, dimensions, camera,
+            Renderer.render(pixels, dimensions, camera, pathTracingProperties,
                     bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    skybox, skyboxDimensions, pathTracingProperties);
+                    skybox, skyboxDimensions);
 
         endTime = System.nanoTime();
         double sequentialTime = (endTime - startTime) / 1000000.0;

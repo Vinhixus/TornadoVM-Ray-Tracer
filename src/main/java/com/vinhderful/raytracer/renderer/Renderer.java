@@ -47,9 +47,9 @@ public class Renderer {
             return -((y - height * 0.5F + width * 0.5F) / width * 2 - 1);
     }
 
-    public static void render(int[] pixels, int[] dimensions, float[] camera,
+    public static void render(int[] pixels, int[] dimensions, float[] camera, int[] pathTracingProperties,
                               VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              VectorFloat4 skybox, int[] skyboxDimensions, int[] pathTracingProperties) {
+                              VectorFloat4 skybox, int[] skyboxDimensions) {
 
         Float4 eyePos = new Float4(0, 0, -1 / floatTan(camera[5] * 0.5F * TO_RADIANS), 0);
         Float4 camPos = new Float4(camera[0], camera[1], camera[2], 0);
