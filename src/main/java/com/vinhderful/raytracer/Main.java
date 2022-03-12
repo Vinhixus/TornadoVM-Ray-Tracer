@@ -22,9 +22,9 @@ public class Main {
         // Build world
         World world = new World();
 
-        Sphere sphereWhite = new Sphere(new Vector3f(-3F, -0.5F, 0), 0.5F, Color.WHITE, 4F);
-        Sphere sphereRed = new Sphere(new Vector3f(-1.5F, -0.5F, 0), 0.5F, Color.RED, 8F);
-        Sphere sphereGreen = new Sphere(new Vector3f(0, -0.5F, 0), 0.5F, Color.GREEN, 16F);
+        Sphere sphereWhite = new Sphere(new Vector3f(-3F, -0.5F, 0), 0.5F, Color.WHITE, 8F);
+        Sphere sphereRed = new Sphere(new Vector3f(-1.5F, -0.5F, 0), 0.5F, Color.RED, 16F);
+        Sphere sphereGreen = new Sphere(new Vector3f(0, -0.5F, 0), 0.5F, Color.GREEN, 24F);
         Sphere sphereBlue = new Sphere(new Vector3f(1.5F, -0.5F, 0), 0.5F, Color.BLUE, 32F);
         Sphere sphereBlack = new Sphere(new Vector3f(3F, -0.5F, 0), 0.5F, Color.BLACK, 48F);
         world.addBody(sphereWhite);
@@ -33,7 +33,7 @@ public class Main {
         world.addBody(sphereBlue);
         world.addBody(sphereBlack);
 
-        Cube cube = new Cube(new Vector3f(1.5F, 0, 2.5F), 2F, new Color(0.35F, 0.35F, 0.35F), 32F);
+        Cube cube = new Cube(new Vector3f(1.5F, 0, 2.5F), 2F, new Color(0.35F, 0.35F, 0.35F), 48F);
         world.addBody(cube);
 
         // Dimensions of output

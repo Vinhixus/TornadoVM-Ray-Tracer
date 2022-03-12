@@ -17,7 +17,7 @@ public class Shader {
      * Constant values to tweak lighting and shadows
      */
     public static final float AMBIENT_STRENGTH = 0.15F;
-    public static final float MAX_REFLECTIVITY = 96F;
+    public static final float MAX_REFLECTIVITY = 128F;
     public static final float SHADOW_STRENGTH = 0.25F;
 
     /**

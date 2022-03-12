@@ -16,18 +16,18 @@ public abstract class Body {
 
     /**
      * Construct a body using its position. Color defaults to BLACK, reflectivity
-     * defaults to 16F
+     * defaults to 64F
      *
      * @param position the position
      */
     public Body(Vector3f position) {
         this.position = position;
         this.color = Color.BLACK;
-        this.reflectivity = 32F;
+        this.reflectivity = 64F;
     }
 
     /**
-     * Construct a body using its position and color. Reflectivity defaults to 16F
+     * Construct a body using its position and color. Reflectivity defaults to 64F
      *
      * @param position the position
      * @param color    the color
@@ -35,7 +35,7 @@ public abstract class Body {
     public Body(Vector3f position, Color color) {
         this.position = position;
         this.color = color;
-        this.reflectivity = 32F;
+        this.reflectivity = 64F;
     }
 
     /**
