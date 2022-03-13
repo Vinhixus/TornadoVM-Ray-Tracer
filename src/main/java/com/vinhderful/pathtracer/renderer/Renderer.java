@@ -74,7 +74,8 @@ public class Renderer {
                         pixels[x + y * width] = Color.toARGB(bodyColors.get(LIGHT_INDEX));
                     else {
                         Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
-                        Float4 pixelColor = Shader.getPixelColor(hitIndex, hitPosition, rayDirection,
+                        Float4 pixelColor = Shader.getPixelColor(
+                                hitIndex, hitPosition, camPos, rayDirection,
                                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                                 skybox, skyboxDimensions,
                                 shadowSampleSize, reflectionBounceLimit);
