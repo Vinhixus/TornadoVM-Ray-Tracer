@@ -29,6 +29,7 @@ import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -170,6 +171,7 @@ public class Main {
 
     // Frames per second text output and helper variables
     public Text fpsText;
+    private volatile long fpsLastUpdate;
     private volatile double fps;
 
     // Device selection dropdown
@@ -350,6 +352,19 @@ public class Main {
      */
     private void setupOperatingLoops() {
 
+        // Define rendering thread
+        ExecutorService renderer = Executors.newFixedThreadPool(1);
+        Runnable render = () -> {
+
+            // Render and signal that render is ready
+            render();
+            renderReady = true;
+
+            // Record fps
+            fps = 1_000_000_000.0 / (System.nanoTime() - fpsLastUpdate);
+            fpsLastUpdate = System.nanoTime();
+        };
+
         // Define main animation loop - gets called every frame
         new AnimationTimer() {
 
@@ -363,26 +378,10 @@ public class Main {
                 if (renderReady) {
                     pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
                     renderReady = false;
+                    renderer.execute(render);
                 }
             }
         }.start();
-
-        // Define rendering loop on separate thread, record fps
-        new Thread(() -> {
-            long lastUpdate = System.nanoTime();
-
-            while (true) {
-                if (!renderReady) {
-                    render();
-                    renderReady = true;
-
-                    // Record fps
-                    long now = System.nanoTime();
-                    fps = 1_000_000_000.0 / (now - lastUpdate);
-                    lastUpdate = System.nanoTime();
-                }
-            }
-        }).start();
 
         // Output fps every half seconds
         ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
