@@ -1,10 +1,10 @@
-package com.vinhderful.raytracer.misc;
+package com.vinhderful.pathtracer.misc;
 
-import com.vinhderful.raytracer.misc.bodies.Body;
-import com.vinhderful.raytracer.misc.bodies.Light;
-import com.vinhderful.raytracer.misc.bodies.Plane;
-import com.vinhderful.raytracer.misc.bodies.Sphere;
-import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.pathtracer.misc.bodies.Body;
+import com.vinhderful.pathtracer.misc.bodies.Light;
+import com.vinhderful.pathtracer.misc.bodies.Plane;
+import com.vinhderful.pathtracer.misc.bodies.Sphere;
+import com.vinhderful.pathtracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;

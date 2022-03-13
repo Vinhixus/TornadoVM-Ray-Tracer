@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer;
+package com.vinhderful.pathtracer;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

@@ -1,9 +1,9 @@
-package com.vinhderful.raytracer.utils;
+package com.vinhderful.pathtracer.utils;
 
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
-import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
+import static com.vinhderful.pathtracer.misc.World.PLANE_INDEX;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**

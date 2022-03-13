@@ -1,9 +1,9 @@
-package com.vinhderful.raytracer.controllers;
+package com.vinhderful.pathtracer.controllers;
 
-import com.vinhderful.raytracer.Settings;
-import com.vinhderful.raytracer.misc.Camera;
-import com.vinhderful.raytracer.misc.World;
-import com.vinhderful.raytracer.renderer.Renderer;
+import com.vinhderful.pathtracer.Settings;
+import com.vinhderful.pathtracer.misc.Camera;
+import com.vinhderful.pathtracer.misc.World;
+import com.vinhderful.pathtracer.renderer.Renderer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;

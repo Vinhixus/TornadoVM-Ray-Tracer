@@ -1,7 +1,7 @@
-package com.vinhderful.raytracer;
+package com.vinhderful.pathtracer;
 
-import com.vinhderful.raytracer.misc.World;
-import com.vinhderful.raytracer.renderer.Renderer;
+import com.vinhderful.pathtracer.misc.World;
+import com.vinhderful.pathtracer.renderer.Renderer;
 import uk.ac.manchester.tornado.api.*;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;

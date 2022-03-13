@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Text?>
 <StackPane fx:id="stackPane" prefWidth="240.0" stylesheets="@../GUI.css" xmlns="http://javafx.com/javafx/17"
-           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vinhderful.raytracer.controllers.Loading">
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vinhderful.pathtracer.controllers.Loading">
     <Text fx:id="text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Loading...">
         <StackPane.margin>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>

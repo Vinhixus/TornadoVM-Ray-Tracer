@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer.utils;
+package com.vinhderful.pathtracer.utils;
 
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 

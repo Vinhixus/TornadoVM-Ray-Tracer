@@ -1,6 +1,6 @@
-package com.vinhderful.raytracer.misc.bodies;
+package com.vinhderful.pathtracer.misc.bodies;
 
-import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.pathtracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 
 public class Plane extends Body {

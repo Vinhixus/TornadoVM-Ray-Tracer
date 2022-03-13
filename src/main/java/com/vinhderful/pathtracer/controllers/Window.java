@@ -1,6 +1,6 @@
-package com.vinhderful.raytracer.controllers;
+package com.vinhderful.pathtracer.controllers;
 
-import com.vinhderful.raytracer.App;
+import com.vinhderful.pathtracer.App;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;

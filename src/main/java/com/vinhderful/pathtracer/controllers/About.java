@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer.controllers;
+package com.vinhderful.pathtracer.controllers;
 
 import javafx.scene.control.Hyperlink;
 

@@ -1,9 +1,9 @@
-package com.vinhderful.raytracer.misc;
+package com.vinhderful.pathtracer.misc;
 
-import com.vinhderful.raytracer.Settings;
+import com.vinhderful.pathtracer.Settings;
 import uk.ac.manchester.tornado.api.collections.types.Float3;
 
-import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
+import static com.vinhderful.pathtracer.utils.Angle.TO_RADIANS;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 public class Camera {

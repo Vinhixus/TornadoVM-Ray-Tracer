@@ -1,14 +1,14 @@
-package com.vinhderful.raytracer.renderer;
+package com.vinhderful.pathtracer.renderer;
 
-import com.vinhderful.raytracer.utils.BodyOps;
-import com.vinhderful.raytracer.utils.Color;
-import com.vinhderful.raytracer.utils.Float4Ext;
+import com.vinhderful.pathtracer.utils.BodyOps;
+import com.vinhderful.pathtracer.utils.Color;
+import com.vinhderful.pathtracer.utils.Float4Ext;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
-import static com.vinhderful.raytracer.misc.World.LIGHT_INDEX;
-import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
+import static com.vinhderful.pathtracer.misc.World.LIGHT_INDEX;
+import static com.vinhderful.pathtracer.misc.World.PLANE_INDEX;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 public class Shader {

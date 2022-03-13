@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer.misc.bodies;
+package com.vinhderful.pathtracer.misc.bodies;
 
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 
