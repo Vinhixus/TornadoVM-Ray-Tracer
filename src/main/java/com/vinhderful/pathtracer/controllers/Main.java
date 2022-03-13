@@ -136,7 +136,7 @@ public class Main {
     /**
      * Multithreading helper variable - indicator of when rendered has finished rendering frame
      */
-    private volatile boolean renderReady = false;
+    private volatile boolean renderReady = true;
 
 
     /**
@@ -369,7 +369,7 @@ public class Main {
 
         // Define rendering loop on separate thread, record fps
         new Thread(() -> {
-            long lastUpdate = System.currentTimeMillis();
+            long lastUpdate = System.nanoTime();
 
             while (true) {
                 if (!renderReady) {
@@ -377,9 +377,9 @@ public class Main {
                     renderReady = true;
 
                     // Record fps
-                    long now = System.currentTimeMillis();
-                    fps = 1000.0 / (now - lastUpdate);
-                    lastUpdate = System.currentTimeMillis();
+                    long now = System.nanoTime();
+                    fps = 1_000_000_000.0 / (now - lastUpdate);
+                    lastUpdate = System.nanoTime();
                 }
             }
         }).start();
