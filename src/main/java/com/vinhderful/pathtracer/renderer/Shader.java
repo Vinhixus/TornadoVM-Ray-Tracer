@@ -13,9 +13,9 @@ import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 public class Shader {
 
-    public static final float AMBIENT_STRENGTH = 0.05F;
+    public static final float AMBIENT_STRENGTH = 0.1F;
     public static final float MAX_REFLECTIVITY = 128F;
-    public static final float SHADOW_STRENGTH = 0.1F;
+    public static final float SHADOW_STRENGTH = 0.15F;
 
     public static final float PHI = floatPI() * (3 - floatSqrt(5));
 
@@ -119,8 +119,7 @@ public class Shader {
                 reflectivity *= t;
                 rayDirection = reflectionDir;
             } else {
-                Float4 color = new Float4(0, 0, 0, 0);
-                // Float4 color = BodyOps.getSkyboxColor(skybox, skyboxDimensions, reflectionDir);
+                Float4 color = BodyOps.getSkyboxColor(skybox, skyboxDimensions, reflectionDir);
                 reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity));
             }
         }

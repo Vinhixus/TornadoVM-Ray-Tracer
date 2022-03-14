@@ -83,8 +83,7 @@ public class Renderer {
                         pixels[x + y * width] = Color.toARGB(pixelColor);
                     }
                 } else {
-                    // pixels[x + y * width] = Color.toARGB(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection));
-                    pixels[x + y * width] = 0xFF000000;
+                    pixels[x + y * width] = Color.toARGB(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection));
                 }
             }
     }

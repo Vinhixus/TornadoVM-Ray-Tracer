@@ -69,8 +69,8 @@ public class BodyOps {
     public static Float4 getSkyboxColor(VectorFloat4 skybox, int[] skyBoxDimensions, Float4 d) {
 
         // Convert unit vector to texture coordinates
-        float u = (float) (0.5 + Math.atan2(d.getZ(), d.getX()) / (2 * floatPI()));
-        float v = (float) (0.5 - Math.asin(d.getY()) / floatPI());
+        float u = 0.5F + floatAtan2(d.getZ(), d.getX()) / (2 * floatPI());
+        float v = 0.5F - floatAsin(d.getY()) / floatPI();
 
         int x = (int) (u * (skyBoxDimensions[0] - 1));
         int y = (int) (v * (skyBoxDimensions[1] - 1));
