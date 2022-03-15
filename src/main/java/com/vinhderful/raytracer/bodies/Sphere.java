@@ -39,6 +39,7 @@ public class Sphere extends Body {
 
     /**
      * Given a ray, return the point where the ray first intersects with the sphere
+     * https://www.youtube.com/watch?v=HFPlKQGChpE&ab_channel=TheArtofCode
      *
      * @param ray the ray
      * @return The first point of intersection as Vector3f or null if the ray does

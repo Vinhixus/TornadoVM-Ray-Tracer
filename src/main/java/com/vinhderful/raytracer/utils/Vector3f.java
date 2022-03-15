@@ -37,9 +37,11 @@ public class Vector3f {
         double _yaw = Math.toRadians(yaw);
         double _pitch = Math.toRadians(pitch);
 
+        // Rotate horizontally (yaw)
         float _y = (float) (y * Math.cos(_pitch) - z * Math.sin(_pitch));
         float _z = (float) (y * Math.sin(_pitch) + z * Math.cos(_pitch));
 
+        // Rotate vertically (pitch)
         float _x = (float) (x * Math.cos(_yaw) + _z * Math.sin(_yaw));
         _z = (float) (-x * Math.sin(_yaw) + _z * Math.cos(_yaw));
 

@@ -26,7 +26,9 @@ public class Shader {
     public static final float PHI = (float) (Math.PI * (3 - Math.sqrt(5)));
 
     /**
-     * Get the diffuse brightness of a body given a hit event and the world
+     * Get the diffuse brightness of a body given a hit event and the world according to
+     * the Phong lighting model:
+     * https://learnopengl.com/Lighting/Basic-Lighting
      *
      * @param hit   the hit event
      * @param world the world
@@ -34,11 +36,16 @@ public class Shader {
      */
     public static float getDiffuse(Hit hit, World world) {
         Light light = world.getLight();
-        return hit.getNormal().dotProduct(light.getPosition().subtract(hit.getPosition()).normalize());
+        Vector3f lightDirection = light.getPosition().subtract(hit.getPosition()).normalize();
+
+        // Diffuse lighting from normal and light direction
+        return hit.getNormal().dotProduct(lightDirection);
     }
 
     /**
-     * Get the specular brightness of a body given a hit event and the world
+     * Get the specular brightness of a body given a hit event and the world according to
+     * the Blinn-Phong lighting model:
+     * https://learnopengl.com/Advanced-Lighting/Advanced-Lighting
      *
      * @param hit   the hit event
      * @param world the world
@@ -56,13 +63,17 @@ public class Shader {
         float specularFactor = Math.max(0F, hit.getNormal().dotProduct(halfwayDirection));
 
         // Specular energy conservation
+        // https://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/
         float k = (float) ((8.0 + bodyReflectivity) / (8.0 * Math.PI));
+
+
         return (float) (k * Math.pow(specularFactor, bodyReflectivity) * (bodyReflectivity / MAX_REFLECTIVITY));
     }
 
     /**
      * Get the factor that defines if a spot should be in shadow
-     * Light is sampled using the sunflower seed arrangement
+     * Light is sampled using the sunflower seed arrangement/vogel spiral phenomenon
+     * https://www.codeproject.com/Articles/1221341/The-Vogel-Spiral-Phenomenon
      *
      * @param hit   the hit event
      * @param world the world
@@ -75,12 +86,18 @@ public class Shader {
         Vector3f lightPos = light.getPosition();
         Vector3f hitPos = hit.getPosition();
 
+        // As the light is bounded by a sphere light model, we uniformly sample the great circle
+        // with a normal parallel to our light direction
+
+        // We obtain a plane perpendicular to the light direction, generate two perpendicular vectors
+        // that form a new coordinate system together with the light direction vector
         Vector3f n = hitPos.subtract(lightPos).normalize();
         Vector3f u = n.perpVector();
         Vector3f v = n.crossProduct(u);
 
         int raysHit = 0;
 
+        // Uniformly sample the great circle using the sunflower seed arrangement
         for (int i = 0; i < sampleSize; i++) {
 
             float t = PHI * i;
@@ -89,6 +106,7 @@ public class Shader {
             float x = (float) (2 * lightScale * r * Math.cos(t));
             float y = (float) (2 * lightScale * r * Math.sin(t));
 
+            // Translate points to plane
             Vector3f samplePoint = lightPos.add(u.multiply(x)).add(v.multiply(y));
             Vector3f rayDir = samplePoint.subtract(hitPos).normalize();
             Vector3f rayOrigin = hitPos.add(rayDir.multiply(0.001F));
@@ -121,11 +139,13 @@ public class Shader {
 
         Color hitColor = hitBody.getColor(hitPos);
 
+        // Generate Blinn-Phong model variables
         float diffuse = Math.max(AMBIENT_STRENGTH, getDiffuse(hit, world));
         float specular = getSpecular(hit, world);
         float reflectivity = hitBody.getReflectivity() / MAX_REFLECTIVITY;
         float shadow = getShadowFactor(hit, world, shadowSampleSize);
 
+        // Recursively bounce ray around the scene and calculate reflections
         Color reflection;
         Vector3f reflectionDir = rayDir.subtract(hit.getNormal().multiply(2 * rayDir.dotProduct(hit.getNormal())));
         Vector3f reflectionOrigin = hitPos.add(reflectionDir.multiply(0.001F));

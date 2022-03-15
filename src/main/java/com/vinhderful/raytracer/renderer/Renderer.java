@@ -75,6 +75,7 @@ public class Renderer {
             if (body == null) continue;
 
             Vector3f intersection = body.getIntersection(ray);
+
             if (intersection != null && (closestHit == null
                     || closestHit.getPosition().distanceFrom(ray.getOrigin())
                     > intersection.distanceFrom(ray.getOrigin())))
@@ -86,6 +87,7 @@ public class Renderer {
 
     /**
      * Calculate the OpenGL style x coordinate of the canvas
+     * (0, 0) is the middle of the screen
      *
      * @param x the pixel's x coordinate
      * @return the normalized x coordinate
@@ -99,6 +101,7 @@ public class Renderer {
 
     /**
      * Calculate the OpenGL style y coordinate of the canvas
+     * (0, 0) is the middle of the screen
      *
      * @param y the pixel's y coordinate
      * @return the normalized y coordinate
@@ -116,14 +119,22 @@ public class Renderer {
      * @param world the world to render
      */
     public void render(World world) {
+
         Camera camera = world.getCamera();
+
+        // Place camera in front of viewport
         Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
 
+        // Loop over every pixel
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++) {
-                Vector3f rayDir = new Vector3f(getNormalizedX(x), getNormalizedY(y), 0).subtract(eyePos).normalize().rotate(camera.getYaw(), camera.getPitch());
+
+                // Shoot ray from camera to pixel
+                Vector3f rayDir = new Vector3f(getNormalizedX(x), getNormalizedY(y), 0)
+                        .subtract(eyePos).normalize().rotate(camera.getYaw(), camera.getPitch());
                 Ray ray = new Ray(camera.getPosition(), rayDir);
 
+                // Calculate pixel color
                 Hit hit = getClosestHit(ray, world);
                 if (hit != null) {
                     if (hit.getBody() == world.getLight())

@@ -27,7 +27,6 @@ public class Skybox {
         try {
             System.out.println("Loading skybox image '" + resourceName + "'...");
             sphereImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(resourceName)));
-            System.out.println("Skybox ready.");
         } catch (IOException | IllegalArgumentException ex) {
             ex.printStackTrace();
         }
@@ -42,17 +41,13 @@ public class Skybox {
      */
     public Color getColor(Vector3f d) {
 
-        // Convert unit vector to texture coordinates
+        // https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
         float u = (float) (0.5 + Math.atan2(d.getZ(), d.getX()) / (2 * Math.PI));
         float v = (float) (0.5 - Math.asin(d.getY()) / Math.PI);
 
-        try {
-            return Color.fromInt(sphereImage.getRGB((int) (u * (sphereImage.getWidth() - 1)), (int) (v * (sphereImage.getHeight() - 1))));
-        } catch (Exception e) {
-            System.out.println("U: " + u + " V: " + v);
-            e.printStackTrace();
+        int x = (int) (u * (sphereImage.getWidth() - 1));
+        int y = (int) (v * (sphereImage.getHeight() - 1));
 
-            return Color.MAGENTA;
-        }
+        return Color.fromInt(sphereImage.getRGB(x, y));
     }
 }

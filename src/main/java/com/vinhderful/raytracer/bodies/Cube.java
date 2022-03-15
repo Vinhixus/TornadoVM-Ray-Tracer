@@ -54,6 +54,7 @@ public class Cube extends Body {
 
     /**
      * Given a ray, return the point where the ray first intersects with the cube
+     * https://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
      *
      * @param ray the ray
      * @return The first point of intersection as Vector3f or null if the ray does
