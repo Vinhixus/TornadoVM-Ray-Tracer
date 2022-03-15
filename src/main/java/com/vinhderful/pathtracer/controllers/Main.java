@@ -194,11 +194,11 @@ public class Main {
     private ArrayList<TornadoDevice> devices;
     private TaskSchedule ts;
     private GridScheduler grid;
-    private boolean renderWithTornado;
+    private volatile boolean renderWithTornado;
 
     // PixelWriter and it's format
-    private PixelWriter pixelWriter;
-    private PixelFormat<IntBuffer> format;
+    private volatile PixelWriter pixelWriter;
+    private volatile PixelFormat<IntBuffer> format;
 
     // Control and About windows
     private Window controls;
@@ -359,11 +359,24 @@ public class Main {
             // Render and signal that render is ready
             render();
             renderReady = true;
-
-            // Record fps
-            fps = 1_000_000_000.0 / (System.nanoTime() - fpsLastUpdate);
-            fpsLastUpdate = System.nanoTime();
         };
+
+        // Define drawing thread
+        new Thread(() -> {
+            while (true) {
+
+                // Set the pixels on the canvas when render is ready
+                if (renderReady) {
+                    pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
+                    renderReady = false;
+                    renderer.execute(render);
+
+                    // Record fps
+                    fps = 1_000_000_000.0 / (System.nanoTime() - fpsLastUpdate);
+                    fpsLastUpdate = System.nanoTime();
+                }
+            }
+        }).start();
 
         // Define main animation loop - gets called every frame
         new AnimationTimer() {
@@ -373,13 +386,6 @@ public class Main {
 
                 // Update camera Position
                 camera.updatePositionOnMovement(fwd, back, strafeL, strafeR, up, down);
-
-                // Set the pixels on the canvas when render is ready
-                if (renderReady) {
-                    pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
-                    renderReady = false;
-                    renderer.execute(render);
-                }
             }
         }.start();
 
