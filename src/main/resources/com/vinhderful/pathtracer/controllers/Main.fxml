@@ -5,13 +5,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<BorderPane onKeyPressed="#keyPressed" onKeyReleased="#keyReleased" stylesheets="@../GUI.css"
+<BorderPane onKeyPressed="#keyPressed" onKeyReleased="#keyReleased"
+            stylesheets="@../GUI.css"
             xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.vinhderful.pathtracer.controllers.Main">
     <center>
-        <Pane BorderPane.alignment="CENTER">
-            <Canvas fx:id="canvas" height="720" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed"
-                    onMouseReleased="#mouseReleased" width="1280"/>
+        <Pane fx:id="pane" BorderPane.alignment="CENTER">
+            <Canvas fx:id="canvas"
+                    onMouseDragged="#mouseDragged"
+                    onMousePressed="#mousePressed"
+                    onMouseReleased="#mouseReleased"/>
         </Pane>
     </center>
     <right>

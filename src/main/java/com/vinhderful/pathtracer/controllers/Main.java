@@ -18,6 +18,7 @@ import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import uk.ac.manchester.tornado.api.*;
@@ -146,6 +147,7 @@ public class Main {
     @FXML
 
     // Main pane and canvas encapsulating the viewport
+    public Pane pane;
     public Canvas canvas;
 
     public VBox settingsPanel;
@@ -245,6 +247,8 @@ public class Main {
         // Set viewport (canvas) dimensions
         width = Settings.WIDTH;
         height = Settings.HEIGHT;
+        canvas.setWidth(width);
+        canvas.setHeight(height);
 
         // Setup canvas and graphics context
         GraphicsContext g = canvas.getGraphicsContext2D();
