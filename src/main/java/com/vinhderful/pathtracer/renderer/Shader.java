@@ -1,12 +1,12 @@
-package com.vinhderful.raytracer.renderer;
+package com.vinhderful.pathtracer.renderer;
 
-import com.vinhderful.raytracer.bodies.Body;
-import com.vinhderful.raytracer.scene.Light;
-import com.vinhderful.raytracer.scene.World;
-import com.vinhderful.raytracer.utils.Color;
-import com.vinhderful.raytracer.utils.Hit;
-import com.vinhderful.raytracer.utils.Ray;
-import com.vinhderful.raytracer.utils.Vector3f;
+import com.vinhderful.pathtracer.bodies.Body;
+import com.vinhderful.pathtracer.scene.Light;
+import com.vinhderful.pathtracer.scene.World;
+import com.vinhderful.pathtracer.utils.Color;
+import com.vinhderful.pathtracer.utils.Hit;
+import com.vinhderful.pathtracer.utils.Ray;
+import com.vinhderful.pathtracer.utils.Vector3f;
 
 /**
  * Implementations of the Phong shading techniques

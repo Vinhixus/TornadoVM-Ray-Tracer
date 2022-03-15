@@ -1,8 +1,8 @@
-package com.vinhderful.raytracer.scene;
+package com.vinhderful.pathtracer.scene;
 
-import com.vinhderful.raytracer.bodies.Cube;
-import com.vinhderful.raytracer.utils.Color;
-import com.vinhderful.raytracer.utils.Vector3f;
+import com.vinhderful.pathtracer.bodies.Cube;
+import com.vinhderful.pathtracer.utils.Color;
+import com.vinhderful.pathtracer.utils.Vector3f;
 
 /**
  * Represents a light source using its position and color

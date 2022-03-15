@@ -1,11 +1,11 @@
-package com.vinhderful.raytracer;
+package com.vinhderful.pathtracer;
 
-import com.vinhderful.raytracer.bodies.Cube;
-import com.vinhderful.raytracer.bodies.Sphere;
-import com.vinhderful.raytracer.renderer.Renderer;
-import com.vinhderful.raytracer.scene.World;
-import com.vinhderful.raytracer.utils.Color;
-import com.vinhderful.raytracer.utils.Vector3f;
+import com.vinhderful.pathtracer.bodies.Cube;
+import com.vinhderful.pathtracer.bodies.Sphere;
+import com.vinhderful.pathtracer.renderer.Renderer;
+import com.vinhderful.pathtracer.scene.World;
+import com.vinhderful.pathtracer.utils.Color;
+import com.vinhderful.pathtracer.utils.Vector3f;
 
 import javax.imageio.ImageIO;
 import java.awt.image.*;

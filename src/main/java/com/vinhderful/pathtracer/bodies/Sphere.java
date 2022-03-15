@@ -1,8 +1,8 @@
-package com.vinhderful.raytracer.bodies;
+package com.vinhderful.pathtracer.bodies;
 
-import com.vinhderful.raytracer.utils.Color;
-import com.vinhderful.raytracer.utils.Ray;
-import com.vinhderful.raytracer.utils.Vector3f;
+import com.vinhderful.pathtracer.utils.Color;
+import com.vinhderful.pathtracer.utils.Ray;
+import com.vinhderful.pathtracer.utils.Vector3f;
 
 /**
  * Represent a sphere in a 3D scene using its position, radius and color

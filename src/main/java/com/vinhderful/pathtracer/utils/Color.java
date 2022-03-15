@@ -1,4 +1,4 @@
-package com.vinhderful.raytracer.utils;
+package com.vinhderful.pathtracer.utils;
 
 /**
  * Represents a color using red, green and blue values
