@@ -11,22 +11,34 @@ import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Benchmark class provides a no-GUI application to test the performance of the path tracer when using hardware
+ * acceleration with TornadoVM vs running sequentially.
+ * The benchmark simply generates a set number of frames and records the time it took.
+ */
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Benchmark {
 
-    public static final int FRAMES_TO_GENERATE = 5;
+    // The number of frames to generate
+    private static final int FRAMES_TO_GENERATE = 5;
 
-    public static final int WIDTH = 2048;
-    public static final int HEIGHT = 1024;
-    public static final int SHADOW_SAMPLE_SIZE = 200;
-    public static final int REFLECTION_BOUNCES = 4;
+    // Dimensions of the viewport
+    private static final int WIDTH = 2048;
+    private static final int HEIGHT = 1024;
 
+    // Path tracing properties
+    private static final int SHADOW_SAMPLE_SIZE = 200;
+    private static final int REFLECTION_BOUNCES = 4;
+
+    // Output and input buffers
     private static int[] pixels;
     private static float[] camera;
     private static int[] dimensions;
     private static int[] pathTracingProperties;
-    // ==============================================================
 
+    /**
+     * Initialise rendering environment
+     */
     private static void setRenderingProperties() {
         dimensions = new int[]{WIDTH, HEIGHT};
         pixels = new int[WIDTH * HEIGHT];
@@ -35,7 +47,11 @@ public class Benchmark {
         pathTracingProperties = new int[]{SHADOW_SAMPLE_SIZE, REFLECTION_BOUNCES};
     }
 
-    // ==============================================================
+    /**
+     * Main program
+     *
+     * @param args program arguments
+     */
     public static void main(String[] args) throws Exception {
 
         setRenderingProperties();
@@ -50,7 +66,7 @@ public class Benchmark {
         VectorFloat4 bodyColors = world.getBodyColorsBuffer();
         VectorFloat bodyReflectivities = world.getBodyReflectivitiesBuffer();
 
-        // ==============================================================
+        // Set up Tornado Task Schedule
         TaskSchedule ts = new TaskSchedule("s0");
         ts.streamIn(camera, pathTracingProperties, bodyPositions);
         ts.task("t0", Renderer::render, pixels,
@@ -59,6 +75,7 @@ public class Benchmark {
                 skybox, skyboxDimensions);
         ts.streamOut(pixels);
 
+        // Set up worker grid
         WorkerGrid worker = new WorkerGrid2D(WIDTH, HEIGHT);
         worker.setLocalWork(16, 16, 1);
         GridScheduler grid = new GridScheduler();
@@ -141,7 +158,7 @@ public class Benchmark {
         System.out.println("Duration: " + sequentialTime + " ms");
 
         // ==============================================================
-        // Performance increase
+        // Calculate performance increase
         // ==============================================================
         System.out.println("-----------------------------------------");
         System.out.println("Performance increase: " + sequentialTime / tornadoTime + "x");

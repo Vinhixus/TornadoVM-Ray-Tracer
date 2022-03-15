@@ -15,15 +15,25 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Controller class for Loading window popping up while main program is loading
+ */
 public class Loading {
 
+    /**
+     * JavaFX GUI elements
+     */
     @FXML
     public StackPane stackPane;
     public Text text;
 
+    /**
+     * Initializer, gets called first when the FXML is loaded
+     */
     @FXML
     public void initialize() {
 
+        // Task to create the main window
         Task<Parent> createMainWindow = new Task<>() {
 
             @Override
@@ -40,6 +50,7 @@ public class Loading {
             }
         };
 
+        // Show stage when FXML is loaded
         createMainWindow.setOnSucceeded(e -> {
             BorderPane root = (BorderPane) createMainWindow.getValue();
             Scene scene = null;
@@ -56,6 +67,7 @@ public class Loading {
             loadingStage.close();
         });
 
+        // Load FXML on new thread
         new Thread(createMainWindow).start();
     }
 }

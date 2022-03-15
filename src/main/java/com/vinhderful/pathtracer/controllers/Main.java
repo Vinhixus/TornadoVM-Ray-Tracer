@@ -35,7 +35,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Initialises JavaFX FXML elements together with Main.fxml, contains driver code
+ * Controller for the main window, contains driver code for the path tracer
  */
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Main {

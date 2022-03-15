@@ -19,9 +19,19 @@ import java.util.concurrent.atomic.AtomicReference;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatCos;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatSin;
 
+/**
+ * A world representing objects in the scene
+ */
 public class World {
 
+    /**
+     * A light is required to be at index 0
+     */
     public static final int LIGHT_INDEX = 0;
+
+    /**
+     * A plane is required to be at index 1
+     */
     public static final int PLANE_INDEX = 1;
 
     private Skybox skybox;
@@ -29,17 +39,28 @@ public class World {
     private Plane plane;
     private final ArrayList<Body> bodies;
 
+    /**
+     * Input buffers
+     */
     private VectorFloat4 bodyPositions;
     private VectorFloat bodySizes;
     private VectorFloat4 bodyColors;
     private VectorFloat bodyReflectivities;
 
+    /**
+     * Variables encapsulating the animation that can be played
+     */
     private final ScheduledExecutorService animationService;
     private final Runnable animation;
     private Future<?> animator;
     AtomicReference<Float> t;
     private boolean isAnimating;
 
+    /**
+     * Instantiate a default world
+     *
+     * @throws Exception is thrown if light is not found at index 0 or plane is not found at index 1
+     */
     public World() throws Exception {
 
         // Populate world
@@ -64,6 +85,9 @@ public class World {
         allocateAndInitializeBuffers();
     }
 
+    /**
+     * Generate a pre-defined default world
+     */
     private void generateDefaultWorld() {
 
         // Skybox
@@ -72,6 +96,7 @@ public class World {
         skybox = new Skybox(skyboxFileName);
 
         System.out.println("-> Adding object to the scene...");
+        
         // Sphere light
         light = new Light(new Float4(1F, 3F, -1.5F, 0), 0.4F, Color.WHITE);
         addBody(light);
@@ -88,10 +113,21 @@ public class World {
         addBody(new Sphere(new Float4(0, 0.5F, 7.5F, 0), 0.5F, Color.BLACK, 48F));
     }
 
+    /**
+     * Return if the world is currently being animated
+     *
+     * @return if the world is animating
+     */
     public boolean isAnimating() {
         return isAnimating;
     }
 
+    /**
+     * Define the default animation step:
+     * The spheres in the scene move around in a circle
+     *
+     * @return a Runnable defining one animation step
+     */
     private Runnable getDefaultAnimation() {
         return () -> {
             t.set((t.get() + 0.017453292F) % 6.2831855F);
@@ -110,21 +146,33 @@ public class World {
         };
     }
 
+    /**
+     * Play the defined animation
+     */
     public void startAnimation() {
         animator = animationService.scheduleAtFixedRate(animation, 0, 16_666_666, TimeUnit.NANOSECONDS);
         isAnimating = true;
     }
 
+    /**
+     * Pause the default animation
+     */
     public void stopAnimation() {
         animator.cancel(true);
         isAnimating = false;
     }
 
+    /**
+     * Toggle animation state
+     */
     public void toggleAnimation() {
         if (isAnimating) stopAnimation();
         else startAnimation();
     }
 
+    /**
+     * Allocate and initialise the input buffers for rendering
+     */
     private void allocateAndInitializeBuffers() {
         System.out.println("-> Allocating object representation buffers...");
 
@@ -145,6 +193,9 @@ public class World {
         }
     }
 
+    /**
+     * Copy the data to input buffers
+     */
     public void updateBodyPositionBuffer() {
         if (isAnimating)
             for (int i = 0; i < bodies.size(); i++)
@@ -153,40 +204,84 @@ public class World {
             bodyPositions.set(LIGHT_INDEX, light.getPosition().duplicate());
     }
 
-    private void addBody(Body body) {
-        bodies.add(body);
-    }
-
-    public Light getLight() {
-        return light;
-    }
-
-
-    public Plane getPlane() {
-        return plane;
-    }
-
+    /**
+     * Return the memory address to the input buffer representing body positions
+     *
+     * @return the VectorFloat4 representing body positions
+     */
     public VectorFloat4 getBodyPositionsBuffer() {
         return bodyPositions;
     }
 
+    /**
+     * Return the memory address to the input buffer representing body sizes
+     *
+     * @return the VectorFloat representing body sizes
+     */
     public VectorFloat getBodySizesBuffer() {
         return bodySizes;
     }
 
+    /**
+     * Return the memory address to the input buffer representing body colors
+     *
+     * @return the VectorFloat representing body colors
+     */
     public VectorFloat4 getBodyColorsBuffer() {
         return bodyColors;
     }
 
+    /**
+     * Return the memory address to the input buffer representing body reflectivities
+     *
+     * @return the VectorFloat representing body reflectivities
+     */
     public VectorFloat getBodyReflectivitiesBuffer() {
         return bodyReflectivities;
     }
 
+    /**
+     * Return the memory address to the input buffer representing the skybox
+     *
+     * @return the VectorFloat4 representing skybox
+     */
     public VectorFloat4 getSkyboxBuffer() {
-        return skybox.getVectorFloat4();
+        return skybox.getBuffer();
     }
 
+    /**
+     * Return the memory address to the input buffer representing skybox dimensions
+     *
+     * @return the int array containing [0] = width of skybox image, [1] = height of skybox image
+     */
     public int[] getSkyboxDimensionsBuffer() {
-        return skybox.getDimensions();
+        return skybox.getDimensionsBuffer();
+    }
+
+    /**
+     * Return the light source in the world
+     *
+     * @return the light source
+     */
+    public Light getLight() {
+        return light;
+    }
+
+    /**
+     * Return the plane
+     *
+     * @return the plane
+     */
+    public Plane getPlane() {
+        return plane;
+    }
+
+    /**
+     * Add a body to the world
+     *
+     * @param body the body to add
+     */
+    private void addBody(Body body) {
+        bodies.add(body);
     }
 }

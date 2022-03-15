@@ -1,6 +1,6 @@
 package com.vinhderful.pathtracer.misc;
 
-import uk.ac.manchester.tornado.api.collections.types.Float4;
+import com.vinhderful.pathtracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import javax.imageio.ImageIO;
@@ -13,7 +13,8 @@ import java.util.Objects;
  */
 public class Skybox {
 
-    private BufferedImage sphereImage;
+    private BufferedImage image;
+    private VectorFloat4 buffer;
 
     /**
      * Read the given resource into a BufferedImage
@@ -22,38 +23,48 @@ public class Skybox {
      */
     public Skybox(String resourceName) {
 
-        sphereImage = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
 
         try {
-            sphereImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(resourceName)));
+            image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(resourceName)));
         } catch (IOException | IllegalArgumentException ex) {
             ex.printStackTrace();
             System.exit(-1);
         }
+
+        allocateAndInitializeBuffer();
     }
 
-    public static Float4 fromARGB(int argb) {
-        int b = (argb) & 0xFF;
-        int g = (argb >> 8) & 0xFF;
-        int r = (argb >> 16) & 0xFF;
-        return new Float4(r / 255F, g / 255F, b / 255F, 0);
-    }
+    /**
+     * Allocate memory space and initialise the input buffer
+     */
+    private void allocateAndInitializeBuffer() {
 
-    public VectorFloat4 getVectorFloat4() {
+        int width = image.getWidth();
+        int height = image.getHeight();
 
-        int width = sphereImage.getWidth();
-        int height = sphereImage.getHeight();
-
-        VectorFloat4 colors = new VectorFloat4(width * height);
+        buffer = new VectorFloat4(width * height);
 
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
-                colors.set(x + y * width, fromARGB(sphereImage.getRGB(x, y)));
-
-        return colors;
+                buffer.set(x + y * width, Color.toFloat4(image.getRGB(x, y)));
     }
 
-    public int[] getDimensions() {
-        return new int[]{sphereImage.getWidth(), sphereImage.getHeight()};
+    /**
+     * Return the memory address of the input buffer
+     *
+     * @return the pointer pointing to the VectorFloat4 input buffer
+     */
+    public VectorFloat4 getBuffer() {
+        return buffer;
+    }
+
+    /**
+     * Return the dimensions as an input buffer
+     *
+     * @return the dimensions int array containing [0] = width, [1] = height
+     */
+    public int[] getDimensionsBuffer() {
+        return new int[]{image.getWidth(), image.getHeight()};
     }
 }

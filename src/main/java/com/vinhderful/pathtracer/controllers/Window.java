@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 
+/**
+ * Helper class to encapsulate Controls and About windows
+ */
 public class Window {
 
     private volatile boolean isShown;
@@ -21,14 +24,25 @@ public class Window {
     private final URL fxml;
     private final Image icon;
 
+    /**
+     * Instantiate a Window given a title, path to the controlling FXML and path to the icon
+     *
+     * @param name     window title
+     * @param fxmlPath path to FXML
+     * @param iconPath path to icon
+     */
     public Window(String name, String fxmlPath, String iconPath) {
         this.name = name;
         this.fxml = Objects.requireNonNull(getClass().getResource(fxmlPath));
         this.icon = new Image(Objects.requireNonNull(App.class.getResourceAsStream(iconPath)));
     }
 
+    /**
+     * Load the FXML and show the stage
+     */
     private void load() {
 
+        // Load FXML
         Task<Parent> loadTask = new Task<>() {
 
             @Override
@@ -45,6 +59,7 @@ public class Window {
             }
         };
 
+        // Show stage when FXML is loaded
         loadTask.setOnSucceeded(e -> Platform.runLater(() -> {
             StackPane root = (StackPane) loadTask.getValue();
             Scene scene = null;
@@ -60,9 +75,13 @@ public class Window {
             stage.setOnCloseRequest(event -> isShown = false);
         }));
 
+        // Load FXML on new thread
         new Thread(loadTask).start();
     }
 
+    /**
+     * Show the window
+     */
     public void show() {
         if (!isShown) {
             load();
