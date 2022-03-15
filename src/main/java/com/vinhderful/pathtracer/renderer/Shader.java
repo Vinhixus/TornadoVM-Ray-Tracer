@@ -86,6 +86,7 @@ public class Shader {
 
         Float4 reflectionColor = new Float4(0, 0, 0, 0);
         float reflectivity = 1F;
+        float diffuse = 1F;
 
         for (int i = 0; i < reflectionBounceLimit && hitIndex > LIGHT_INDEX; i++) {
 
@@ -105,11 +106,13 @@ public class Shader {
                 float bodyReflectivity = bodyReflectivities.get(hitIndex);
 
                 Float4 color = BodyOps.getColor(hitIndex, hitPosition, bodyColors);
-                if (hitIndex > LIGHT_INDEX)
-                    color = getBlinnPhong(hitIndex, hitPosition, reflectionOrigin, bodyPosition, color, bodyReflectivity, lightPosition);
 
-                float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
-                color = Color.mult(color, shadow);
+                if (hitIndex > LIGHT_INDEX) {
+                    float shadow = diffuse * getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
+                    float specular = diffuse * getSpecular(hitIndex, hitPosition, reflectionOrigin, bodyPosition, bodyReflectivity, lightPosition);
+                    diffuse *= max(AMBIENT_STRENGTH, getDiffuse(hitIndex, hitPosition, bodyPosition, lightPosition));
+                    color = Color.mult(Color.add(Color.mult(color, diffuse), specular), shadow);
+                }
 
                 if (i == reflectionBounceLimit - 1)
                     reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity));
