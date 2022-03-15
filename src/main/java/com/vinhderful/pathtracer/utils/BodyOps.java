@@ -1,6 +1,7 @@
 package com.vinhderful.pathtracer.utils;
 
 import uk.ac.manchester.tornado.api.collections.types.Float4;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import static com.vinhderful.pathtracer.misc.World.PLANE_INDEX;
@@ -56,6 +57,83 @@ public class BodyOps {
             } else
                 return NO_INTERSECTION;
         }
+    }
+
+
+    /**
+     * Given the positions and sizes of the objects in the scene, and a shadow feeler ray represented by an origin and
+     * a direction vector, alongside the position of the light, return whether the shadow feeler hits any objects,
+     * thus blocking the light
+     *
+     * @param bodyPositions the structure representing the positions of the objects in the scene
+     * @param bodySizes     the structure representing the sizes of the objects in the scene
+     * @param rayOrigin     the origin point of the ray
+     * @param rayDirection  the direction of the ray
+     * @param lightPosition the position of the light
+     * @return if the shadow feeler hits any objects
+     */
+    public static boolean intersects(VectorFloat4 bodyPositions, VectorFloat bodySizes,
+                                     Float4 rayOrigin, Float4 rayDirection,
+                                     Float4 lightPosition) {
+
+        // Calculate the distance to the light
+        float lightDistance = Float4Ext.distance(rayOrigin, lightPosition);
+
+        // Initialise intersects boolean
+        boolean intersects = false;
+
+        // Loop over objects in the scene, excluding light and plane, break out of loop when intersection is found
+        for (int i = 2; i < bodyPositions.getLength() && !intersects; i++) {
+
+            // Calculate the intersection of the ray with the current object
+            Float4 intersection = BodyOps.getIntersection(i, bodyPositions.get(i), bodySizes.get(i), rayOrigin, rayDirection);
+
+            // If the ray hits the object, and distance to the current object is smaller than the distance to the light,
+            // then the object is in the way of the light and blocking it
+            if (intersection.getW() == 0 && Float4Ext.distance(intersection, rayOrigin) < lightDistance)
+                intersects = true;
+        }
+
+        // Return result
+        return intersects;
+    }
+
+    /**
+     * Given the positions and sizes of the objects in the scene, and a ray represented by an origin and a direction
+     * vector, return the position of the first point the ray hits, alongside the index of the hit object.
+     * -------------------------------------------------------------------------------------------------------------
+     * - The first three elements of the returned Float4 represents the X, Y and Z values of the hit position
+     * respectively, (-1, -1, -1) is returned if no objects are hit.
+     * - The fourth element of the returned Float4 represents the index of the hit object, -1 is returned if no objects
+     * are hit
+     *
+     * @param bodyPositions the structure representing the positions of the objects in the scene
+     * @param bodySizes     the structure representing the sizes of the objects in the scene
+     * @param rayOrigin     the origin point of the ray
+     * @param rayDirection  the direction of the ray
+     * @return the closest hit position alongside the hit objects index
+     */
+    public static Float4 getClosestHit(VectorFloat4 bodyPositions, VectorFloat bodySizes,
+                                       Float4 rayOrigin, Float4 rayDirection) {
+
+        // Initialise closes hit as a no-hit
+        Float4 closestHit = new Float4(-1F, -1F, -1F, -1F);
+
+        // Loop over objects in the scene
+        for (int i = 0; i < bodyPositions.getLength(); i++) {
+
+            // Calculate the intersection of the ray with the current object
+            Float4 intersection = getIntersection(i, bodyPositions.get(i), bodySizes.get(i), rayOrigin, rayDirection);
+
+            // If the ray hits the object, and the previous closest hit distance is larger than the distance of
+            // the ray origin and the current object, then the current hit is the closest hit
+            if (intersection.getW() == 0 && (closestHit.getW() == -1F ||
+                    Float4Ext.distance(closestHit, rayOrigin) > Float4Ext.distance(intersection, rayOrigin)))
+                closestHit = new Float4(intersection.getX(), intersection.getY(), intersection.getZ(), i);
+        }
+
+        // Return the resulting closest hit
+        return closestHit;
     }
 
     /**

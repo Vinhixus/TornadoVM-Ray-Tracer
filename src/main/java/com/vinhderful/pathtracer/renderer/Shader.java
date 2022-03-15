@@ -8,7 +8,6 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import static com.vinhderful.pathtracer.misc.World.LIGHT_INDEX;
-import static com.vinhderful.pathtracer.misc.World.PLANE_INDEX;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
@@ -187,7 +186,7 @@ public class Shader {
             Float4 rayOrigin = Float4.add(hitPosition, Float4.mult(rayDirection, 0.001F));
 
             // Check if ray hits an object, if yes, then the point is in cast shadow
-            if (Renderer.getClosestHit(bodyPositions, bodySizes, rayOrigin, rayDirection).getW() > PLANE_INDEX)
+            if (BodyOps.intersects(bodyPositions, bodySizes, rayOrigin, rayDirection, samplePoint))
                 raysHit++;
         }
 
@@ -214,7 +213,7 @@ public class Shader {
 
             float t = bodyReflectivities.get(hitIndex) / MAX_REFLECTIVITY;
 
-            Float4 hit = Renderer.getClosestHit(bodyPositions, bodySizes, reflectionOrigin, reflectionDir);
+            Float4 hit = BodyOps.getClosestHit(bodyPositions, bodySizes, reflectionOrigin, reflectionDir);
             hitIndex = (int) hit.getW();
 
             if (hitIndex != -1) {
