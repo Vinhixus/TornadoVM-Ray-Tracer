@@ -365,9 +365,14 @@ public class Main {
             renderReady = true;
         };
 
-        // Define drawing thread
-        new Thread(() -> {
-            while (true) {
+        // Define main animation loop - gets called every frame
+        new AnimationTimer() {
+
+            @Override
+            public void handle(long now) {
+
+                // Update camera Position
+                camera.updatePositionOnMovement(fwd, back, strafeL, strafeR, up, down);
 
                 // Set the pixels on the canvas when render is ready
                 if (renderReady) {
@@ -379,17 +384,6 @@ public class Main {
                     fps = 1_000_000_000.0 / (System.nanoTime() - fpsLastUpdate);
                     fpsLastUpdate = System.nanoTime();
                 }
-            }
-        }).start();
-
-        // Define main animation loop - gets called every frame
-        new AnimationTimer() {
-
-            @Override
-            public void handle(long now) {
-
-                // Update camera Position
-                camera.updatePositionOnMovement(fwd, back, strafeL, strafeR, up, down);
             }
         }.start();
 
@@ -426,7 +420,8 @@ public class Main {
 
         // Adjustable path tracing properties
         shadowSampleSizeSlider.setValue(shadowSampleSize);
-        shadowSampleSizeSlider.setMax(Settings.MAX_SHADOW_SAMPLE_SIZE);
+        shadowSampleSizeSlider.setMax(10);
+        shadowSampleSizeSlider.setMajorTickUnit(1);
         shadowSampleSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> shadowSampleSize = newValue.intValue());
         shadowSampleSizeText.textProperty().bind(shadowSampleSizeSlider.valueProperty().asString("%.0f"));
 
@@ -576,10 +571,18 @@ public class Main {
 
         // Map task schedule to selected device if selected device is tornado device
         if (selectedDeviceIndex > 0) {
+            shadowSampleSizeSlider.setMax(Settings.MAX_SHADOW_SAMPLE_SIZE);
+            shadowSampleSizeSlider.setMajorTickUnit(50);
+            shadowSampleSizeSlider.setMinorTickCount(50);
             renderWithTornado = true;
             ts.mapAllTo(device);
-        } else
+        } else {
+            // Limit shadow sample size when rendering sequentially
+            shadowSampleSizeSlider.setMax(10);
+            shadowSampleSizeSlider.setMajorTickUnit(1);
+            shadowSampleSizeSlider.setMinorTickCount(0);
             renderWithTornado = false;
+        }
     }
 
     /**

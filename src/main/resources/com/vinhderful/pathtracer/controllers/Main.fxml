@@ -97,7 +97,7 @@
                 <Text fx:id="shadowSampleSizeText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0"
                       GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="shadowSampleSize" fx:id="shadowSampleSizeSlider" blockIncrement="1.0" majorTickUnit="50.0"
+            <Slider id="shadowSampleSize" fx:id="shadowSampleSizeSlider" blockIncrement="1.0" minorTickCount="0"
                     showTickLabels="true" showTickMarks="true" snapToTicks="true"/>
             <GridPane>
                 <columnConstraints>

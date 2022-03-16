@@ -112,7 +112,7 @@ public class Renderer {
                     // shading reflections and shadows
                     else {
                         Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
-                        Float4 pixelColor = Shader.getPixelColor(
+                        Float4 pixelColor = PathTracer.getPixelColor(
                                 hitIndex, hitPosition, cameraPosition, rayDirection,
                                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                                 skybox, skyboxDimensions,

@@ -48,7 +48,7 @@ public class BodyOps {
             float t = Float4.dot(Float4.sub(position, rayOrigin), rayDirection);
             Float4 p = Float4.add(rayOrigin, Float4.mult(rayDirection, t));
 
-            float y = Float4.length(Float4.sub(position, p));
+            float y = Float4Ext.distance(position, p);
 
             if (y < size) {
                 float t1 = t - floatSqrt(size * size - y * y);

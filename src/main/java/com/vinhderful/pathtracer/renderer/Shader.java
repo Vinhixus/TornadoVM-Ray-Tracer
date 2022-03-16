@@ -7,7 +7,6 @@ import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
-import static com.vinhderful.pathtracer.misc.World.LIGHT_INDEX;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
@@ -69,7 +68,7 @@ public class Shader {
         float specular = getSpecular(hitIndex, hitPosition, rayOrigin, bodyPosition, bodyReflectivity, lightPosition);
 
         // Mix the elements
-        return Color.add(Color.mult(bodyColor, diffuse), specular);
+        return Color.mult(Color.add(bodyColor, specular), diffuse);
     }
 
 
@@ -193,83 +192,5 @@ public class Shader {
         // Calculate soft shadows according to how many of the sampled shadow feelers hit an object
         if (raysHit == 0) return 1;
         else return 1 - (float) raysHit / (sampleSize * (1 + SHADOW_BRIGHTNESS));
-    }
-
-    public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
-                                       VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                                       Float4 lightPosition, float lightSize,
-                                       VectorFloat4 skybox, int[] skyboxDimensions,
-                                       int shadowSampleSize, int reflectionBounceLimit) {
-
-        Float4 reflectionColor = new Float4(0, 0, 0, 0);
-        float reflectivity = 1F;
-        float diffuse = 1F;
-
-        for (int i = 0; i < reflectionBounceLimit && hitIndex > LIGHT_INDEX; i++) {
-
-            Float4 hitNormal = BodyOps.getNormal(hitIndex, bodyPositions.get(hitIndex), hitPosition);
-            Float4 reflectionDir = Float4.sub(rayDirection, Float4.mult(hitNormal, 2 * Float4.dot(rayDirection, hitNormal)));
-            Float4 reflectionOrigin = Float4.add(hitPosition, Float4.mult(reflectionDir, 0.001F));
-
-            float t = bodyReflectivities.get(hitIndex) / MAX_REFLECTIVITY;
-
-            Float4 hit = BodyOps.getClosestHit(bodyPositions, bodySizes, reflectionOrigin, reflectionDir);
-            hitIndex = (int) hit.getW();
-
-            if (hitIndex != -1) {
-                hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
-
-                Float4 bodyPosition = bodyPositions.get(hitIndex);
-                float bodyReflectivity = bodyReflectivities.get(hitIndex);
-
-                Float4 color = BodyOps.getColor(hitIndex, hitPosition, bodyColors);
-
-                if (hitIndex > LIGHT_INDEX) {
-                    float shadow = diffuse * getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
-                    float specular = diffuse * getSpecular(hitIndex, hitPosition, reflectionOrigin, bodyPosition, bodyReflectivity, lightPosition);
-                    diffuse *= max(AMBIENT_STRENGTH, getDiffuse(hitIndex, hitPosition, bodyPosition, lightPosition));
-                    color = Color.mult(Color.add(Color.mult(color, diffuse), specular), shadow);
-                }
-
-                if (i == reflectionBounceLimit - 1)
-                    reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity));
-                else
-                    reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity * (1 - t)));
-
-                reflectivity *= t;
-                rayDirection = reflectionDir;
-            } else {
-                Float4 color = BodyOps.getSkyboxColor(skybox, skyboxDimensions, reflectionDir);
-                reflectionColor = Color.add(reflectionColor, Color.mult(color, reflectivity));
-            }
-        }
-
-        return reflectionColor;
-    }
-
-    public static Float4 getPixelColor(int hitIndex, Float4 hitPosition, Float4 rayOrigin, Float4 rayDirection,
-                                       VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                                       VectorFloat4 skybox, int[] skyboxDimensions,
-                                       int shadowSampleSize, int reflectionBounceLimit) {
-
-        Float4 lightPosition = bodyPositions.get(LIGHT_INDEX);
-        float lightSize = bodySizes.get(LIGHT_INDEX);
-
-        Float4 bodyPosition = bodyPositions.get(hitIndex);
-        Float4 bodyColor = BodyOps.getColor(hitIndex, hitPosition, bodyColors);
-        float bodyReflectivity = bodyReflectivities.get(hitIndex);
-
-        Float4 reflectionColor = getReflection(hitIndex, hitPosition, rayDirection,
-                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                lightPosition, lightSize,
-                skybox, skyboxDimensions,
-                shadowSampleSize, reflectionBounceLimit);
-        Float4 color = Color.mix(bodyColor, reflectionColor, bodyReflectivity / MAX_REFLECTIVITY);
-
-        if (hitIndex > LIGHT_INDEX)
-            color = getBlinnPhong(hitIndex, hitPosition, rayOrigin, bodyPosition, color, bodyReflectivity, lightPosition);
-
-        float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
-        return Color.mult(color, shadow);
     }
 }
