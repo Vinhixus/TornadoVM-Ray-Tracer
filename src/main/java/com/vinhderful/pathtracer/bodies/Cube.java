@@ -4,6 +4,9 @@ import com.vinhderful.pathtracer.utils.Color;
 import com.vinhderful.pathtracer.utils.Ray;
 import com.vinhderful.pathtracer.utils.Vector3f;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 /**
  * Represent a cube in a 3D scene using its position, scale and color
  */
@@ -63,64 +66,60 @@ public class Cube extends Body {
     @Override
     public Vector3f getIntersection(Ray ray) {
 
-        float t1, t2, tNear = Float.NEGATIVE_INFINITY, tFar = Float.POSITIVE_INFINITY;
-        boolean intersects = true;
+        float dX = 1.0F / ray.getDirection().getX();
+        float dY = 1.0F / ray.getDirection().getY();
+        float dZ = 1.0F / ray.getDirection().getZ();
 
-        float[] rayDirection = ray.getDirection().toArray();
-        float[] rayOrigin = ray.getOrigin().toArray();
-        float[] b1 = min.toArray();
-        float[] b2 = max.toArray();
+        float t1 = (min.getX() - ray.getOrigin().getX()) * dX;
+        float t2 = (max.getX() - ray.getOrigin().getX()) * dX;
+        float t3 = (min.getY() - ray.getOrigin().getY()) * dY;
+        float t4 = (max.getY() - ray.getOrigin().getY()) * dY;
+        float t5 = (min.getZ() - ray.getOrigin().getZ()) * dZ;
+        float t6 = (max.getZ() - ray.getOrigin().getZ()) * dZ;
 
-        for (int i = 0; i < 3; i++) {
-            if (rayDirection[i] == 0) {
-                if (rayOrigin[i] < b1[i] || rayOrigin[i] > b2[i])
-                    intersects = false;
-            } else {
-                t1 = (b1[i] - rayOrigin[i]) / rayDirection[i];
-                t2 = (b2[i] - rayOrigin[i]) / rayDirection[i];
+        float tMin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
+        float tMax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
 
+        if (tMax < 0 || tMin > tMax)
+            return null;
 
-                if (t1 > t2) {
-                    float temp = t1;
-                    t1 = t2;
-                    t2 = temp;
-                }
-
-                if (t1 > tNear) tNear = t1;
-                if (t2 < tFar) tFar = t2;
-                if (tNear > tFar || tFar < 0) intersects = false;
-            }
-        }
-
-        if (intersects) return ray.getOrigin().add(ray.getDirection().multiply(tNear));
-        else return null;
+        if (tMin < 0)
+            return ray.getOrigin().add(ray.getDirection().multiply(tMax));
+        else
+            return ray.getOrigin().add(ray.getDirection().multiply(tMin));
     }
-
+    
     /**
      * Get the normal vector of the cube at a given point
+     * https://stackoverflow.com/questions/16875946/ray-box-intersection-normal
      *
      * @param point the point
      * @return the normal vector at the given point
      */
     @Override
     public Vector3f getNormalAt(Vector3f point) {
-        float[] direction = point.subtract(position).toArray();
-        float biggestValue = Float.NaN;
 
-        for (int i = 0; i < 3; i++)
-            if (Float.isNaN(biggestValue) || biggestValue < Math.abs(direction[i]))
-                biggestValue = Math.abs(direction[i]);
+        Vector3f normal = new Vector3f(0, 1, 0);
+        Vector3f localPoint = point.subtract(position);
 
-        if (biggestValue == 0) return new Vector3f(0, 0, 0);
-        else
-            for (int i = 0; i < 3; i++)
-                if (Math.abs(direction[i]) == biggestValue) {
-                    float[] normal = new float[]{0, 0, 0};
-                    normal[i] = direction[i] > 0 ? 1 : -1;
+        float min = Float.MAX_VALUE;
+        float distance = Math.abs(scale - Math.abs(localPoint.getX()));
 
-                    return new Vector3f(normal[0], normal[1], normal[2]);
-                }
+        if (distance < min) {
+            min = distance;
+            normal = new Vector3f(1, 0, 0).multiply(Math.signum(localPoint.getX()));
+        }
 
-        return new Vector3f(0, 0, 0);
+        distance = Math.abs(scale - Math.abs(localPoint.getY()));
+        if (distance < min) {
+            min = distance;
+            normal = new Vector3f(0, 1, 0).multiply(Math.signum(localPoint.getY()));
+        }
+
+        distance = Math.abs(scale - Math.abs(localPoint.getZ()));
+        if (distance < min)
+            normal = new Vector3f(0, 0, 1).multiply(Math.signum(localPoint.getZ()));
+
+        return normal;
     }
 }
