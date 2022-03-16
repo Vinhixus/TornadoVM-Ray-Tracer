@@ -50,7 +50,7 @@ public class Sphere extends Body {
         float t = position.subtract(ray.getOrigin()).dotProduct(ray.getDirection());
         Vector3f p = ray.getOrigin().add(ray.getDirection().multiply(t));
 
-        float y = position.subtract(p).magnitude();
+        float y = position.distanceFrom(p);
         if (y < radius) {
             float x = (float) Math.sqrt(radius * radius - y * y);
             float t1 = t - x;
