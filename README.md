@@ -18,6 +18,9 @@ Intel i7-8550u CPU.
 ## Installation
 
 1. Clone and set up the project as a [maven](https://maven.apache.org/) project.
+   1. For IntelliJ IDEA:
+      1. Go to File -> New -> Project from Version Control...
+      2. Enter `https://github.com/Vinhixus/TornadoVM-Path-Tracer.git` as the URL and create project
 2. Set up TornadoVM with the instructions found at: [TornadoVM GitHub](https://github.com/beehive-lab/TornadoVM), for
    this project, please build only the OpenCL backend.
 3. Download the JavaFX SDK for your system from: [JavaFX downloads](https://gluonhq.com/products/javafx/), latest LTS
