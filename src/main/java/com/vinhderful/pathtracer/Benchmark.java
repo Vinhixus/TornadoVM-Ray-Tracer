@@ -23,8 +23,8 @@ public class Benchmark {
     private static final int FRAMES_TO_GENERATE = 5;
 
     // Dimensions of the viewport
-    private static final int WIDTH = 2048;
-    private static final int HEIGHT = 1024;
+    private static final int WIDTH = 1280;
+    private static final int HEIGHT = 720;
 
     // Path tracing properties
     private static final int SHADOW_SAMPLE_SIZE = 200;
@@ -102,8 +102,6 @@ public class Benchmark {
                 String listingName = "(" + driver.getName() + ") " + device.getPhysicalDevice().getDeviceName();
                 System.out.println(deviceCount + ": " + listingName);
 
-                ts.mapAllTo(device);
-                ts.execute(grid);
                 deviceCount++;
             }
         }
@@ -126,6 +124,7 @@ public class Benchmark {
         } while (true);
 
         ts.mapAllTo(devices.get(Integer.parseInt(input)));
+        ts.execute(grid);
 
         // ==============================================================
         // Run computation in parallel
