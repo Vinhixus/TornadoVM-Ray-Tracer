@@ -23,7 +23,7 @@ public class Shader {
     /**
      * Similarly to ambient strength, shadow brightness determines how bright object-cast shadows are in the scene
      */
-    public static final float SHADOW_BRIGHTNESS = 0.25F;
+    public static final float SHADOW_BRIGHTNESS = 0.35F;
 
     /**
      * The fibonacci golden angle used to uniformly sample the sphere light
