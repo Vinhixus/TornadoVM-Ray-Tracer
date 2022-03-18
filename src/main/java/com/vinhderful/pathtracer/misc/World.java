@@ -33,12 +33,16 @@ public class World {
      * A plane is required to be at index 1
      */
     public static final int PLANE_INDEX = 1;
-
+    private final ArrayList<Body> bodies;
+    /**
+     * Variables encapsulating the animation that can be played
+     */
+    private final ScheduledExecutorService animationService;
+    private final Runnable animation;
+    AtomicReference<Float> t;
     private Skybox skybox;
     private Light light;
     private Plane plane;
-    private final ArrayList<Body> bodies;
-
     /**
      * Input buffers
      */
@@ -46,14 +50,7 @@ public class World {
     private VectorFloat bodySizes;
     private VectorFloat4 bodyColors;
     private VectorFloat bodyReflectivities;
-
-    /**
-     * Variables encapsulating the animation that can be played
-     */
-    private final ScheduledExecutorService animationService;
-    private final Runnable animation;
     private Future<?> animator;
-    AtomicReference<Float> t;
     private boolean isAnimating;
 
     /**
@@ -96,13 +93,13 @@ public class World {
         skybox = new Skybox(skyboxFileName);
 
         System.out.println("-> Adding object to the scene...");
-        
+
         // Sphere light
         light = new Light(new Float4(1F, 3F, -1.5F, 0), 0.4F, Color.WHITE);
         addBody(light);
 
         // Checkerboard plane
-        plane = new Plane(0, 16F);
+        plane = new Plane(0, 40F, 16F);
         addBody(plane);
 
         // Spheres in the scene

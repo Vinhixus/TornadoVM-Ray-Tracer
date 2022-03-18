@@ -18,12 +18,12 @@ public class Shader {
      * In a scene where not every source that emits light can be sampled, we use a constant ambient value that signifies
      * how much an object is illuminated regardless of being in a shadow. Value should be in the range of [0, 1]
      */
-    public static final float AMBIENT_STRENGTH = 0.1F;
+    public static final float AMBIENT_STRENGTH = 0.2F;
 
     /**
      * Similarly to ambient strength, shadow brightness determines how bright object-cast shadows are in the scene
      */
-    public static final float SHADOW_BRIGHTNESS = 0.15F;
+    public static final float SHADOW_BRIGHTNESS = 0.25F;
 
     /**
      * The fibonacci golden angle used to uniformly sample the sphere light

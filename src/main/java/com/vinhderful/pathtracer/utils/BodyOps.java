@@ -37,8 +37,13 @@ public class BodyOps {
         // Plane
         if (hitIndex == PLANE_INDEX) {
             float t = -(rayOrigin.getY() - position.getY()) / rayDirection.getY();
-            if (t > 0 && Float.isFinite(t))
-                return Float4.add(rayOrigin, Float4.mult(rayDirection, t));
+            if (t > 0 && Float.isFinite(t)) {
+                Float4 intersection = Float4.add(rayOrigin, Float4.mult(rayDirection, t));
+                if (abs(intersection.getX()) > size * 0.5F || abs(intersection.getZ()) > size * 0.5F)
+                    return NO_INTERSECTION;
+                else
+                    return intersection;
+            }
 
             return NO_INTERSECTION;
         }
@@ -169,9 +174,10 @@ public class BodyOps {
 
         // Get checkerboard pattern for plane
         if (hitIndex == PLANE_INDEX) {
+
             if ((int) (floor(point.getX()) + floor(point.getZ())) % 2 == 0)
                 // GRAY
-                return new Float4(0.5F, 0.5F, 0.5F, 0);
+                return new Float4(0.4F, 0.4F, 0.4F, 0);
             else
                 // DARK GRAY
                 return new Float4(0.2F, 0.2F, 0.2F, 0);

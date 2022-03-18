@@ -7,6 +7,7 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import static com.vinhderful.pathtracer.misc.World.LIGHT_INDEX;
+import static com.vinhderful.pathtracer.misc.World.PLANE_INDEX;
 import static com.vinhderful.pathtracer.renderer.Shader.*;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
 
@@ -73,7 +74,7 @@ public class PathTracer {
 
                 // If the object is not a light source, then perform shading
                 if (hitIndex > LIGHT_INDEX) {
-                    float diffuse = max(AMBIENT_STRENGTH, getDiffuse(hitIndex, hitPosition, bodyPosition, lightPosition));
+                    float diffuse = hitIndex == PLANE_INDEX ? 1F : max(AMBIENT_STRENGTH, getDiffuse(hitIndex, hitPosition, bodyPosition, lightPosition));
                     float specular = getSpecular(hitIndex, hitPosition, reflectionOrigin, bodyPosition, bodyReflectivity, lightPosition);
                     float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
                     shading = diffuse * shadow;
@@ -151,7 +152,7 @@ public class PathTracer {
         Float4 color = Color.mix(bodyColor, reflectionColor, bodyReflectivity / MAX_REFLECTIVITY);
 
         // Calculate specular highlights and shading
-        float diffuse = max(AMBIENT_STRENGTH, getDiffuse(hitIndex, hitPosition, bodyPosition, lightPosition));
+        float diffuse = hitIndex == PLANE_INDEX ? 1F : max(AMBIENT_STRENGTH, getDiffuse(hitIndex, hitPosition, bodyPosition, lightPosition));
         float specular = getSpecular(hitIndex, hitPosition, rayOrigin, bodyPosition, bodyReflectivity, lightPosition);
         float shadow = getShadow(hitPosition, bodyPositions, bodySizes, lightPosition, lightSize, shadowSampleSize);
         float shading = diffuse * shadow;
