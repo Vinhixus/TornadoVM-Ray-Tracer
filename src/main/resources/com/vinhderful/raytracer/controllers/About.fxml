@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" stylesheets="@../GUI.css" xmlns="http://javafx.com/javafx/17"
+           fx:controller="com.vinhderful.raytracer.controllers.About">
+    <VBox prefWidth="480.0">
+        <StackPane.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        </StackPane.margin>
+        <StackPane>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TornadoVM Ray Tracer (version 1.0)">
+                <StackPane.margin>
+                    <Insets/>
+                </StackPane.margin>
+            </Text>
+        </StackPane>
+        <Separator>
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0"/>
+            </VBox.margin>
+        </Separator>
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Author: Vinh Pham Van">
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+            </VBox.margin>
+        </Text>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="- Email"/>
+            <Hyperlink fx:id="email" textFill="WHITE" text="phamvvinh1998@gmail.com" GridPane.columnIndex="1"/>
+        </GridPane>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="- LinkedIn"/>
+            <Hyperlink fx:id="linkedIn" textFill="WHITE" text="vinh-pham-van" GridPane.columnIndex="1"/>
+        </GridPane>
+        <Separator>
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0"/>
+            </VBox.margin>
+        </Separator>
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="With special thanks to: ">
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+            </VBox.margin>
+        </Text>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Supervisor, TornadoVM Project Leader"/>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Christos Kotselidis" textAlignment="CENTER"
+                  GridPane.columnIndex="1"/>
+        </GridPane>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TornadoVM Lead Architect"/>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Juan Fumero" textAlignment="CENTER"
+                  GridPane.columnIndex="1"/>
+        </GridPane>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TornadoVM Senior Solutions Architect"/>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Thanos Stratikopoulos"
+                  textAlignment="CENTER"
+                  GridPane.columnIndex="1"/>
+        </GridPane>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TornadoVM Principal Software Engineer"/>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Maria Xekalaki" textAlignment="CENTER"
+                  GridPane.columnIndex="1"/>
+        </GridPane>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TornadoVM Senior Software Engineer"/>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Florin Blanaru" textAlignment="CENTER"
+                  GridPane.columnIndex="1"/>
+        </GridPane>
+    </VBox>
+</StackPane>
