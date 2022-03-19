@@ -1,6 +1,6 @@
-package com.vinhderful.pathtracer.scene;
+package com.vinhderful.raytracer.scene;
 
-import com.vinhderful.pathtracer.utils.Vector3f;
+import com.vinhderful.raytracer.utils.Vector3f;
 
 /**
  * Represents the camera/eye looking into the scene using position, yaw, pitch

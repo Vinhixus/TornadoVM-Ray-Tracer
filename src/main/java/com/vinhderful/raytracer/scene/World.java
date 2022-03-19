@@ -1,9 +1,9 @@
-package com.vinhderful.pathtracer.scene;
+package com.vinhderful.raytracer.scene;
 
-import com.vinhderful.pathtracer.bodies.Body;
-import com.vinhderful.pathtracer.bodies.Plane;
-import com.vinhderful.pathtracer.utils.Color;
-import com.vinhderful.pathtracer.utils.Vector3f;
+import com.vinhderful.raytracer.bodies.Body;
+import com.vinhderful.raytracer.bodies.Plane;
+import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.Vector3f;
 
 import java.util.ArrayList;
 

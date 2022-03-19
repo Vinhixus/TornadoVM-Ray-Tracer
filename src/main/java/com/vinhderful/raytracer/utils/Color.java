@@ -1,4 +1,4 @@
-package com.vinhderful.pathtracer.utils;
+package com.vinhderful.raytracer.utils;
 
 /**
  * Represents a color using red, green and blue values
@@ -32,6 +32,18 @@ public class Color {
         this.red = red;
         this.green = green;
         this.blue = blue;
+    }
+
+    /**
+     * Get a Color object from an ARGB value
+     *
+     * @return the Color object
+     */
+    public static Color fromInt(int argb) {
+        int b = (argb) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int r = (argb >> 16) & 0xFF;
+        return new Color(r / 255F, g / 255F, b / 255F);
     }
 
     /**
@@ -114,18 +126,6 @@ public class Color {
                 r * other.getRed() + (1F - r) * red,
                 r * other.getGreen() + (1F - r) * green,
                 r * other.getBlue() + (1F - r) * blue);
-    }
-
-    /**
-     * Get a Color object from an ARGB value
-     *
-     * @return the Color object
-     */
-    public static Color fromInt(int argb) {
-        int b = (argb) & 0xFF;
-        int g = (argb >> 8) & 0xFF;
-        int r = (argb >> 16) & 0xFF;
-        return new Color(r / 255F, g / 255F, b / 255F);
     }
 
     /**

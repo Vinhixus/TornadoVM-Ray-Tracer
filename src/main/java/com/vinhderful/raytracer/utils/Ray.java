@@ -1,4 +1,4 @@
-package com.vinhderful.pathtracer.utils;
+package com.vinhderful.raytracer.utils;
 
 /**
  * Represents a ray using its origin and direction

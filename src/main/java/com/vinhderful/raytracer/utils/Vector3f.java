@@ -1,4 +1,4 @@
-package com.vinhderful.pathtracer.utils;
+package com.vinhderful.raytracer.utils;
 
 /**
  * Represents a vector in 3d space using x, y, z values

@@ -1,13 +1,13 @@
-## Java Path Tracer for TornadoVM - Sequential Implementation
+## Java Ray Tracer for TornadoVM - Sequential Implementation
 
 ![Demo](Demo.png)
 
 # Description
 
-This project aims to build a path tracing engine in Java, accelerated on heterogeneous hardware using
+This project aims to build a ray tracing engine in Java, accelerated on heterogeneous hardware using
 TornadoVM ([https://www.tornadovm.org/](https://www.tornadovm.org/)).
 
-The current branch contains a sequential, object-oriented implementation of the path tracer, built from scratch for the
+The current branch contains a sequential, object-oriented implementation of the ray tracer, built from scratch for the
 purposes of understanding the basics behind the algorithms ahead of performing an refactor compatible with acceleration
 on heterogeneous hardware using TornadoVM.
 

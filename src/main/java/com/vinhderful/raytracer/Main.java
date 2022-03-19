@@ -1,11 +1,11 @@
-package com.vinhderful.pathtracer;
+package com.vinhderful.raytracer;
 
-import com.vinhderful.pathtracer.bodies.Cube;
-import com.vinhderful.pathtracer.bodies.Sphere;
-import com.vinhderful.pathtracer.renderer.Renderer;
-import com.vinhderful.pathtracer.scene.World;
-import com.vinhderful.pathtracer.utils.Color;
-import com.vinhderful.pathtracer.utils.Vector3f;
+import com.vinhderful.raytracer.bodies.Cube;
+import com.vinhderful.raytracer.bodies.Sphere;
+import com.vinhderful.raytracer.renderer.Renderer;
+import com.vinhderful.raytracer.scene.World;
+import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.Vector3f;
 
 import javax.imageio.ImageIO;
 import java.awt.image.*;
@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Java-based Path Tracer
+ * Java-based Ray Tracer
  */
 public class Main {
 
@@ -40,7 +40,7 @@ public class Main {
         int width = 1920;
         int height = 1080;
 
-        // Path tracing properties
+        // Ray tracing properties
         int shadowSampleSize = 250;
         int reflectionBounceLimit = 5;
 

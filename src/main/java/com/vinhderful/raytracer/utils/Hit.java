@@ -1,6 +1,6 @@
-package com.vinhderful.pathtracer.utils;
+package com.vinhderful.raytracer.utils;
 
-import com.vinhderful.pathtracer.bodies.Body;
+import com.vinhderful.raytracer.bodies.Body;
 
 /**
  * Represents an event of a ray hitting a body, storing the ray, the body and

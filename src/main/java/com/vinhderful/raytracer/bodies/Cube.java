@@ -1,8 +1,8 @@
-package com.vinhderful.pathtracer.bodies;
+package com.vinhderful.raytracer.bodies;
 
-import com.vinhderful.pathtracer.utils.Color;
-import com.vinhderful.pathtracer.utils.Ray;
-import com.vinhderful.pathtracer.utils.Vector3f;
+import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.Ray;
+import com.vinhderful.raytracer.utils.Vector3f;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -88,7 +88,7 @@ public class Cube extends Body {
         else
             return ray.getOrigin().add(ray.getDirection().multiply(tMin));
     }
-    
+
     /**
      * Get the normal vector of the cube at a given point
      * https://stackoverflow.com/questions/16875946/ray-box-intersection-normal

@@ -1,7 +1,7 @@
-package com.vinhderful.pathtracer.scene;
+package com.vinhderful.raytracer.scene;
 
-import com.vinhderful.pathtracer.utils.Color;
-import com.vinhderful.pathtracer.utils.Vector3f;
+import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.Vector3f;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,7 +18,7 @@ public class Skybox {
     /**
      * Read the given resource into a BufferedImage
      *
-     * @param resourceName the path to the resource
+     * @param resourceName the ray to the resource
      */
     public Skybox(String resourceName) {
 
