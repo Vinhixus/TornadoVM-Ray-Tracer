@@ -72,8 +72,16 @@ mvn clean install
 
 5. Run TornadoVM-Ray-Tracer:
 
+**With GUI:**
+
 ```bash
 tornadovm-ray-tracer com.vinhderful.raytracer.App
+```
+
+**Without GUI in benchmarking mode:**
+
+```bash
+tornadovm-ray-tracer com.vinhderful.raytracer.Benchmark
 ```
 
 ## Author
@@ -93,4 +101,4 @@ Email: [phamvvinh1998@gmail.com](mailto:phamvvinh1998@gmail.com)
 
 ## Licenses
 
-TO DO
+[![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](https://github.com/beehive-lab/TornadoVM/blob/master/LICENSE_APACHE2)
