@@ -17,34 +17,64 @@ Intel i7-8550u CPU.
 
 ## Installation
 
-1. Clone and set up the project as a [maven](https://maven.apache.org/) project.
-    1. For IntelliJ IDEA:
-        1. Go to File -> New -> Project from Version Control...
-        2. Enter `https://github.com/Vinhixus/TornadoVM-Ray-Tracer.git` as the URL and create project
-2. Set up TornadoVM with the instructions found at: [TornadoVM GitHub](https://github.com/beehive-lab/TornadoVM), for
-   this project, please build only the OpenCL backend.
-3. Download the JavaFX SDK for your system from: [JavaFX downloads](https://gluonhq.com/products/javafx/), the latest
-   LTS version is recommended
-4. To run the program, compile and run App.java, for which obtain the VM options as below:
-    1. Navigate to your TornadoVM installation folder e.g.: `cd /home/alice/Downloads/tornadovm/`
-    2. Set your Tornado environment variables using `source source.sh`<br/><br/>
-    3. Obtain tornado flags using: `tornado --printFlags`
-    4. Copy the output starting from `server`. You should have flags similar to the following:<br/>
-       <pre><code>-server -XX:-UseCompressedOops -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -Djava.library.path=/home/alice/Downloads/tornadovm/bin/sdk/lib --module-path .:/home/alice/Downloads/tornadovm/bin/sdk/share/java/tornado  -Dtornado.load.api.implementation=uk.ac.manchester.tornado.runtime.tasks.TornadoTaskSchedule -Dtornado.load.runtime.implementation=uk.ac.manchester.tornado.runtime.TornadoCoreRuntime -Dtornado.load.tornado.implementation=uk.ac.manchester.tornado.runtime.common.Tornado -Dtornado.load.device.implementation.opencl=uk.ac.manchester.tornado.drivers.opencl.runtime.OCLDeviceFactory -Dtornado.load.device.implementation.ptx=uk.ac.manchester.tornado.drivers.ptx.runtime.PTXDeviceFactory -Dtornado.load.device.implementation.spirv=uk.ac.manchester.tornado.drivers.spirv.runtime.SPIRVDeviceFactory -Dtornado.load.annotation.implementation=uk.ac.manchester.tornado.annotation.ASMClassVisitor -Dtornado.load.annotation.parallel=uk.ac.manchester.tornado.api.annotations.Parallel   -XX:+UseParallelOldGC -XX:-UseBiasedLocking @/home/alice/Downloads/tornadovm/bin/sdk/etc/exportLists/common-exports  @/home/alice/Downloads/tornadovm/bin/sdk/etc/exportLists/opencl-exports --add-modules ALL-SYSTEM,tornado.runtime,tornado.annotation,tornado.drivers.common,tornado.drivers.opencl</code></pre><br/><br/>
-    5. Add the path to the lib folder of your downloaded JavaFX SDK to `--module-path`
-       e.g:<br/>
-       <pre><code>--module-path .:/home/alice/Downloads/tornadovm/bin/sdk/share/java/tornado::/home/alice/Downloads/javafx-sdk-17.0.2/lib</code></pre><br/>
-       Note the `::` to separate the Tornado and the JavaFX module paths.<br/><br/>
-    6. Add the following to `--add-modules`: `javafx.controls,javafx.graphics,javafx.fxml`
-       e.g:<br/>
-       <pre><code>--add-modules ALL-SYSTEM,tornado.runtime,tornado.annotation,tornado.drivers.common,tornado.drivers.opencl,javafx.controls,javafx.graphics,javafx.fxml</code></pre><br/><br/>
-    7. Add an extra option: `-Dprism.vsync=false`<br/><br/>
-    8. You should end up with VM options similar to the following:<br/>
-       <pre><code>-server -XX:-UseCompressedOops -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -Djava.library.path=/home/alice/Downloads/tornadovm/bin/sdk/lib --module-path .:/home/alice/Downloads/tornadovm/bin/sdk/share/java/tornado::/home/alice/Downloads/javafx-sdk-17.0.2/lib  -Dtornado.load.api.implementation=uk.ac.manchester.tornado.runtime.tasks.TornadoTaskSchedule -Dtornado.load.runtime.implementation=uk.ac.manchester.tornado.runtime.TornadoCoreRuntime -Dtornado.load.tornado.implementation=uk.ac.manchester.tornado.runtime.common.Tornado -Dtornado.load.device.implementation.opencl=uk.ac.manchester.tornado.drivers.opencl.runtime.OCLDeviceFactory -Dtornado.load.device.implementation.ptx=uk.ac.manchester.tornado.drivers.ptx.runtime.PTXDeviceFactory -Dtornado.load.device.implementation.spirv=uk.ac.manchester.tornado.drivers.spirv.runtime.SPIRVDeviceFactory -Dtornado.load.annotation.implementation=uk.ac.manchester.tornado.annotation.ASMClassVisitor -Dtornado.load.annotation.parallel=uk.ac.manchester.tornado.api.annotations.Parallel   -XX:+UseParallelOldGC -XX:-UseBiasedLocking @/home/alice/Downloads/tornadovm/bin/sdk/etc/exportLists/common-exports  @/home/alice/Downloads/tornadovm/bin/sdk/etc/exportLists/opencl-exports --add-modules ALL-SYSTEM,tornado.runtime,tornado.annotation,tornado.drivers.common,tornado.drivers.opencl,javafx.controls,javafx.graphics,javafx.fxml -Dprism.vsync=false</code></pre>
+1. Clone the project:
 
-## Publication
+```bash 
+git clone https://github.com/Vinhixus/TornadoVM-Ray-Tracer.git
+```
 
-TO DO
+2. Install dependencies:
+
+- Install TornadoVM. The following example builds TornadoVM with OpenJDK 11 and OpenCL:
+
+```bash
+git clone https://github.com/beehive-lab/TornadoVM.git 
+cd TornadoVM
+./scripts/tornadoVMInstaller.sh --jdk11 --opencl
+source source.sh
+cd ..
+```
+
+**If you cannot build TornadoVM with the installer, try
+the [manual installation](https://github.com/beehive-lab/TornadoVM/blob/master/assembly/src/docs/12_INSTALL_WITH_JDK11_PLUS.md)
+.**
+
+- Download the JavaFX SDK for your system from: [JavaFX downloads](https://gluonhq.com/products/javafx/). You will need
+  the path of the JavaFX SDK for Step 3.
+
+**Note that TornadoVM-Ray-Tracer has been tested with JavaFX version 17.0.2.**
+
+3. Set up the environment and store the variables in a file (e.g. `sources.env`):
+
+```bash 
+cd TornadoVM-Ray-Tracer
+vim sources.env
+export TORNADO_RAY_TRACER_ROOT="${PWD}"
+export PATH="${PATH}:${TORNADO_RAY_TRACER_ROOT=}/bin"
+export JAVAFX_SDK=<path to JavaFX>/javafx-sdk-17.0.2/
+export TORNADO_ROOT=<path to TornadoVM>
+export PATH="${PATH}:${TORNADO_ROOT}/bin/bin/"
+export TORNADO_SDK=${TORNADO_ROOT}/bin/sdk
+export JAVA_HOME=${TORNADO_ROOT}/TornadoVM-OpenJDK11/jdk-11.0.13+8
+```
+
+Load the environment:
+
+```bash
+source sources.env
+```
+
+4. Build TornadoVM-Ray-Tracer:
+
+```bash
+mvn clean install
+```
+
+5. Run TornadoVM-Ray-Tracer:
+
+```bash
+tornadovm-ray-tracer com.vinhderful.raytracer.App
+```
 
 ## Author
 

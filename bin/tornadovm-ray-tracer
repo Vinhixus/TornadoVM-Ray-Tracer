@@ -1,0 +1,7 @@
+#!/bin/bash
+
+JARS=$(echo "${TORNADO_PATH_TRACER_ROOT}"/target/classes | tr ' ' ':')
+
+JFLAGS="--module-path .:${JAVAFX_SDK}/lib --add-modules ALL-SYSTEM,javafx.controls,javafx.graphics,javafx.fxml -Dprism.vsync=false"
+
+tornado "${JFLAGS}" -classpath "${CLASSPATH}":"${JARS}" $@
