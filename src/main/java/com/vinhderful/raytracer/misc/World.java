@@ -117,12 +117,12 @@ public class World {
         addBody(light);
 
         // Checkerboard plane
-        plane = new Plane(0, 40F, 16F);
+        plane = new Plane(0, 40F, 24F);
         addBody(plane);
 
         // Spheres in the scene
         addBody(new Sphere(new Float4(0, 1F, 0, 0), 1F, Color.GRAY, 32F));
-        addBody(new Sphere(new Float4(0, 0.5F, 3F, 0), 0.5F, Color.RED, 8F));
+        addBody(new Sphere(new Float4(0, 0.5F, 3F, 0), 0.5F, Color.RED, 0));
         addBody(new Sphere(new Float4(4.5F, 0.5F, 0, 0), 0.5F, Color.GREEN, 16F));
         addBody(new Sphere(new Float4(6F, 0.5F, 0, 0), 0.5F, Color.BLUE, 32F));
         addBody(new Sphere(new Float4(0, 0.5F, 7.5F, 0), 0.5F, Color.BLACK, 48F));
