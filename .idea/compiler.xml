@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="tornadovm-ray-tracer" />
         <module name="tornadovm-path-tracer" />
+        <module name="TornadoVM-Ray-Tracer" />
       </profile>
     </annotationProcessing>
   </component>
