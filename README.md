@@ -75,13 +75,13 @@ mvn clean install
 **With GUI:**
 
 ```bash
-tornadovm-ray-tracer com.vinhderful.raytracer.App
+tornadovm-ray-tracer
 ```
 
 **Without GUI in benchmarking mode:**
 
 ```bash
-tornadovm-ray-tracer com.vinhderful.raytracer.Benchmark
+tornadovm-ray-tracer benchmark
 ```
 
 ## Author

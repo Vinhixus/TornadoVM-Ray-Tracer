@@ -4,4 +4,16 @@ JARS=$(echo ${TORNADO_RAY_TRACER_ROOT}/target/classes | tr ' ' ':')
 
 JFLAGS="--module-path .:${JAVAFX_SDK}/lib --add-modules ALL-SYSTEM,javafx.controls,javafx.graphics,javafx.fxml -Dprism.vsync=false"
 
-tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} $@
+if [ $# -eq 0 ]; then
+	echo "------------------------------------"
+	echo "Running TornadoVM Ray Tracer with GUI..."
+	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} com.vinhderful.raytracer.App
+elif [ "$1" == "benchmark" ]; then
+	echo "-----------------------------------------"
+	echo "Running TornadoVM Ray Tracer benchmark mode..."
+	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} com.vinhderful.raytracer.Benchmark
+else
+	echo "Please run:"
+	echo "tornadovm-ray-tracer               for the gui version or"
+	echo "tornadovm-ray-tracer benchmark     for the benchmark mode!"
+fi
