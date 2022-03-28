@@ -68,8 +68,8 @@ public class Physics {
 
             Float4 tmp = b.getPosition().duplicate();
             float t = 1F / 60;
-            b.setPosition(Float4.add(b.getPosition(), Float4.add(Float4.sub(b.getPosition(), b.getPrevPosition()), Float4.mult(GRAVITY, t * t))));
-            b.setPrevPosition(tmp);
+            b.setPosition(Float4.add(b.getPosition(), Float4.add(Float4.sub(b.getPosition(), b.getPreviousPosition()), Float4.mult(GRAVITY, t * t))));
+            b.setPreviousPosition(tmp);
         }
 
         // Perform collision detection between spheres
@@ -109,45 +109,48 @@ public class Physics {
     private void borderCollide() {
         for (int i = SPHERES_START_INDEX; i < bodies.size(); i++) {
             Body b = bodies.get(i);
-            float size = b.getSize();
 
-            float x = b.getPosition().getX();
-            float y = b.getPosition().getY();
-            float z = b.getPosition().getZ();
+            float size = b.getSize();
+            Float4 position = b.getPosition();
+            Float4 previousPosition = b.getPreviousPosition();
+
+            float x = position.getX();
+            float y = position.getY();
+            float z = position.getZ();
 
             float boxSize = world.getPlane().getSize() * 0.5F;
 
             // Boundaries in X direction
             if (x - size < -boxSize) {
-                float vx = (b.getPrevPosition().getX() - b.getPosition().getX()) * ELASTICITY;
-                b.setPosX(size - boxSize);
-                b.setPrevPosX(b.getPosition().getX() - vx);
+                float vx = (previousPosition.getX() - position.getX()) * ELASTICITY;
+                position.setX(size - boxSize);
+                previousPosition.setX(position.getX() - vx);
             } else if (x + size > boxSize) {
-                float vx = (b.getPrevPosition().getX() - b.getPosition().getX()) * ELASTICITY;
-                b.setPosX(boxSize - size);
-                b.setPrevPosX(b.getPosition().getX() - vx);
+                float vx = (previousPosition.getX() - position.getX()) * ELASTICITY;
+                position.setX(boxSize - size);
+                previousPosition.setX(position.getX() - vx);
             }
 
             // Boundaries in Y direction
             if (y - size < -boxSize) {
-                float vy = (b.getPrevPosition().getY() - b.getPosition().getY()) * ELASTICITY;
-                b.setPosY(size - boxSize);
-                b.setPrevPosY(b.getPosition().getY() - vy);
+                float vy = (previousPosition.getY() - position.getY()) * ELASTICITY;
+                position.setY(size - boxSize);
+                previousPosition.setY(position.getY() - vy);
             } else if (y + size > boxSize) {
-                float vy = (b.getPrevPosition().getY() - b.getPosition().getY()) * ELASTICITY;
-                b.setPosY(boxSize - size);
-                b.setPrevPosY(b.getPosition().getY() - vy);
+                float vy = (previousPosition.getY() - position.getY()) * ELASTICITY;
+                position.setY(boxSize - size);
+                previousPosition.setY(position.getY() - vy);
             }
 
             // Boundaries in Z direction
             if (z - size < -boxSize) {
-                float vz = (b.getPrevPosition().getZ() - b.getPosition().getZ()) * ELASTICITY;
-                b.setPosZ(size - boxSize);
-                b.setPrevPosZ(b.getPosition().getZ() - vz);
+                float vz = (previousPosition.getZ() - position.getZ()) * ELASTICITY;
+                position.setZ(size - boxSize);
+                previousPosition.setZ(position.getZ() - vz);
             } else if (z + size > boxSize) {
-                float vz = (b.getPrevPosition().getZ() - b.getPosition().getZ()) * ELASTICITY;
-                b.setPosZ(boxSize - size);
-                b.setPrevPosZ(b.getPosition().getZ() - vz);
+                float vz = (b.getPreviousPosition().getZ() - position.getZ()) * ELASTICITY;
+                position.setZ(boxSize - size);
+                previousPosition.setZ(position.getZ() - vz);
             }
         }
     }

@@ -224,7 +224,7 @@ public class World {
             }
 
             bodies.get(i).setPosition(position);
-            bodies.get(i).setPrevPosition(position.duplicate());
+            bodies.get(i).setPreviousPosition(position.duplicate());
         }
     }
 

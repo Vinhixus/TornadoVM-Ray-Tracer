@@ -30,7 +30,8 @@ public abstract class Body {
     private final float size;
     private final Float4 color;
     private final float reflectivity;
-    private Float4 prevPosition;
+
+    private Float4 previousPosition;
     private Float4 position;
 
     /**
@@ -43,7 +44,7 @@ public abstract class Body {
      */
     public Body(Float4 position, float size, Float4 color, float reflectivity) {
         this.position = position;
-        this.prevPosition = position.duplicate();
+        this.previousPosition = position.duplicate();
         this.size = size;
         this.color = color;
         this.reflectivity = reflectivity;
@@ -58,32 +59,13 @@ public abstract class Body {
         return position;
     }
 
+    /**
+     * Set the position of this body to a given value
+     *
+     * @param position the value to set the position of this body to
+     */
     public void setPosition(Float4 position) {
         this.position = position;
-    }
-
-    public void setPosX(float x) {
-        this.position.setX(x);
-    }
-
-    public void setPosY(float y) {
-        this.position.setY(y);
-    }
-
-    public void setPosZ(float z) {
-        this.position.setZ(z);
-    }
-
-    public void setPrevPosX(float x) {
-        this.prevPosition.setX(x);
-    }
-
-    public void setPrevPosY(float y) {
-        this.prevPosition.setY(y);
-    }
-
-    public void setPrevPosZ(float z) {
-        this.prevPosition.setZ(z);
     }
 
     /**
@@ -91,12 +73,17 @@ public abstract class Body {
      *
      * @return the previous position of the body
      */
-    public Float4 getPrevPosition() {
-        return prevPosition;
+    public Float4 getPreviousPosition() {
+        return previousPosition;
     }
 
-    public void setPrevPosition(Float4 position) {
-        this.prevPosition = position;
+    /**
+     * Set the position of this body to a given value
+     *
+     * @param position the value to set the position of this body to
+     */
+    public void setPreviousPosition(Float4 position) {
+        this.previousPosition = position;
     }
 
     /**
