@@ -68,12 +68,13 @@ public class World {
      */
     private final ScheduledExecutorService physicsService;
     private final Runnable physicsUpdate;
+    private Future<?> physicsLoop;
+    private boolean physicsEnabled;
 
     /**
      * Random generator
      */
     private final Random r;
-
 
     /**
      * Skybox, light and plane
@@ -89,8 +90,6 @@ public class World {
     private VectorFloat bodySizes;
     private VectorFloat4 bodyColors;
     private VectorFloat bodyReflectivities;
-    private Future<?> physicsLoop;
-    private boolean physicsEnabled;
 
     /**
      * Instantiate a default world
@@ -121,6 +120,17 @@ public class World {
 
         // Generate the tornado compatible vector representations of the bodies
         allocateAndInitializeBuffers();
+    }
+
+    /**
+     * Helper function to generate a random float value between min and max
+     *
+     * @param min the minimum boundary of the random float
+     * @param max the maximum boundary of the random float
+     * @return a random float between min and max
+     */
+    private float randFloat(float min, float max) {
+        return min + r.nextFloat() * (max - min);
     }
 
     /**
@@ -183,18 +193,6 @@ public class World {
             float reflectivity = randFloat(0, MAX_REFLECTIVITY * 0.5F);
             addBody(new Sphere(position, radius, color, reflectivity));
         }
-    }
-
-
-    /**
-     * Helper function to generate a random float value between min and max
-     *
-     * @param min the minimum boundary of the random float
-     * @param max the maximum boundary of the random float
-     * @return a random float between min and max
-     */
-    private float randFloat(float min, float max) {
-        return min + r.nextFloat() * (max - min);
     }
 
     /**
