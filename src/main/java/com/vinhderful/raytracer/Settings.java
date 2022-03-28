@@ -33,7 +33,7 @@ public class Settings {
     /**
      * Height of the viewport resolution
      */
-    public static final int HEIGHT = 720;
+    public static final int HEIGHT = 736;
 
     /**
      * Initial shadow sample size the program opens up with
@@ -74,4 +74,6 @@ public class Settings {
      * Initial field of view of the camera (horizontal angle determining the part of the world we can see)
      */
     public static final float INITIAL_CAMERA_FOV = 60;
+
+    public static final int NUM_SPHERES = 10;
 }

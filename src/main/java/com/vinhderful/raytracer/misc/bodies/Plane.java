@@ -22,20 +22,19 @@ import com.vinhderful.raytracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 
 /**
- * Represents a plane using position, height and reflectivity
+ * Represents a plane as the bottom side of a bounding box
  * The plane will have an appearance of a checkerboard
  */
 public class Plane extends Body {
 
     /**
-     * Construct a plane given its height, side size and reflectivity
-     * Plane parallel to the X-Z plane
+     * Construct a plane given the side size of the bounding box and a reflectivity value
+     * Plane is the bottom side of the bounding box and is parallel to the X-Z plane
      *
-     * @param height       height of the plane (Y coordinate)
-     * @param size         the size of the side of the plane
+     * @param size         the size of the side of the bounding box
      * @param reflectivity reflectivity of the plane
      */
-    public Plane(float height, float size, float reflectivity) {
-        super(new Float4(0, height, 0, 0), size, Color.GRAY, reflectivity);
+    public Plane(float size, float reflectivity) {
+        super(new Float4(0, -size * 0.5F, 0, 0), size, Color.GRAY, reflectivity);
     }
 }

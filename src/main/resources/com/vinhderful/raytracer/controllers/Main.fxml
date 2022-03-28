@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * This file is part of Tornado-Ray-Tracer: A Java-based ray tracer running on TornadoVM.
  * URL: https://github.com/Vinhixus/TornadoVM-Ray-Tracer
@@ -23,15 +24,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" onKeyPressed="#keyPressed"
-            onKeyReleased="#keyReleased"
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" onKeyPressed="#keyPressed" onKeyReleased="#keyReleased"
             stylesheets="@../GUI.css" xmlns="http://javafx.com/javafx/17"
             fx:controller="com.vinhderful.raytracer.controllers.Main">
     <center>
         <Pane fx:id="pane" BorderPane.alignment="CENTER">
-            <Canvas fx:id="canvas"
-                    onMouseDragged="#mouseDragged"
-                    onMousePressed="#mousePressed"
+            <Canvas fx:id="canvas" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed"
                     onMouseReleased="#mouseReleased"/>
         </Pane>
     </center>
@@ -51,7 +49,7 @@
                 <Label alignment="CENTER" contentDisplay="CENTER" text="Light X"/>
                 <Text fx:id="lightXText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="lightX" fx:id="lightXSlider" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
+            <Slider id="lightX" fx:id="lightXSlider" majorTickUnit="2.0" max="8.0" min="-8.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true"/>
             <GridPane>
                 <columnConstraints>
@@ -64,7 +62,7 @@
                 <Label alignment="CENTER" contentDisplay="CENTER" text="Light Y"/>
                 <Text fx:id="lightYText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="lightY" fx:id="lightYSlider" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="1"
+            <Slider id="lightY" fx:id="lightYSlider" majorTickUnit="2.0" max="8.0" min="-8.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true"/>
             <GridPane>
                 <columnConstraints>
@@ -77,7 +75,7 @@
                 <Label alignment="CENTER" contentDisplay="CENTER" text="Light Z"/>
                 <Text fx:id="lightZText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnIndex="1"/>
             </GridPane>
-            <Slider id="lightZ" fx:id="lightZSlider" majorTickUnit="1.0" max="5.0" min="-5.0" minorTickCount="1"
+            <Slider id="lightZ" fx:id="lightZSlider" majorTickUnit="2.0" max="8.0" min="-8.0" minorTickCount="1"
                     showTickLabels="true" showTickMarks="true"/>
             <Separator>
                 <VBox.margin>
@@ -164,16 +162,26 @@
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </VBox.margin>
             </Separator>
-            <GridPane>
+            <StackPane>
+                <VBox.margin>
+                    <Insets bottom="10.0"/>
+                </VBox.margin>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Physics:"/>
+            </StackPane>
+            <GridPane prefHeight="30.0" prefWidth="409.0">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="0.0" minWidth="0.0"
+                                       percentWidth="32.0" prefWidth="0.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="0.0" minWidth="0.0"
+                                       percentWidth="68.0" prefWidth="0.0"/>
                 </columnConstraints>
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label alignment="CENTER" contentDisplay="CENTER" text="Animation"/>
-                <Button fx:id="animateButton" mnemonicParsing="false" onAction="#toggleAnimation" text="Play"
+                <Button fx:id="physicsButton" mnemonicParsing="false" onAction="#togglePhysics" prefHeight="28.0"
+                        prefWidth="122.0" text="Enable"/>
+                <Button fx:id="randomizePositionsButton" disable="true" mnemonicParsing="false"
+                        onAction="#randomizePositions" prefHeight="28.0" prefWidth="177.0" text="Randomize Positions"
                         GridPane.columnIndex="1"/>
             </GridPane>
         </VBox>

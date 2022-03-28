@@ -22,7 +22,7 @@ import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
-import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
+import static com.vinhderful.raytracer.misc.World.*;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
@@ -52,8 +52,37 @@ public class BodyOps {
         // Define Float4 to return if there is no intersection
         final Float4 NO_INTERSECTION = new Float4(-1F, -1F, -1F, -1F);
 
+        // Light
+        if (hitIndex == LIGHT_INDEX) {
+
+            Float4 min = Float4.sub(position, size * 0.5F);
+            Float4 max = Float4.add(position, size * 0.5F);
+
+            float dX = 1.0F / rayDirection.getX();
+            float dY = 1.0F / rayDirection.getY();
+            float dZ = 1.0F / rayDirection.getZ();
+
+            float t1 = (min.getX() - rayOrigin.getX()) * dX;
+            float t2 = (max.getX() - rayOrigin.getX()) * dX;
+            float t3 = (min.getY() - rayOrigin.getY()) * dY;
+            float t4 = (max.getY() - rayOrigin.getY()) * dY;
+            float t5 = (min.getZ() - rayOrigin.getZ()) * dZ;
+            float t6 = (max.getZ() - rayOrigin.getZ()) * dZ;
+
+            float tMin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
+            float tMax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
+
+            if (tMax < 0 || tMin > tMax)
+                return NO_INTERSECTION;
+
+            if (tMin < 0)
+                return Float4.add(rayOrigin, Float4.mult(rayDirection, tMax));
+            else
+                return Float4.add(rayOrigin, Float4.mult(rayDirection, tMin));
+        }
+
         // Plane
-        if (hitIndex == PLANE_INDEX) {
+        else if (hitIndex == PLANE_INDEX) {
             float t = -(rayOrigin.getY() - position.getY()) / rayDirection.getY();
             if (t > 0 && Float.isFinite(t)) {
                 Float4 intersection = Float4.add(rayOrigin, Float4.mult(rayDirection, t));
@@ -106,7 +135,7 @@ public class BodyOps {
         boolean intersects = false;
 
         // Loop over objects in the scene, excluding light and plane, break out of loop when intersection is found
-        for (int i = 2; i < bodyPositions.getLength() && !intersects; i++) {
+        for (int i = SPHERES_START_INDEX; i < bodyPositions.getLength() && !intersects; i++) {
 
             // Calculate the intersection of the ray with the current object
             Float4 intersection = BodyOps.getIntersection(i, bodyPositions.get(i), bodySizes.get(i), rayOrigin, rayDirection);

@@ -28,14 +28,14 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatCos;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatSin;
+import static com.vinhderful.raytracer.Settings.NUM_SPHERES;
+import static com.vinhderful.raytracer.renderer.Shader.MAX_REFLECTIVITY;
 
 /**
  * A world representing objects in the scene
@@ -51,16 +51,33 @@ public class World {
      * A plane is required to be at index 1
      */
     public static final int PLANE_INDEX = 1;
-    private final ArrayList<Body> bodies;
+
+    public static final int SPHERES_START_INDEX = 2;
+
     /**
-     * Variables encapsulating the animation that can be played
+     * Objects in the scene
      */
-    private final ScheduledExecutorService animationService;
-    private final Runnable animation;
-    AtomicReference<Float> t;
+    private final ArrayList<Body> bodies;
+
+    /**
+     * Variables encapsulating the physics
+     */
+    private final ScheduledExecutorService physicsService;
+    private final Runnable physicsUpdate;
+
+    /**
+     * Random generator
+     */
+    private final Random r;
+
+
+    /**
+     * Skybox, light and plane
+     */
     private Skybox skybox;
     private Light light;
     private Plane plane;
+
     /**
      * Input buffers
      */
@@ -68,8 +85,8 @@ public class World {
     private VectorFloat bodySizes;
     private VectorFloat4 bodyColors;
     private VectorFloat bodyReflectivities;
-    private Future<?> animator;
-    private boolean isAnimating;
+    private Future<?> physicsLoop;
+    private boolean physicsEnabled;
 
     /**
      * Instantiate a default world
@@ -78,15 +95,17 @@ public class World {
      */
     public World() throws Exception {
 
+        r = new Random();
+
         // Populate world
         bodies = new ArrayList<>();
         generateDefaultWorld();
 
-        // Setup default animation
-        animationService = Executors.newScheduledThreadPool(1);
-        animation = getDefaultAnimation();
-        t = new AtomicReference<>((float) 0);
-        isAnimating = false;
+        // Setup default physics service
+        Physics physics = new Physics(this);
+        physicsService = Executors.newScheduledThreadPool(1);
+        physicsEnabled = false;
+        physicsUpdate = physics::update;
 
         // Make sure we have 1 light and 1 plane at the first two indexes
         if (bodies.size() < 2)
@@ -113,76 +132,81 @@ public class World {
         System.out.println("-> Adding object to the scene...");
 
         // Sphere light
-        light = new Light(new Float4(1F, 3F, -1.5F, 0), 0.4F, Color.WHITE);
+        light = new Light(new Float4(0, 0, 0, 0), 1.2F, Color.WHITE);
         addBody(light);
 
         // Checkerboard plane
-        plane = new Plane(0, 40F, 24F);
+        plane = new Plane(20F, 24F);
         addBody(plane);
 
-        // Spheres in the scene
-        addBody(new Sphere(new Float4(0, 1F, 0, 0), 1F, Color.GRAY, 32F));
-        addBody(new Sphere(new Float4(0, 0.5F, 3F, 0), 0.5F, Color.RED, 0));
-        addBody(new Sphere(new Float4(4.5F, 0.5F, 0, 0), 0.5F, Color.GREEN, 16F));
-        addBody(new Sphere(new Float4(6F, 0.5F, 0, 0), 0.5F, Color.BLUE, 32F));
-        addBody(new Sphere(new Float4(0, 0.5F, 7.5F, 0), 0.5F, Color.BLACK, 48F));
+        // Generate random spheres in the scene
+        for (int i = 0; i < NUM_SPHERES; i++) {
+            float radius = randFloat(1, 2);
+            float boundary = plane.getSize() * 0.5F - radius;
+            Float4 position = new Float4(randFloat(-boundary, boundary), randFloat(-boundary, boundary), randFloat(-boundary, boundary), 0);
+            Float4 color = new Float4(r.nextFloat(), r.nextFloat(), r.nextFloat(), 0);
+            float reflectivity = randFloat(0, MAX_REFLECTIVITY * 0.5F);
+            addBody(new Sphere(position, radius, color, reflectivity));
+        }
     }
 
+
     /**
-     * Return if the world is currently being animated
+     * Helper function to generate a random float value between min and max
      *
-     * @return if the world is animating
+     * @param min the minimum boundary of the random float
+     * @param max the maximum boundary of the random float
+     * @return a random float between min and max
      */
-    public boolean isAnimating() {
-        return isAnimating;
+    private float randFloat(float min, float max) {
+        return min + r.nextFloat() * (max - min);
     }
 
     /**
-     * Define the default animation step:
-     * The spheres in the scene move around in a circle
+     * Randomize the positions of the spheres in the scene
+     */
+    public void randomizePositions() {
+
+        for (int i = SPHERES_START_INDEX; i < bodies.size(); i++) {
+            float radius = bodies.get(i).getSize();
+            float boundary = plane.getSize() * 0.5F - radius;
+            Float4 position = new Float4(randFloat(-boundary, boundary), randFloat(-boundary, boundary), randFloat(-boundary, boundary), 0);
+            bodies.get(i).setPosition(position);
+            bodies.get(i).setPrevPosition(position.duplicate());
+        }
+    }
+
+    /**
+     * Return if the physics is currently enabled
      *
-     * @return a Runnable defining one animation step
+     * @return if the physics is enabled
      */
-    private Runnable getDefaultAnimation() {
-        return () -> {
-            t.set((t.get() + 0.017453292F) % 6.2831855F);
-
-            bodies.get(3).getPosition().setX(3F * floatSin(t.get()));
-            bodies.get(3).getPosition().setZ(3F * floatCos(t.get()));
-
-            bodies.get(4).getPosition().setX(4.5F * floatCos(t.get()));
-            bodies.get(4).getPosition().setZ(4.5F * floatSin(t.get()));
-
-            bodies.get(5).getPosition().setX(6F * floatCos(-t.get()));
-            bodies.get(5).getPosition().setZ(6F * floatSin(-t.get()));
-
-            bodies.get(6).getPosition().setX(7.5F * floatSin(-t.get()));
-            bodies.get(6).getPosition().setZ(7.5F * floatCos(-t.get()));
-        };
+    public boolean isPhysicsEnabled() {
+        return physicsEnabled;
     }
 
     /**
-     * Play the defined animation
+     * Enable physics
      */
-    public void startAnimation() {
-        animator = animationService.scheduleAtFixedRate(animation, 0, 16_666_666, TimeUnit.NANOSECONDS);
-        isAnimating = true;
+    public void enablePhysics() {
+        physicsLoop = physicsService.scheduleAtFixedRate(physicsUpdate, 0, 16_666_666, TimeUnit.NANOSECONDS);
+        physicsEnabled = true;
     }
 
     /**
-     * Pause the default animation
+     * Disable physics
      */
-    public void stopAnimation() {
-        animator.cancel(true);
-        isAnimating = false;
+    public void disablePhysics() {
+        physicsLoop.cancel(true);
+        physicsEnabled = false;
     }
 
     /**
-     * Toggle animation state
+     * Toggle between enabled/disabled physics
      */
-    public void toggleAnimation() {
-        if (isAnimating) stopAnimation();
-        else startAnimation();
+    public void togglePhysics() {
+        if (physicsEnabled) disablePhysics();
+        else enablePhysics();
     }
 
     /**
@@ -212,11 +236,15 @@ public class World {
      * Copy the data to input buffers
      */
     public void updateBodyPositionBuffer() {
-        if (isAnimating)
+        if (physicsEnabled)
             for (int i = 0; i < bodies.size(); i++)
                 bodyPositions.set(i, bodies.get(i).getPosition().duplicate());
         else
             bodyPositions.set(LIGHT_INDEX, light.getPosition().duplicate());
+    }
+
+    public ArrayList<Body> getBodies() {
+        return bodies;
     }
 
     /**

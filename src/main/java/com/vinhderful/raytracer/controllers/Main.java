@@ -137,6 +137,7 @@ public class Main {
     public Canvas canvas;
     public VBox settingsPanel;
     public MenuItem settingsPanelToggle;
+
     // Adjustable light position
     public Slider lightXSlider;
     public Slider lightYSlider;
@@ -144,38 +145,49 @@ public class Main {
     public Text lightXText;
     public Text lightYText;
     public Text lightZText;
+
     // Adjustable camera field of view
     public Slider cameraFOVSlider;
     public Text cameraFOVText;
+
     // Adjustable soft shadow sample size and reflection bounce limit
     public Slider shadowSampleSizeSlider;
     public Text shadowSampleSizeText;
     public Slider reflectionBouncesSlider;
     public Text reflectionBouncesText;
+
     // Frames per second text output and helper variables
     public Text fpsText;
+
     // Device selection dropdown
     public ComboBox<String> deviceDropdown;
-    // Button to play predefined animation, helper variables for animation
-    public Button animateButton;
+
+    // Buttons to enable/disable physics and to randomise the positions of the spheres
+    public Button physicsButton;
+    public Button randomizePositionsButton;
+
     /**
      * Resolution of the canvas
      */
     private int width;
     private int height;
+
     /**
      * Camera
      */
     private Camera camera;
+
     /**
      * Ray tracing properties
      */
     private int shadowSampleSize;
     private int reflectionBounces;
+
     /**
      * The world containing the objects in the scene, the skybox and the defined animation
      */
     private World world;
+
     /**
      * Multithreading helper variable - indicator of when rendered has finished rendering frame
      */
@@ -183,6 +195,7 @@ public class Main {
     private volatile long fpsLastUpdate;
     private volatile double fps;
     private int selectedDeviceIndex;
+
     // Camera control
     private double mousePosX;
     private double mousePosY;
@@ -586,11 +599,19 @@ public class Main {
     }
 
     /**
-     * Define action on clicking "Animate" button
+     * Define action enabling/disabling physics
      */
-    public void toggleAnimation() {
-        world.toggleAnimation();
-        animateButton.setText(world.isAnimating() ? "Pause" : "Play");
+    public void togglePhysics() {
+        world.togglePhysics();
+        physicsButton.setText(world.isPhysicsEnabled() ? "Disable" : "Enable");
+        randomizePositionsButton.setDisable(!world.isPhysicsEnabled());
+    }
+    
+    /**
+     * Randomise the positions of the spheres in the scene
+     */
+    public void randomizePositions() {
+        world.randomizePositions();
     }
 
     /**
