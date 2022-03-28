@@ -53,6 +53,9 @@ public class World {
      */
     public static final int PLANE_INDEX = 1;
 
+    /**
+     * The spheres in the scene start at index 2
+     */
     public static final int SPHERES_START_INDEX = 2;
 
     /**

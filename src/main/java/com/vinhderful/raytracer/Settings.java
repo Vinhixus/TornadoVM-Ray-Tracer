@@ -75,5 +75,8 @@ public class Settings {
      */
     public static final float INITIAL_CAMERA_FOV = 60;
 
+    /**
+     * Numbeof spheres in the scene to generate
+     */
     public static final int NUM_SPHERES = 10;
 }
