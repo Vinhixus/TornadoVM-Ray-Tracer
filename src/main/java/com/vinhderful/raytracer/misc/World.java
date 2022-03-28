@@ -23,6 +23,7 @@ import com.vinhderful.raytracer.misc.bodies.Light;
 import com.vinhderful.raytracer.misc.bodies.Plane;
 import com.vinhderful.raytracer.misc.bodies.Sphere;
 import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.Float4Ext;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
@@ -120,6 +121,17 @@ public class World {
     }
 
     /**
+     * Helper function to generate a random position given a minimum and maximum coordinate value
+     *
+     * @param min the minimum coordinate value
+     * @param max the maximum coordinate value
+     * @return a random position bounded by min and max
+     */
+    private Float4 getRandomPosition(float min, float max) {
+        return new Float4(randFloat(min, max), randFloat(min, max), randFloat(min, max), 0);
+    }
+
+    /**
      * Generate a pre-defined default world
      */
     private void generateDefaultWorld() {
@@ -143,7 +155,27 @@ public class World {
         for (int i = 0; i < NUM_SPHERES; i++) {
             float radius = randFloat(1, 2);
             float boundary = plane.getSize() * 0.5F - radius;
-            Float4 position = new Float4(randFloat(-boundary, boundary), randFloat(-boundary, boundary), randFloat(-boundary, boundary), 0);
+
+            Float4 position;
+
+            if (i == 0) {
+                position = getRandomPosition(-boundary, boundary);
+            } else {
+
+                // Make sure spheres don't overlap
+                while (true) {
+                    position = getRandomPosition(-boundary, boundary);
+
+                    boolean overlaps = false;
+                    for (int j = SPHERES_START_INDEX; j < i + SPHERES_START_INDEX; j++)
+                        if (Float4Ext.distance(position, bodies.get(j).getPosition()) < radius + bodies.get(j).getSize()) {
+                            overlaps = true;
+                            break;
+                        }
+                    if (!overlaps) break;
+                }
+            }
+
             Float4 color = new Float4(r.nextFloat(), r.nextFloat(), r.nextFloat(), 0);
             float reflectivity = randFloat(0, MAX_REFLECTIVITY * 0.5F);
             addBody(new Sphere(position, radius, color, reflectivity));
@@ -170,7 +202,27 @@ public class World {
         for (int i = SPHERES_START_INDEX; i < bodies.size(); i++) {
             float radius = bodies.get(i).getSize();
             float boundary = plane.getSize() * 0.5F - radius;
-            Float4 position = new Float4(randFloat(-boundary, boundary), randFloat(-boundary, boundary), randFloat(-boundary, boundary), 0);
+
+            Float4 position;
+
+            if (i == SPHERES_START_INDEX) {
+                position = getRandomPosition(-boundary, boundary);
+            } else {
+
+                // Make sure spheres don't overlap
+                while (true) {
+                    position = getRandomPosition(-boundary, boundary);
+
+                    boolean overlaps = false;
+                    for (int j = SPHERES_START_INDEX; j < i; j++)
+                        if (Float4Ext.distance(position, bodies.get(j).getPosition()) < radius + bodies.get(j).getSize()) {
+                            overlaps = true;
+                            break;
+                        }
+                    if (!overlaps) break;
+                }
+            }
+
             bodies.get(i).setPosition(position);
             bodies.get(i).setPrevPosition(position.duplicate());
         }
