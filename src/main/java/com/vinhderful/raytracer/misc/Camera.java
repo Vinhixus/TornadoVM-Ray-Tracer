@@ -19,10 +19,12 @@
 package com.vinhderful.raytracer.misc;
 
 import com.vinhderful.raytracer.Settings;
+import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
 import uk.ac.manchester.tornado.api.collections.types.Float3;
 
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.min;
 
 /**
  * Represents a scene camera with:
@@ -112,9 +114,9 @@ public class Camera {
 
         // Calculate forward pointing vector from yaw and pitch
         Float3 fwdVector = Float3.normalise(new Float3(
-                floatSin(_yaw) * floatCos(_pitch),
-                floatSin(_pitch),
-                floatCos(_yaw) * floatCos(_pitch)));
+                TornadoMath.sin(_yaw) * TornadoMath.cos(_pitch),
+                        TornadoMath.sin(_pitch),
+                TornadoMath.cos(_yaw) * TornadoMath.cos(_pitch)));
 
         // Calculate left and right pointing vector from forward and up vectors
         Float3 leftVector = Float3.normalise(Float3.cross(fwdVector, upVector));

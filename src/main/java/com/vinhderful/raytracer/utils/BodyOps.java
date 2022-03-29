@@ -18,12 +18,17 @@
  */
 package com.vinhderful.raytracer.utils;
 
+import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 import static com.vinhderful.raytracer.misc.World.*;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.abs;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatPI;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floor;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.min;
 
 /**
  * Operations on the objects in the scene
@@ -103,7 +108,7 @@ public class BodyOps {
             float y = Float4Ext.distance(position, p);
 
             if (y < size) {
-                float t1 = t - floatSqrt(size * size - y * y);
+                float t1 = t - TornadoMath.sqrt(size * size - y * y);
                 if (t1 > 0) return Float4.add(rayOrigin, Float4.mult(rayDirection, t1));
                 else return NO_INTERSECTION;
             } else
@@ -247,8 +252,8 @@ public class BodyOps {
 
         // Convert unit vector to texture coordinates
         // https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
-        float u = 0.5F + floatAtan2(direction.getZ(), direction.getX()) / (2 * floatPI());
-        float v = 0.5F - floatAsin(direction.getY()) / floatPI();
+        float u = 0.5F + TornadoMath.atan2(direction.getZ(), direction.getX()) / (2 * floatPI());
+        float v = 0.5F - TornadoMath.asin(direction.getY()) / floatPI();
 
         // Get color from the skybox VectorFloat4
         int x = (int) (u * (skyBoxDimensions[0] - 1));
