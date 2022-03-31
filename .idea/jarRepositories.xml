@@ -21,5 +21,15 @@
       <option name="name" value="universityOfManchester-graal" />
       <option name="url" value="https://raw.githubusercontent.com/beehive-lab/tornado/maven-tornadovm" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="central" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="github" />
+      <option name="name" value="github" />
+      <option name="url" value="https://maven.pkg.github.com/beehive-lab/spirv-beehive-toolkit" />
+    </remote-repository>
   </component>
 </project>

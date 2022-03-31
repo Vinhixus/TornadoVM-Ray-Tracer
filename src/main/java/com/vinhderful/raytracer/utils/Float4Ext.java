@@ -18,10 +18,10 @@
  */
 package com.vinhderful.raytracer.utils;
 
+import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
 
 /**
  * Additional Float4 operations
@@ -43,12 +43,12 @@ public class Float4Ext {
         float _pitch = pitch * TO_RADIANS;
 
         // Perform horizontal rotation
-        float _y = a.getY() * floatCos(_pitch) - a.getZ() * floatSin(_pitch);
-        float _z = a.getY() * floatSin(_pitch) + a.getZ() * floatCos(_pitch);
+        float _y = a.getY() * TornadoMath.cos(_pitch) - a.getZ() * TornadoMath.sin(_pitch);
+        float _z = a.getY() * TornadoMath.sin(_pitch) + a.getZ() * TornadoMath.cos(_pitch);
 
         // Perform vertical rotation
-        float _x = a.getX() * floatCos(_yaw) + _z * floatSin(_yaw);
-        _z = -a.getX() * floatSin(_yaw) + _z * floatCos(_yaw);
+        float _x = a.getX() * TornadoMath.cos(_yaw) + _z * TornadoMath.sin(_yaw);
+        _z = -a.getX() * TornadoMath.sin(_yaw) + _z * TornadoMath.cos(_yaw);
 
         return new Float4(_x, _y, _z, 0);
     }
@@ -64,7 +64,7 @@ public class Float4Ext {
         float x = a.getX() - b.getX();
         float y = a.getY() - b.getY();
         float z = a.getZ() - b.getZ();
-        return floatSqrt(x * x + y * y + z * z);
+        return TornadoMath.sqrt(x * x + y * y + z * z);
     }
 
     /**

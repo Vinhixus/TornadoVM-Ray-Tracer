@@ -18,17 +18,18 @@
  */
 package com.vinhderful.raytracer.renderer;
 
+import static com.vinhderful.raytracer.misc.World.LIGHT_INDEX;
+import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
+
 import com.vinhderful.raytracer.utils.BodyOps;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Float4Ext;
+
 import uk.ac.manchester.tornado.api.annotations.Parallel;
+import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
-
-import static com.vinhderful.raytracer.misc.World.LIGHT_INDEX;
-import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatTan;
 
 /**
  * The Renderer class contains the main parallelized render method
@@ -92,7 +93,7 @@ public class Renderer {
         // Relatively to the viewport, the camera will be placed in the middle, with exactly one unit of distance to
         // the viewport calculated by the field of view (camera[5] = fov)
         // https://docs.microsoft.com/en-us/windows/win32/direct3d9/viewports-and-clipping
-        Float4 relativeCameraPosition = new Float4(0, 0, -1 / floatTan(camera[5] * 0.5F * TO_RADIANS), 0);
+        Float4 relativeCameraPosition = new Float4(0, 0, -1 / TornadoMath.tan(camera[5] * 0.5F * TO_RADIANS), 0);
         Float4 cameraPosition = new Float4(camera[0], camera[1], camera[2], 0);
 
         // Get dimensions of the viewport

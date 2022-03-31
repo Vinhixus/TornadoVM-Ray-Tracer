@@ -21,11 +21,14 @@ package com.vinhderful.raytracer.renderer;
 import com.vinhderful.raytracer.utils.BodyOps;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Float4Ext;
+import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.*;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.floatPI;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
+import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.pow;
 
 /**
  * The Shader class contains operations to perform Blinn-Phong shading, calculating reflections and soft shadows
@@ -47,7 +50,7 @@ public class Shader {
      * The fibonacci golden angle used to uniformly sample the sphere light
      * https://en.wikipedia.org/wiki/Golden_angle
      */
-    public static final float PHI = floatPI() * (3 - floatSqrt(5));
+    public static final float PHI = floatPI() * (3 - TornadoMath.sqrt(5));
 
     /**
      * The maximum reflectivity constant is derived from the Blinn-Phong specular exponents, the more shiny an object is,
@@ -188,10 +191,10 @@ public class Shader {
 
             // Generate sampling points on a circle according to the Vogel Spiral Phenomenon
             float t = PHI * i;
-            float r = floatSqrt((float) i / sampleSize);
+            float r = TornadoMath.sqrt((float) i / sampleSize);
 
-            float x = 2 * lightSize * r * floatCos(t);
-            float y = 2 * lightSize * r * floatSin(t);
+            float x = 2 * lightSize * r * TornadoMath.cos(t);
+            float y = 2 * lightSize * r * TornadoMath.sin(t);
 
             // Translate the points to the great circle
             Float4 samplePoint = Float4.add(Float4.add(lightPosition, Float4.mult(u, x)), Float4.mult(v, y));
