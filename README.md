@@ -42,7 +42,7 @@ the [manual installation](https://github.com/beehive-lab/TornadoVM/blob/master/a
 - Download the JavaFX SDK for your system from: [JavaFX downloads](https://gluonhq.com/products/javafx/). You will need
   the path of the JavaFX SDK for Step 3.
 
-**Note that TornadoVM-Ray-Tracer has been tested with JavaFX version 17.0.2.**
+**Note that TornadoVM-Ray-Tracer has been tested with JavaFX version 18.**
 
 3. Set up the environment and store the variables in a file (e.g. `sources.env`):
 
@@ -51,7 +51,7 @@ cd TornadoVM-Ray-Tracer
 vim sources.env
 export TORNADO_RAY_TRACER_ROOT="${PWD}"
 export PATH="${PATH}:${TORNADO_RAY_TRACER_ROOT=}/bin"
-export JAVAFX_SDK=<path to JavaFX>/javafx-sdk-17.0.2/
+export JAVAFX_SDK=<path to JavaFX>/javafx-sdk-18/
 export TORNADO_ROOT=<path to TornadoVM>
 export PATH="${PATH}:${TORNADO_ROOT}/bin/bin/"
 export TORNADO_SDK=${TORNADO_ROOT}/bin/sdk
