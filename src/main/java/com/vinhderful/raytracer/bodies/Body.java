@@ -79,24 +79,6 @@ public abstract class Body {
     }
 
     /**
-     * Set the x attribute of the position of the body
-     *
-     * @param x the x value to set position.x to
-     */
-    public void setX(float x) {
-        position.setX(x);
-    }
-
-    /**
-     * Set the z attribute of the position of the body
-     *
-     * @param z the z value to set the position.z to
-     */
-    public void setZ(float z) {
-        position.setZ(z);
-    }
-
-    /**
      * Return the color of the body at a given 3D point
      *
      * @param point the 3D point

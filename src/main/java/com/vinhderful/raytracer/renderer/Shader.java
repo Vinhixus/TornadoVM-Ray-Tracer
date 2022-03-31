@@ -71,11 +71,11 @@ public class Shader {
      */
     public static float getSpecular(Hit hit, World world) {
         Light light = world.getLight();
-        Vector3f hitPos = hit.getPosition();
+        Vector3f hitPosition = hit.getPosition();
         float bodyReflectivity = hit.getBody().getReflectivity();
 
-        Vector3f lightDirection = light.getPosition().subtract(hitPos).normalize();
-        Vector3f rayDirection = hit.getRay().getOrigin().subtract(hitPos).normalize();
+        Vector3f lightDirection = light.getPosition().subtract(hitPosition).normalize();
+        Vector3f rayDirection = hit.getRay().getOrigin().subtract(hitPosition).normalize();
 
         Vector3f halfwayDirection = lightDirection.add(rayDirection).normalize();
         float specularFactor = Math.max(0F, hit.getNormal().dotProduct(halfwayDirection));
@@ -101,16 +101,16 @@ public class Shader {
 
         Light light = world.getLight();
         float lightScale = light.getScale();
-        Vector3f lightPos = light.getPosition();
-        Vector3f hitPos = hit.getPosition();
+        Vector3f lightPosition = light.getPosition();
+        Vector3f hitPosition = hit.getPosition();
 
         // As the light is bounded by a sphere light model, we uniformly sample the great circle
         // with a normal parallel to our light direction
 
         // We obtain a plane perpendicular to the light direction, generate two perpendicular vectors
         // that form a new coordinate system together with the light direction vector
-        Vector3f n = hitPos.subtract(lightPos).normalize();
-        Vector3f u = n.perpVector();
+        Vector3f n = hitPosition.subtract(lightPosition).normalize();
+        Vector3f u = n.perpendicularVector();
         Vector3f v = n.crossProduct(u);
 
         int raysHit = 0;
@@ -125,10 +125,10 @@ public class Shader {
             float y = (float) (2 * lightScale * r * Math.sin(t));
 
             // Translate points to plane
-            Vector3f samplePoint = lightPos.add(u.multiply(x)).add(v.multiply(y));
-            Vector3f rayDir = samplePoint.subtract(hitPos).normalize();
-            Vector3f rayOrigin = hitPos.add(rayDir.multiply(0.001F));
-            Ray sampleRay = new Ray(rayOrigin, rayDir);
+            Vector3f samplePoint = lightPosition.add(u.multiply(x)).add(v.multiply(y));
+            Vector3f rayDirection = samplePoint.subtract(hitPosition).normalize();
+            Vector3f rayOrigin = hitPosition.add(rayDirection.multiply(0.001F));
+            Ray sampleRay = new Ray(rayOrigin, rayDirection);
 
             Hit sampleHit = Renderer.getClosestHit(sampleRay, world);
             if (sampleHit != null && sampleHit.getBody() != light)
@@ -151,11 +151,11 @@ public class Shader {
      */
     public static Color getPixelColor(Hit hit, World world, int shadowSampleSize, int reflectionBounceLimit) {
 
-        Vector3f hitPos = hit.getPosition();
-        Vector3f rayDir = hit.getRay().getDirection();
+        Vector3f hitPosition = hit.getPosition();
+        Vector3f rayDirection = hit.getRay().getDirection();
         Body hitBody = hit.getBody();
 
-        Color hitColor = hitBody.getColor(hitPos);
+        Color hitColor = hitBody.getColor(hitPosition);
 
         // Generate Blinn-Phong model variables
         float diffuse = Math.max(AMBIENT_STRENGTH, getDiffuse(hit, world));
@@ -165,9 +165,9 @@ public class Shader {
 
         // Recursively bounce ray around the scene and calculate reflections
         Color reflection;
-        Vector3f reflectionDir = rayDir.subtract(hit.getNormal().multiply(2 * rayDir.dotProduct(hit.getNormal())));
-        Vector3f reflectionOrigin = hitPos.add(reflectionDir.multiply(0.001F));
-        Hit reflectionHit = reflectionBounceLimit > 0 ? Renderer.getClosestHit(new Ray(reflectionOrigin, reflectionDir), world) : null;
+        Vector3f reflectionDirection = rayDirection.subtract(hit.getNormal().multiply(2 * rayDirection.dotProduct(hit.getNormal())));
+        Vector3f reflectionOrigin = hitPosition.add(reflectionDirection.multiply(0.001F));
+        Hit reflectionHit = reflectionBounceLimit > 0 ? Renderer.getClosestHit(new Ray(reflectionOrigin, reflectionDirection), world) : null;
 
         if (reflectionHit != null)
             if (reflectionHit.getBody() == world.getLight())
@@ -175,7 +175,7 @@ public class Shader {
             else
                 reflection = getPixelColor(reflectionHit, world, shadowSampleSize, reflectionBounceLimit - 1);
         else
-            reflection = world.getSkybox().getColor(reflectionDir);
+            reflection = world.getSkybox().getColor(reflectionDirection);
 
         if (hitBody == world.getPlane())
             return hitColor.mix(reflection, reflectivity).add(specular).multiply(shadow);

@@ -73,12 +73,12 @@ public class Main {
         System.out.println("---------------------------------------");
 
         // Write to image
-        ColorModel cm = new DirectColorModel(24, 0xFF0000, 0xFF00, 0xFF);
+        ColorModel colorModel = new DirectColorModel(24, 0xFF0000, 0xFF00, 0xFF);
         WritableRaster raster = Raster.createPackedRaster(
                 new DataBufferInt(pixels, pixels.length), width, height, width,
                 new int[]{0xFF0000, 0xFF00, 0xFF},
                 null);
-        BufferedImage img = new BufferedImage(cm, raster, false, null);
+        BufferedImage img = new BufferedImage(colorModel, raster, false, null);
 
         String name = "Render.png";
         System.out.println("Writing to image'" + name + "'...");

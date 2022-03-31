@@ -141,16 +141,16 @@ public class Renderer {
         Camera camera = world.getCamera();
 
         // Place camera in front of viewport
-        Vector3f eyePos = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
+        Vector3f relativeCameraPosition = new Vector3f(0, 0, (float) (-1 / Math.tan(Math.toRadians(camera.getFOV() / 2))));
 
         // Loop over every pixel
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++) {
 
                 // Shoot ray from camera to pixel
-                Vector3f rayDir = new Vector3f(getNormalizedX(x), getNormalizedY(y), 0)
-                        .subtract(eyePos).normalize().rotate(camera.getYaw(), camera.getPitch());
-                Ray ray = new Ray(camera.getPosition(), rayDir);
+                Vector3f rayDirection = new Vector3f(getNormalizedX(x), getNormalizedY(y), 0)
+                        .subtract(relativeCameraPosition).normalize().rotate(camera.getYaw(), camera.getPitch());
+                Ray ray = new Ray(camera.getPosition(), rayDirection);
 
                 // Calculate pixel color
                 Hit hit = getClosestHit(ray, world);
@@ -160,7 +160,7 @@ public class Renderer {
                     else
                         pixels[x + y * width] = Shader.getPixelColor(hit, world, shadowSampleSize, reflectionBounceLimit).toARGB();
                 } else
-                    pixels[x + y * width] = world.getSkybox().getColor(rayDir).toARGB();
+                    pixels[x + y * width] = world.getSkybox().getColor(rayDirection).toARGB();
             }
     }
 

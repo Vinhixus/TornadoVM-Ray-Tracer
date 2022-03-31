@@ -143,21 +143,21 @@ public class Vector3f {
     /**
      * Add this vector to another given vector
      *
-     * @param vec the other vector
+     * @param other the other vector
      * @return the resulting vector
      */
-    public Vector3f add(Vector3f vec) {
-        return new Vector3f(x + vec.x, y + vec.y, z + vec.z);
+    public Vector3f add(Vector3f other) {
+        return new Vector3f(x + other.x, y + other.y, z + other.z);
     }
 
     /**
      * Subtract another given vector from this vector
      *
-     * @param vec the other vector
+     * @param other the other vector
      * @return the resulting vector
      */
-    public Vector3f subtract(Vector3f vec) {
-        return new Vector3f(x - vec.x, y - vec.y, z - vec.z);
+    public Vector3f subtract(Vector3f other) {
+        return new Vector3f(x - other.x, y - other.y, z - other.z);
     }
 
     /**
@@ -193,43 +193,34 @@ public class Vector3f {
     /**
      * Get the dot product of this vector and another given vector
      *
-     * @param vec the other vector
+     * @param other the other vector
      * @return the resulting dot product
      */
-    public float dotProduct(Vector3f vec) {
-        return x * vec.x + y * vec.y + z * vec.z;
+    public float dotProduct(Vector3f other) {
+        return x * other.x + y * other.y + z * other.z;
     }
 
     /**
      * Get the cross product of this vector and another given vector
      *
-     * @param vec the other vector
+     * @param other the other vector
      * @return the resulting cross product
      */
-    public Vector3f crossProduct(Vector3f vec) {
+    public Vector3f crossProduct(Vector3f other) {
         return new Vector3f(
-                y * vec.getZ() - z * vec.getY(),
-                z * vec.getX() - x * vec.getZ(),
-                x * vec.getY() - y * vec.getX());
+                y * other.getZ() - z * other.getY(),
+                z * other.getX() - x * other.getZ(),
+                x * other.getY() - y * other.getX());
     }
 
     /**
      * Get the distance between this vector and another given vector
      *
-     * @param vec the other vector
+     * @param other the other vector
      * @return the distance between the two vectors
      */
-    public float distanceFrom(Vector3f vec) {
-        return (float) Math.sqrt(Math.pow(x - vec.x, 2) + Math.pow(y - vec.y, 2) + Math.pow(z - vec.z, 2));
-    }
-
-    /**
-     * Get the array representation of the vector
-     *
-     * @return the array representation of the vector
-     */
-    public float[] toArray() {
-        return new float[]{x, y, z};
+    public float distanceFrom(Vector3f other) {
+        return (float) Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2) + Math.pow(z - other.z, 2));
     }
 
     /**
@@ -237,7 +228,7 @@ public class Vector3f {
      *
      * @return an arbitrary perpendicular vector
      */
-    public Vector3f perpVector() {
+    public Vector3f perpendicularVector() {
 
         // Make sure vector is not 0 vector
         if (x == 0 && y == 0 && z == 0) return null;
