@@ -175,18 +175,21 @@ public class BodyOps {
 
         // Initialise closes hit as a no-hit
         Float4 closestHit = new Float4(-1F, -1F, -1F, -1F);
+        float closestHitDistance = Float.MAX_VALUE;
 
         // Loop over objects in the scene
         for (int i = 0; i < bodyPositions.getLength(); i++) {
 
             // Calculate the intersection of the ray with the current object
             Float4 intersection = getIntersection(i, bodyPositions.get(i), bodySizes.get(i), rayOrigin, rayDirection);
+            float intersectionDistance = Float4Ext.distance(intersection, rayOrigin);
 
             // If the ray hits the object, and the previous closest hit distance is larger than the distance of
             // the ray origin and the current object, then the current hit is the closest hit
-            if (intersection.getW() == 0 && (closestHit.getW() == -1F ||
-                    Float4Ext.distance(closestHit, rayOrigin) > Float4Ext.distance(intersection, rayOrigin)))
+            if (intersection.getW() == 0 && (closestHit.getW() == -1F || closestHitDistance > intersectionDistance)) {
                 closestHit = new Float4(intersection.getX(), intersection.getY(), intersection.getZ(), i);
+                closestHitDistance = intersectionDistance;
+            }
         }
 
         // Return the resulting closest hit
