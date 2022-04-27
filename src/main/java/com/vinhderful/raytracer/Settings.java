@@ -58,7 +58,7 @@ public class Settings {
     /**
      * Initial position of the camera
      */
-    public static final Float3 INITIAL_CAMERA_POSITION = new Float3(0, 1, -4);
+    public static final Float3 INITIAL_CAMERA_POSITION = new Float3(0, -5, -15);
 
     /**
      * Initial yaw of the camera (horizontal rotation)
@@ -68,15 +68,10 @@ public class Settings {
     /**
      * Initial pitch of the camera (vertical rotation)
      */
-    public static final float INITIAL_CAMERA_PITCH = 0;
+    public static final float INITIAL_CAMERA_PITCH = 7;
 
     /**
      * Initial field of view of the camera (horizontal angle determining the part of the world we can see)
      */
-    public static final float INITIAL_CAMERA_FOV = 60;
-
-    /**
-     * Numbeof spheres in the scene to generate
-     */
-    public static final int NUM_SPHERES = 10;
+    public static final float INITIAL_CAMERA_FOV = 50;
 }

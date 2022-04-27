@@ -35,9 +35,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.vinhderful.raytracer.Settings.NUM_SPHERES;
-import static com.vinhderful.raytracer.renderer.Shader.MAX_REFLECTIVITY;
-
 /**
  * A world representing objects in the scene
  */
@@ -156,43 +153,20 @@ public class World {
 
         System.out.println("-> Adding object to the scene...");
 
-        // Sphere light
+        // Light
         light = new Light(new Float4(0, 0, 0, 0), 1.2F, Color.WHITE);
         addBody(light);
 
-        // Checkerboard plane
-        plane = new Plane(20F, 24F);
+        // Plane
+        plane = new Plane(24F, 36F);
         addBody(plane);
 
-        // Generate random spheres in the scene
-        for (int i = 0; i < NUM_SPHERES; i++) {
-            float radius = randFloat(1, 2);
-            float boundary = plane.getSize() * 0.5F - radius;
-
-            Float4 position;
-
-            if (i == 0) {
-                position = getRandomPosition(-boundary, boundary);
-            } else {
-
-                // Make sure spheres don't overlap
-                while (true) {
-                    position = getRandomPosition(-boundary, boundary);
-
-                    boolean overlaps = false;
-                    for (int j = SPHERES_START_INDEX; j < i + SPHERES_START_INDEX; j++)
-                        if (Float4Ext.distance(position, bodies.get(j).getPosition()) < radius + bodies.get(j).getSize()) {
-                            overlaps = true;
-                            break;
-                        }
-                    if (!overlaps) break;
-                }
-            }
-
-            Float4 color = new Float4(r.nextFloat(), r.nextFloat(), r.nextFloat(), 0);
-            float reflectivity = randFloat(0, MAX_REFLECTIVITY * 0.5F);
-            addBody(new Sphere(position, radius, color, reflectivity));
-        }
+        // Spheres
+        addBody(new Sphere(new Float4(-8, -8, 0, 0), 1.75F, Color.WHITE, 16));
+        addBody(new Sphere(new Float4(-4, -8, 0, 0), 1.75F, Color.RED, 24));
+        addBody(new Sphere(new Float4(0, -8, 0, 0), 1.75F, Color.GREEN, 36));
+        addBody(new Sphere(new Float4(4, -8, 0, 0), 1.75F, Color.BLUE, 48));
+        addBody(new Sphere(new Float4(8, -8, 0, 0), 1.75F, Color.BLACK, 64));
     }
 
     /**
