@@ -312,6 +312,7 @@ public class Main {
                 IB_dimensions, IB_camera, IB_rayTracingProperties,
                 IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
                 IB_skybox, IB_skyboxDimensions);
+        ts.pinObjectsInMemory(IB_dimensions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities, IB_skybox, IB_skyboxDimensions);
         ts.streamOut(OB_pixels);
 
         // Define worker grid
