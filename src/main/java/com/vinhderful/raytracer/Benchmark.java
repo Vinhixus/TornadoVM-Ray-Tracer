@@ -18,16 +18,21 @@
  */
 package com.vinhderful.raytracer;
 
+import java.util.ArrayList;
+
 import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
-import uk.ac.manchester.tornado.api.*;
+
+import uk.ac.manchester.tornado.api.GridScheduler;
+import uk.ac.manchester.tornado.api.TaskSchedule;
+import uk.ac.manchester.tornado.api.TornadoDriver;
+import uk.ac.manchester.tornado.api.TornadoRuntimeCI;
+import uk.ac.manchester.tornado.api.WorkerGrid;
+import uk.ac.manchester.tornado.api.WorkerGrid2D;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
-
-import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Benchmark class provides a no-GUI application to test the performance of the ray tracer when using hardware
@@ -113,6 +118,11 @@ public class Benchmark {
             TornadoDriver driver = runtimeCI.getDriver(i);
             int numDevices = driver.getDeviceCount();
 
+            // Exclude PTX due to unsupported intrinsic (atan2)
+            if (driver.getName().toLowerCase().contains("ptx")) {
+                continue;
+            }
+
             for (int j = 0; j < numDevices; j++) {
                 TornadoDevice device = driver.getDevice(j);
                 devices.add(device);
@@ -126,59 +136,49 @@ public class Benchmark {
 
         // Choose device
         System.out.println("-----------------------------------------");
-        Scanner scanner = new Scanner(System.in);
-        String input;
 
-        do {
-            System.out.print("Select device index: ");
-            input = scanner.nextLine();
+        for (int deviceId=0; deviceId<devices.size(); deviceId++) {
+            TornadoDevice device = devices.get(deviceId);
 
-            if (!input.matches("^-?\\d+$"))
-                System.out.println("Please enter an integer!");
-            else if (Integer.parseInt(input) < 0 || Integer.parseInt(input) > deviceCount)
-                System.out.println("Please enter a valid index listed above!");
-            else
-                break;
-        } while (true);
-
-        ts.mapAllTo(devices.get(Integer.parseInt(input)));
-        ts.execute(grid);
-
-        // ==============================================================
-        // Run computation in parallel
-        // ==============================================================
-        System.out.println("-----------------------------------------");
-        System.out.println("Generating " + FRAMES_TO_GENERATE + " frames with TornadoVM...");
-        long startTime = System.nanoTime();
-
-        for (int i = 0; i < FRAMES_TO_GENERATE; i++)
+            ts.mapAllTo(device);
             ts.execute(grid);
 
-        long endTime = System.nanoTime();
-        double tornadoTime = (endTime - startTime) / 1000000.0;
-        System.out.println("Duration: " + tornadoTime + " ms");
+            // ==============================================================
+            // Run computation in parallel
+            // ==============================================================
+            System.out.println("-----------------------------------------");
+            System.out.println("Generating " + FRAMES_TO_GENERATE + " frames with TornadoVM for device: " + device);
+            long startTime = System.nanoTime();
 
-        // ==============================================================
-        // Run computation sequentially
-        // ==============================================================
-        System.out.println("-----------------------------------------");
-        System.out.println("Generating " + FRAMES_TO_GENERATE + " frames sequentially...");
-        startTime = System.nanoTime();
+            for (int i = 0; i < FRAMES_TO_GENERATE; i++)
+                ts.execute(grid);
 
-        for (int i = 0; i < FRAMES_TO_GENERATE; i++)
-            Renderer.render(pixels, dimensions, camera, rayTracingProperties,
-                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    skybox, skyboxDimensions);
+            long endTime = System.nanoTime();
+            double tornadoTime = (endTime - startTime) / 1000000.0;
+            System.out.println("Duration: " + tornadoTime + " ms");
 
-        endTime = System.nanoTime();
-        double sequentialTime = (endTime - startTime) / 1000000.0;
-        System.out.println("Duration: " + sequentialTime + " ms");
+            // ==============================================================
+            // Run computation sequentially
+            // ==============================================================
+            System.out.println("-----------------------------------------");
+            System.out.println("Generating " + FRAMES_TO_GENERATE + " frames sequentially...");
+            startTime = System.nanoTime();
 
-        // ==============================================================
-        // Calculate performance increase
-        // ==============================================================
-        System.out.println("-----------------------------------------");
-        System.out.println("Performance increase: " + sequentialTime / tornadoTime + "x");
-        System.out.println("-----------------------------------------");
+            for (int i = 0; i < FRAMES_TO_GENERATE; i++)
+                Renderer.render(pixels, dimensions, camera, rayTracingProperties,
+                        bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                        skybox, skyboxDimensions);
+
+            endTime = System.nanoTime();
+            double sequentialTime = (endTime - startTime) / 1000000.0;
+            System.out.println("Duration: " + sequentialTime + " ms");
+
+            // ==============================================================
+            // Calculate performance increase
+            // ==============================================================
+            System.out.println("-----------------------------------------");
+            System.out.println("Performance increase: " + sequentialTime / tornadoTime + "x");
+            System.out.println("-----------------------------------------");
+        }
     }
 }
