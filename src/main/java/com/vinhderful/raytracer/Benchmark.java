@@ -96,6 +96,7 @@ public class Benchmark {
                 dimensions, camera, rayTracingProperties,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 skybox, skyboxDimensions);
+        ts.lockObjectsInMemory(dimensions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
         ts.streamOut(pixels);
 
         // Set up worker grid

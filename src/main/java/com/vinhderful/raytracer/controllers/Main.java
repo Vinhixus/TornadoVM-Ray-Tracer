@@ -188,10 +188,6 @@ public class Main {
      */
     private World world;
 
-    /**
-     * Multithreading helper variable - indicator of when rendered has finished rendering frame
-     */
-    private volatile boolean renderReady = true;
     private volatile long fpsLastUpdate;
     private volatile double fps;
     private int selectedDeviceIndex;
@@ -312,6 +308,7 @@ public class Main {
                 IB_dimensions, IB_camera, IB_rayTracingProperties,
                 IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
                 IB_skybox, IB_skyboxDimensions);
+        ts.lockObjectsInMemory(IB_dimensions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities, IB_skybox, IB_skyboxDimensions);
         ts.streamOut(OB_pixels);
 
         // Define worker grid
@@ -368,16 +365,6 @@ public class Main {
      * Set up the logic and rendering loops
      */
     private void setupOperatingLoops() {
-
-        // Define rendering thread
-        ExecutorService renderer = Executors.newFixedThreadPool(1);
-        Runnable render = () -> {
-
-            // Render and signal that render is ready
-            render();
-            renderReady = true;
-        };
-
         // Define main animation loop - gets called every frame
         new AnimationTimer() {
 
@@ -388,15 +375,14 @@ public class Main {
                 camera.updatePositionOnMovement(fwd, back, strafeL, strafeR, up, down);
 
                 // Set the pixels on the canvas when render is ready
-                if (renderReady) {
-                    pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
-                    renderReady = false;
-                    renderer.execute(render);
+                pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
 
-                    // Record fps
-                    fps = 1_000_000_000.0 / (System.nanoTime() - fpsLastUpdate);
-                    fpsLastUpdate = System.nanoTime();
-                }
+                // Render
+                render();
+
+                // Record fps
+                fps = 1_000_000_000.0 / (System.nanoTime() - fpsLastUpdate);
+                fpsLastUpdate = System.nanoTime();
             }
         }.start();
 
