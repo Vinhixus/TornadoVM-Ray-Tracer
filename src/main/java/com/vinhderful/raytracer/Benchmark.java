@@ -42,6 +42,8 @@ import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Benchmark {
 
+    private static final boolean SKIP_SEQUENTIAL = Boolean.parseBoolean(System.getProperty("skip.sequential", "False"));
+
     // The number of frames to generate
     private static final int FRAMES_TO_GENERATE = 100;
 
@@ -138,23 +140,26 @@ public class Benchmark {
         // Choose device
         System.out.println("-----------------------------------------");
 
-        // ==============================================================
-        // Run computation sequentially
-        // ==============================================================
-        System.out.println("-----------------------------------------");
-        System.out.println("Running [JAVA SEQUENTIAL]");
-        for (int i = 0; i < FRAMES_TO_GENERATE; i++)
+        double sequentialTime = 0.0;
+        if (!SKIP_SEQUENTIAL) {
+            // ==============================================================
+            // Run computation sequentially
+            // ==============================================================
+            System.out.println("-----------------------------------------");
+            System.out.println("Running [JAVA SEQUENTIAL]");
+            for (int i = 0; i < FRAMES_TO_GENERATE; i++)
+                Renderer.render(pixels, dimensions, camera, rayTracingProperties,
+                        bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                        skybox, skyboxDimensions);
+
+            long startTime = System.nanoTime();
             Renderer.render(pixels, dimensions, camera, rayTracingProperties,
                     bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                     skybox, skyboxDimensions);
-
-        long startTime = System.nanoTime();
-        Renderer.render(pixels, dimensions, camera, rayTracingProperties,
-                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                skybox, skyboxDimensions);
-        long endTime = System.nanoTime();
-        double sequentialTime = (endTime - startTime) / 1000000.0;
-        System.out.println("Duration: " + sequentialTime + " ms");
+            long endTime = System.nanoTime();
+            sequentialTime = (endTime - startTime) / 1000000.0;
+            System.out.println("Duration: " + sequentialTime + " ms");
+        }
 
 
         // ==============================================================
@@ -168,11 +173,11 @@ public class Benchmark {
                     bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                     skybox, skyboxDimensions);
 
-        startTime = System.nanoTime();
+        long startTime = System.nanoTime();
         Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 skybox, skyboxDimensions);
-        endTime = System.nanoTime();
+        long endTime = System.nanoTime();
         double javaStreamsTime = (endTime - startTime) / 1000000.0;
         System.out.println("Duration: " + javaStreamsTime + " ms");
 
@@ -200,7 +205,9 @@ public class Benchmark {
             // Calculate performance increase
             // ==============================================================
             System.out.println("-----------------------------------------");
-            System.out.println("Performance increase vs sequential: " + sequentialTime / tornadoTime + "x");
+            if (!SKIP_SEQUENTIAL) {
+                System.out.println("Performance increase vs sequential: " + sequentialTime / tornadoTime + "x");
+            }
             System.out.println("Performance increase vs Java Streams: " + javaStreamsTime / tornadoTime + "x");
             System.out.println("-----------------------------------------");
         }
