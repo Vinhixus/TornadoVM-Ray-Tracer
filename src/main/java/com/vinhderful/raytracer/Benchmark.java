@@ -137,8 +137,6 @@ public class Benchmark {
             }
         }
 
-        // Choose device
-        System.out.println("-----------------------------------------");
 
         double sequentialTime = 0.0;
         if (!SKIP_SEQUENTIAL) {
@@ -161,7 +159,6 @@ public class Benchmark {
             System.out.println("Duration: " + sequentialTime + " ms");
         }
 
-
         // ==============================================================
         // Run with Java Parallel Streams
         // ==============================================================
@@ -181,6 +178,8 @@ public class Benchmark {
         double javaStreamsTime = (endTime - startTime) / 1000000.0;
         System.out.println("Duration: " + javaStreamsTime + " ms");
 
+        // Running Accelerated version per device
+        System.out.println("-----------------------------------------");
         for (TornadoDevice device : devices) {
             ts.mapAllTo(device);
             ts.execute(grid);
