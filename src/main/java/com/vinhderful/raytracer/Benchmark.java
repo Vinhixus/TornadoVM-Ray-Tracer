@@ -42,8 +42,10 @@ import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Benchmark {
 
+    private static final boolean SKIP_SEQUENTIAL = Boolean.parseBoolean(System.getProperty("skip.sequential", "False"));
+
     // The number of frames to generate
-    private static final int FRAMES_TO_GENERATE = 5;
+    private static final int FRAMES_TO_GENERATE = 100;
 
     // Dimensions of the viewport
     private static final int WIDTH = 1280;
@@ -135,12 +137,50 @@ public class Benchmark {
             }
         }
 
-        // Choose device
+
+        double sequentialTime = 0.0;
+        if (!SKIP_SEQUENTIAL) {
+            // ==============================================================
+            // Run computation sequentially
+            // ==============================================================
+            System.out.println("-----------------------------------------");
+            System.out.println("Running [JAVA SEQUENTIAL]");
+            for (int i = 0; i < FRAMES_TO_GENERATE; i++)
+                Renderer.render(pixels, dimensions, camera, rayTracingProperties,
+                        bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                        skybox, skyboxDimensions);
+
+            long startTime = System.nanoTime();
+            Renderer.render(pixels, dimensions, camera, rayTracingProperties,
+                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                    skybox, skyboxDimensions);
+            long endTime = System.nanoTime();
+            sequentialTime = (endTime - startTime) / 1000000.0;
+            System.out.println("Duration: " + sequentialTime + " ms");
+        }
+
+        // ==============================================================
+        // Run with Java Parallel Streams
+        // ==============================================================
         System.out.println("-----------------------------------------");
+        System.out.println("Running [JAVA PARALLEL STREAMS]");
 
-        for (int deviceId=0; deviceId<devices.size(); deviceId++) {
-            TornadoDevice device = devices.get(deviceId);
+        for (int i = 0; i < FRAMES_TO_GENERATE; i++)
+            Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties,
+                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                    skybox, skyboxDimensions);
 
+        long startTime = System.nanoTime();
+        Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties,
+                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                skybox, skyboxDimensions);
+        long endTime = System.nanoTime();
+        double javaStreamsTime = (endTime - startTime) / 1000000.0;
+        System.out.println("Duration: " + javaStreamsTime + " ms");
+
+        // Running Accelerated version per device
+        System.out.println("-----------------------------------------");
+        for (TornadoDevice device : devices) {
             ts.mapAllTo(device);
             ts.execute(grid);
 
@@ -148,37 +188,26 @@ public class Benchmark {
             // Run computation in parallel
             // ==============================================================
             System.out.println("-----------------------------------------");
-            System.out.println("Generating " + FRAMES_TO_GENERATE + " frames with TornadoVM for device: " + device);
-            long startTime = System.nanoTime();
+            System.out.println("Running with TornadoVM for device: " + device);
 
             for (int i = 0; i < FRAMES_TO_GENERATE; i++)
                 ts.execute(grid);
 
-            long endTime = System.nanoTime();
+            startTime = System.nanoTime();
+            ts.execute(grid);
+            endTime = System.nanoTime();
+
             double tornadoTime = (endTime - startTime) / 1000000.0;
             System.out.println("Duration: " + tornadoTime + " ms");
-
-            // ==============================================================
-            // Run computation sequentially
-            // ==============================================================
-            System.out.println("-----------------------------------------");
-            System.out.println("Generating " + FRAMES_TO_GENERATE + " frames sequentially...");
-            startTime = System.nanoTime();
-
-            for (int i = 0; i < FRAMES_TO_GENERATE; i++)
-                Renderer.render(pixels, dimensions, camera, rayTracingProperties,
-                        bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                        skybox, skyboxDimensions);
-
-            endTime = System.nanoTime();
-            double sequentialTime = (endTime - startTime) / 1000000.0;
-            System.out.println("Duration: " + sequentialTime + " ms");
 
             // ==============================================================
             // Calculate performance increase
             // ==============================================================
             System.out.println("-----------------------------------------");
-            System.out.println("Performance increase: " + sequentialTime / tornadoTime + "x");
+            if (!SKIP_SEQUENTIAL) {
+                System.out.println("Performance increase vs sequential: " + sequentialTime / tornadoTime + "x");
+            }
+            System.out.println("Performance increase vs Java Streams: " + javaStreamsTime / tornadoTime + "x");
             System.out.println("-----------------------------------------");
         }
     }
