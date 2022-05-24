@@ -7,13 +7,18 @@ JFLAGS="--module-path .:${JAVAFX_SDK}/lib --add-modules ALL-SYSTEM,javafx.contro
 if [ $# -eq 0 ]; then
 	echo "------------------------------------"
 	echo "Running TornadoVM Ray Tracer with GUI..."
-	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} --debug com.vinhderful.raytracer.App
+	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} --debug --threadInfo com.vinhderful.raytracer.App
 elif [ "$1" == "benchmark" ]; then
 	echo "-----------------------------------------"
 	echo "Running TornadoVM Ray Tracer benchmark mode..."
 	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} com.vinhderful.raytracer.Benchmark
+elif [ "$1" == "regression" ]; then
+	echo "-----------------------------------------"
+	echo "Running TornadoVM Ray Tracer benchmark mode..."
+	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} -Dskip.sequential=True com.vinhderful.raytracer.Benchmark 
 else
 	echo "Please run:"
 	echo "tornadovm-ray-tracer               for the gui version or"
-	echo "tornadovm-ray-tracer benchmark     for the benchmark mode!"
+	echo "tornadovm-ray-tracer benchmark     for the benchmark mode."
+	echo "tornadovm-ray-tracer regression    for regression tests (it skips sequential execution)"
 fi

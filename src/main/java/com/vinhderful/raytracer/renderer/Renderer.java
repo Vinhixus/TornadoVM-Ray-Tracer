@@ -31,6 +31,8 @@ import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
+import java.util.stream.IntStream;
+
 /**
  * The Renderer class contains the main parallelized render method
  */
@@ -146,5 +148,67 @@ public class Renderer {
                     pixels[x + y * width] = Color.toInt(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection));
                 }
             }
+    }
+
+    public static void renderWithParallelStreams(int[] pixels, int[] dimensions, float[] camera, int[] rayTracingProperties,
+                              VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
+                              VectorFloat4 skybox, int[] skyboxDimensions) {
+
+        // Relatively to the viewport, the camera will be placed in the middle, with exactly one unit of distance to
+        // the viewport calculated by the field of view (camera[5] = fov)
+        // https://docs.microsoft.com/en-us/windows/win32/direct3d9/viewports-and-clipping
+        Float4 relativeCameraPosition = new Float4(0, 0, -1 / TornadoMath.tan(camera[5] * 0.5F * TO_RADIANS), 0);
+        Float4 cameraPosition = new Float4(camera[0], camera[1], camera[2], 0);
+
+        // Get dimensions of the viewport
+        int width = dimensions[0];
+        int height = dimensions[1];
+
+        // Get ray tracing properties
+        int shadowSampleSize = rayTracingProperties[0];
+        int reflectionBounceLimit = rayTracingProperties[1];
+
+        // The main parallel loop - each pixel color can be calculated independently of one another
+        IntStream.range(0, width).parallel().forEach(x -> {
+            IntStream.range(0, height).parallel().forEach(y -> {
+                // Acquire the OpenGL-style coordinates of the pixel, where 0, 0 is the middle
+                Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
+
+                // Acquire direction to each pixel by rotating it around the camera yaw and pitch
+                Float4 rayDirection = Float4Ext.rotate(Float4.normalise(Float4.sub(normalizedCoords, relativeCameraPosition)), camera[3], camera[4]);
+
+                // Shoot ray into the scene to get the closest hit
+                Float4 hit = BodyOps.getClosestHit(bodyPositions, bodySizes, cameraPosition, rayDirection);
+                int hitIndex = (int) hit.getW();
+
+                // If the ray hits an object
+                if (hitIndex != -1) {
+
+                    // If the hit object is the light source, then simply paint the light source's color
+                    // This will give a flat white circle is a white sphere light
+                    if (hitIndex == LIGHT_INDEX) {
+                        pixels[x + y * width] = Color.toInt(bodyColors.get(LIGHT_INDEX));
+                    }
+
+                    // If the hit object is not a light source, then compute the pixel color after calculating
+                    // shading reflections and shadows
+                    else {
+                        Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
+                        Float4 pixelColor = RayTracer.getPixelColor(
+                                hitIndex, hitPosition, cameraPosition, rayDirection,
+                                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
+                                skybox, skyboxDimensions,
+                                shadowSampleSize, reflectionBounceLimit);
+
+                        pixels[x + y * width] = Color.toInt(pixelColor);
+                    }
+                }
+
+                // If the ray doesn't hit anny objects, then draw the background skybox
+                else {
+                    pixels[x + y * width] = Color.toInt(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection));
+                }
+            });
+        });
     }
 }

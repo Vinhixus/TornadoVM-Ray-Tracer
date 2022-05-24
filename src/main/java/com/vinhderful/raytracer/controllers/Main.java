@@ -188,10 +188,6 @@ public class Main {
      */
     private World world;
 
-    /**
-     * Multithreading helper variable - indicator of when rendered has finished rendering frame
-     */
-    private volatile boolean renderReady = true;
     private volatile long fpsLastUpdate;
     private volatile double fps;
     private int selectedDeviceIndex;
@@ -210,6 +206,8 @@ public class Main {
     private TaskSchedule ts;
     private GridScheduler grid;
     private volatile boolean renderWithTornado;
+
+    private volatile boolean renderWithJavaStreams;
 
     // PixelWriter and it's format
     private volatile PixelWriter pixelWriter;
@@ -312,6 +310,7 @@ public class Main {
                 IB_dimensions, IB_camera, IB_rayTracingProperties,
                 IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
                 IB_skybox, IB_skyboxDimensions);
+        ts.lockObjectsInMemory(IB_dimensions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities, IB_skybox, IB_skyboxDimensions);
         ts.streamOut(OB_pixels);
 
         // Define worker grid
@@ -333,6 +332,7 @@ public class Main {
         // Add sequential execution to devices list
         devices.add(null);
         deviceDropdown.getItems().add("(Pure Java) - CPU");
+        deviceDropdown.getItems().add("(Java Parallel Streams) - CPU");
 
         // Get Tornado drivers
         TornadoRuntimeCI runtimeCI = TornadoRuntime.getTornadoRuntime();
@@ -368,16 +368,6 @@ public class Main {
      * Set up the logic and rendering loops
      */
     private void setupOperatingLoops() {
-
-        // Define rendering thread
-        ExecutorService renderer = Executors.newFixedThreadPool(1);
-        Runnable render = () -> {
-
-            // Render and signal that render is ready
-            render();
-            renderReady = true;
-        };
-
         // Define main animation loop - gets called every frame
         new AnimationTimer() {
 
@@ -388,15 +378,14 @@ public class Main {
                 camera.updatePositionOnMovement(fwd, back, strafeL, strafeR, up, down);
 
                 // Set the pixels on the canvas when render is ready
-                if (renderReady) {
-                    pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
-                    renderReady = false;
-                    renderer.execute(render);
+                pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
 
-                    // Record fps
-                    fps = 1_000_000_000.0 / (System.nanoTime() - fpsLastUpdate);
-                    fpsLastUpdate = System.nanoTime();
-                }
+                // Render
+                render();
+
+                // Record fps
+                fps = 1_000_000_000.0 / (System.nanoTime() - fpsLastUpdate);
+                fpsLastUpdate = System.nanoTime();
             }
         }.start();
 
@@ -462,12 +451,17 @@ public class Main {
         IB_rayTracingProperties[1] = reflectionBounces;
 
         // Render to output buffer
-        if (renderWithTornado)
+        if (renderWithTornado) {
             ts.execute(grid);
-        else
+        } else if (renderWithJavaStreams) {
+            Renderer.renderWithParallelStreams(OB_pixels, IB_dimensions, IB_camera, IB_rayTracingProperties,
+                        IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
+                        IB_skybox, IB_skyboxDimensions);
+        } else {
             Renderer.render(OB_pixels, IB_dimensions, IB_camera, IB_rayTracingProperties,
                     IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
                     IB_skybox, IB_skyboxDimensions);
+        }
     }
 
     /**
@@ -577,24 +571,32 @@ public class Main {
      * Define action on device dropdown selection
      */
     public void selectDevice() {
-
         // Get selection from dropdown box
         selectedDeviceIndex = deviceDropdown.getSelectionModel().getSelectedIndex();
-        TornadoDevice device = devices.get(selectedDeviceIndex);
 
-        // Map task schedule to selected device if selected device is tornado device
-        if (selectedDeviceIndex > 0) {
-            shadowSampleSizeSlider.setMax(Settings.MAX_SHADOW_SAMPLE_SIZE);
-            shadowSampleSizeSlider.setMajorTickUnit(50);
-            shadowSampleSizeSlider.setMinorTickCount(50);
-            renderWithTornado = true;
-            ts.mapAllTo(device);
-        } else {
+        if (selectedDeviceIndex == 0) {
+            // Limit shadow sample size when running Java multi-thread
+            shadowSampleSizeSlider.setMax(10);
+            shadowSampleSizeSlider.setMajorTickUnit(1);
+            shadowSampleSizeSlider.setMinorTickCount(0);
+            renderWithTornado = false;
+            renderWithJavaStreams = false;
+        } else if (selectedDeviceIndex == 1) {
             // Limit shadow sample size when rendering sequentially
             shadowSampleSizeSlider.setMax(10);
             shadowSampleSizeSlider.setMajorTickUnit(1);
             shadowSampleSizeSlider.setMinorTickCount(0);
             renderWithTornado = false;
+            renderWithJavaStreams = true;
+        } else if (selectedDeviceIndex > 1) {
+            // Map task schedule to selected device if selected device is tornado device
+            TornadoDevice device = devices.get(selectedDeviceIndex - 1);
+            shadowSampleSizeSlider.setMax(Settings.MAX_SHADOW_SAMPLE_SIZE);
+            shadowSampleSizeSlider.setMajorTickUnit(50);
+            shadowSampleSizeSlider.setMinorTickCount(50);
+            renderWithTornado = true;
+            renderWithJavaStreams = false;
+            ts.mapAllTo(device);
         }
     }
 
@@ -606,7 +608,7 @@ public class Main {
         physicsButton.setText(world.isPhysicsEnabled() ? "Disable" : "Enable");
         randomizePositionsButton.setDisable(!world.isPhysicsEnabled());
     }
-    
+
     /**
      * Randomise the positions of the spheres in the scene
      */
