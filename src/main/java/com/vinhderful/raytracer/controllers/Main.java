@@ -335,7 +335,7 @@ public class Main {
         deviceDropdown.getItems().add("(Java Parallel Streams) - CPU");
 
         // Get Tornado drivers
-        TornadoRuntimeCI runtimeCI = TornadoRuntime.getTornadoRuntime();
+        TornadoRuntimeInterface runtimeCI = TornadoRuntime.getTornadoRuntime();
         int numTornadoDrivers = runtimeCI.getNumDrivers();
 
         for (int i = 0; i < numTornadoDrivers; i++) {

@@ -26,7 +26,7 @@ import com.vinhderful.raytracer.renderer.Renderer;
 import uk.ac.manchester.tornado.api.GridScheduler;
 import uk.ac.manchester.tornado.api.TaskSchedule;
 import uk.ac.manchester.tornado.api.TornadoDriver;
-import uk.ac.manchester.tornado.api.TornadoRuntimeCI;
+import uk.ac.manchester.tornado.api.TornadoRuntimeInterface;
 import uk.ac.manchester.tornado.api.WorkerGrid;
 import uk.ac.manchester.tornado.api.WorkerGrid2D;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
@@ -112,7 +112,7 @@ public class Benchmark {
         System.out.println("-----------------------------------------");
         System.out.println("Getting Tornado Devices...");
         ArrayList<TornadoDevice> devices = new ArrayList<>();
-        TornadoRuntimeCI runtimeCI = TornadoRuntime.getTornadoRuntime();
+        TornadoRuntimeInterface runtimeCI = TornadoRuntime.getTornadoRuntime();
         int numTornadoDrivers = runtimeCI.getNumDrivers();
         int deviceCount = 0;
 
