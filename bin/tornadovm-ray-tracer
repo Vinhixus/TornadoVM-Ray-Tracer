@@ -15,7 +15,7 @@ elif [ "$1" == "benchmark" ]; then
 elif [ "$1" == "regression" ]; then
 	echo "-----------------------------------------"
 	echo "Running TornadoVM Ray Tracer benchmark mode..."
-	tornado --module-path="${JFLAGS}" -classpath="${CLASSPATH}:${JARS}" --jvm="-Dskip.sequential=True " com.vinhderful.raytracer.Benchmark 
+	tornado --module-path="${JFLAGS}" --classpath="${CLASSPATH}:${JARS}" --jvm="-Dskip.sequential=True " com.vinhderful.raytracer.Benchmark 
 else
 	echo "Please run:"
 	echo "tornadovm-ray-tracer               for the gui version or"
