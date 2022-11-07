@@ -24,7 +24,7 @@ import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
 
 import uk.ac.manchester.tornado.api.GridScheduler;
-import uk.ac.manchester.tornado.api.TaskSchedule;
+import uk.ac.manchester.tornado.api.TaskGraph;
 import uk.ac.manchester.tornado.api.TornadoDriver;
 import uk.ac.manchester.tornado.api.TornadoRuntimeInterface;
 import uk.ac.manchester.tornado.api.WorkerGrid;
@@ -32,6 +32,7 @@ import uk.ac.manchester.tornado.api.WorkerGrid2D;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
+import uk.ac.manchester.tornado.api.enums.DataTransferMode;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
 /**
@@ -92,14 +93,15 @@ public class Benchmark {
         VectorFloat bodyReflectivities = world.getBodyReflectivitiesBuffer();
 
         // Set up Tornado Task Schedule
-        TaskSchedule ts = new TaskSchedule("s0");
-        ts.streamIn(camera, rayTracingProperties, bodyPositions);
+        TaskGraph ts = new TaskGraph("s0");
+        ts.transferToDevice(DataTransferMode.EVERY_EXECUTION, camera, rayTracingProperties, bodyPositions);
+        ts.transferToDevice(DataTransferMode.FIRST_EXECUTION, dimensions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
         ts.task("t0", Renderer::render, pixels,
                 dimensions, camera, rayTracingProperties,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 skybox, skyboxDimensions);
         ts.lockObjectsInMemory(dimensions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
-        ts.streamOut(pixels);
+        ts.transferToHost(pixels);
 
         // Set up worker grid
         WorkerGrid worker = new WorkerGrid2D(WIDTH, HEIGHT);
