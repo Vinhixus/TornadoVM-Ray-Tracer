@@ -24,8 +24,10 @@ import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
 
 import uk.ac.manchester.tornado.api.GridScheduler;
+import uk.ac.manchester.tornado.api.ImmutableTaskGraph;
 import uk.ac.manchester.tornado.api.TaskGraph;
 import uk.ac.manchester.tornado.api.TornadoDriver;
+import uk.ac.manchester.tornado.api.TornadoExecutionPlan;
 import uk.ac.manchester.tornado.api.TornadoRuntimeInterface;
 import uk.ac.manchester.tornado.api.WorkerGrid;
 import uk.ac.manchester.tornado.api.WorkerGrid2D;
@@ -100,15 +102,16 @@ public class Benchmark {
                 dimensions, camera, rayTracingProperties,
                 bodyPositions, bodySizes, bodyColors, bodyReflectivities,
                 skybox, skyboxDimensions);
-        ts.lockObjectsInMemory(dimensions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
-        ts.transferToHost(pixels);
+        ts.transferToHost(DataTransferMode.EVERY_EXECUTION, pixels);
 
         // Set up worker grid
         WorkerGrid worker = new WorkerGrid2D(WIDTH, HEIGHT);
         worker.setLocalWork(16, 16, 1);
         GridScheduler grid = new GridScheduler();
         grid.setWorkerGrid("s0.t0", worker);
-        ts.execute(grid);
+
+        TornadoExecutionPlan rayTracingPlan = new TornadoExecutionPlan(ts.snapshot());
+        rayTracingPlan.withGridScheduler(grid).execute();
 
         // Get Tornado devices
         System.out.println("-----------------------------------------");
@@ -183,8 +186,8 @@ public class Benchmark {
         // Running Accelerated version per device
         System.out.println("-----------------------------------------");
         for (TornadoDevice device : devices) {
-            ts.mapAllTo(device);
-            ts.execute(grid);
+            rayTracingPlan.withDevice(device);
+            rayTracingPlan.execute();
 
             // ==============================================================
             // Run computation in parallel
@@ -193,10 +196,10 @@ public class Benchmark {
             System.out.println("Running with TornadoVM for device: " + device);
 
             for (int i = 0; i < FRAMES_TO_GENERATE; i++)
-                ts.execute(grid);
+                rayTracingPlan.execute();
 
             startTime = System.nanoTime();
-            ts.execute(grid);
+            rayTracingPlan.execute();
             endTime = System.nanoTime();
 
             double tornadoTime = (endTime - startTime) / 1000000.0;

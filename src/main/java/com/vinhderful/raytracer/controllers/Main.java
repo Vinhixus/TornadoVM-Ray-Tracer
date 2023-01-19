@@ -42,6 +42,7 @@ import javafx.scene.text.Text;
 import uk.ac.manchester.tornado.api.GridScheduler;
 import uk.ac.manchester.tornado.api.TaskGraph;
 import uk.ac.manchester.tornado.api.TornadoDriver;
+import uk.ac.manchester.tornado.api.TornadoExecutionPlan;
 import uk.ac.manchester.tornado.api.TornadoRuntimeInterface;
 import uk.ac.manchester.tornado.api.WorkerGrid;
 import uk.ac.manchester.tornado.api.WorkerGrid2D;
@@ -209,6 +210,9 @@ public class Main {
     // Tornado elements
     private ArrayList<TornadoDevice> devices;
     private TaskGraph ts;
+
+    private TornadoExecutionPlan executionPlan;
+
     private GridScheduler grid;
     private volatile boolean renderWithTornado;
 
@@ -310,20 +314,21 @@ public class Main {
 
         // Define task schedule
         ts = new TaskGraph("s0");
-        ts.lockObjectsInMemory(IB_dimensions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities, IB_skybox, IB_skyboxDimensions);
         ts.transferToDevice(DataTransferMode.EVERY_EXECUTION, IB_camera, IB_rayTracingProperties, IB_bodyPositions);
         ts.transferToDevice(DataTransferMode.FIRST_EXECUTION, IB_dimensions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities, IB_skybox, IB_skyboxDimensions);
         ts.task("t0", Renderer::render, OB_pixels,
                 IB_dimensions, IB_camera, IB_rayTracingProperties,
                 IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
                 IB_skybox, IB_skyboxDimensions);
-        ts.transferToHost(OB_pixels);
+        ts.transferToHost(DataTransferMode.EVERY_EXECUTION, OB_pixels);
 
         // Define worker grid
         WorkerGrid worker = new WorkerGrid2D(IB_dimensions[0], IB_dimensions[1]);
         worker.setLocalWork(16, 16, 1);
         grid = new GridScheduler();
         grid.setWorkerGrid("s0.t0", worker);
+
+        executionPlan = new TornadoExecutionPlan(ts.snapshot());
     }
 
 
@@ -359,8 +364,8 @@ public class Main {
                 deviceDropdown.getItems().add(listingName);
 
                 // Perform an initial mapping to avoid runtime lag
-                ts.mapAllTo(device);
-                ts.execute(grid);
+                executionPlan.withDevice(device).withGridScheduler(grid);
+                executionPlan.execute();
             }
         }
 
@@ -458,7 +463,7 @@ public class Main {
 
         // Render to output buffer
         if (renderWithTornado) {
-            ts.execute(grid);
+            executionPlan.execute();
         } else if (renderWithJavaStreams) {
             Renderer.renderWithParallelStreams(OB_pixels, IB_dimensions, IB_camera, IB_rayTracingProperties,
                         IB_bodyPositions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities,
@@ -602,7 +607,7 @@ public class Main {
             shadowSampleSizeSlider.setMinorTickCount(50);
             renderWithTornado = true;
             renderWithJavaStreams = false;
-            ts.mapAllTo(device);
+            executionPlan.withDevice(device);
         }
     }
 
