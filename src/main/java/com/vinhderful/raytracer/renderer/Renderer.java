@@ -110,8 +110,11 @@ public class Renderer {
         for (@Parallel int x = 0; x < width; x++)
             for (@Parallel int y = 0; y < height; y++) {
 
+                float normalizedX = getNormalizedX(width, height, x);
+                float normalizedY = getNormalizedY(width, height, y);
+
                 // Acquire the OpenGL-style coordinates of the pixel, where 0, 0 is the middle
-                Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
+                Float4 normalizedCoords = new Float4(normalizedX, normalizedY, 0, 0);
 
                 // Acquire direction to each pixel by rotating it around the camera yaw and pitch
                 Float4 rayDirection = Float4Ext.rotate(Float4.normalise(Float4.sub(normalizedCoords, relativeCameraPosition)), camera[3], camera[4]);
