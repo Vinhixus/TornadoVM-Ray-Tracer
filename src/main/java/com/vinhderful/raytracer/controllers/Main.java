@@ -244,8 +244,8 @@ public class Main {
         setupRenderingEnvironment();
         System.out.println("Allocating buffers...");
         allocateBuffers();
-        System.out.println("Setting up Tornado Task Schedule...");
-        setupTornadoTaskSchedule();
+        System.out.println("Setting up Tornado Task Graph...");
+        setupTornadoTaskGraph();
         System.out.println("Getting Available Tornado Devices...");
         setAvailableDevices();
         System.out.println("Setting up operating loops...");
@@ -308,11 +308,11 @@ public class Main {
 
 
     /**
-     * Define Tornado task schedule for Parallel Renderer.render method
+     * Define Tornado task graph for Parallel Renderer.render method
      */
-    private void setupTornadoTaskSchedule() {
+    private void setupTornadoTaskGraph() {
 
-        // Define task schedule
+        // Define task graph
         ts = new TaskGraph("s0");
         ts.transferToDevice(DataTransferMode.EVERY_EXECUTION, IB_camera, IB_rayTracingProperties, IB_bodyPositions);
         ts.transferToDevice(DataTransferMode.FIRST_EXECUTION, IB_dimensions, IB_bodySizes, IB_bodyColors, IB_bodyReflectivities, IB_skybox, IB_skyboxDimensions);
@@ -600,7 +600,7 @@ public class Main {
             renderWithTornado = false;
             renderWithJavaStreams = true;
         } else if (selectedDeviceIndex > 1) {
-            // Map task schedule to selected device if selected device is tornado device
+            // Map task graph to selected device if selected device is tornado device
             TornadoDevice device = devices.get(selectedDeviceIndex - 1);
             shadowSampleSizeSlider.setMax(Settings.MAX_SHADOW_SAMPLE_SIZE);
             shadowSampleSizeSlider.setMajorTickUnit(50);
