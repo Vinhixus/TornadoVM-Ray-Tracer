@@ -98,7 +98,9 @@ public class Benchmark {
      */
     public static void main(String[] args) throws Exception {
 
-        setRenderingProperties();
+        setRenderingProperties(
+
+        );
 
         System.out.println("-----------------------------------------");
         System.out.println("Building world...");
@@ -221,10 +223,10 @@ public class Benchmark {
                     // ==============================================================
         System.out.println("-----------------------------------------");
         if (!SKIP_SEQUENTIAL) {
-                            System.out.println("Performance increase vs sequential: " + sequentialTime / tornadoTime + "x");
+            System.out.println("Performance increase vs sequential: " + sequentialTime / tornadoTime + "x");
         }
-                    System.out.println("Performance increase vs Java Streams: " + javaStreamsTime / tornadoTime + "x");
-                    System.out.println("-----------------------------------------");
+        System.out.println("Performance increase vs Java Streams: " + javaStreamsTime / tornadoTime + "x");
+        System.out.println("-----------------------------------------");
     }
 }
 }
