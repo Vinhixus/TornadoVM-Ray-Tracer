@@ -30,6 +30,8 @@ import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
+import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
 
 import java.util.stream.IntStream;
 
@@ -88,23 +90,23 @@ public class Renderer {
      * @param skyboxDimensions     INPUT BUFFER - 2 element int array containing the dimensions of the skybox image
      *                             0 - skybox image width; 1 - skybox image height
      */
-    public static void render(int[] pixels, int[] dimensions, float[] camera, int[] rayTracingProperties,
+    public static void render(IntArray pixels, IntArray dimensions, FloatArray camera, IntArray rayTracingProperties,
                               VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              VectorFloat4 skybox, int[] skyboxDimensions) {
+                              VectorFloat4 skybox, IntArray skyboxDimensions) {
 
         // Relatively to the viewport, the camera will be placed in the middle, with exactly one unit of distance to
         // the viewport calculated by the field of view (camera[5] = fov)
         // https://docs.microsoft.com/en-us/windows/win32/direct3d9/viewports-and-clipping
-        Float4 relativeCameraPosition = new Float4(0, 0, -1 / TornadoMath.tan(camera[5] * 0.5F * TO_RADIANS), 0);
-        Float4 cameraPosition = new Float4(camera[0], camera[1], camera[2], 0);
+        Float4 relativeCameraPosition = new Float4(0, 0, -1 / TornadoMath.tan(camera.get(5) * 0.5F * TO_RADIANS), 0);
+        Float4 cameraPosition = new Float4(camera.get(0), camera.get(1), camera.get(2), 0);
 
         // Get dimensions of the viewport
-        int width = dimensions[0];
-        int height = dimensions[1];
+        int width = dimensions.get(0);
+        int height = dimensions.get(1);
 
         // Get ray tracing properties
-        int shadowSampleSize = rayTracingProperties[0];
-        int reflectionBounceLimit = rayTracingProperties[1];
+        int shadowSampleSize = rayTracingProperties.get(0);
+        int reflectionBounceLimit = rayTracingProperties.get(1);
 
         // The main parallel loop - each pixel color can be calculated independently of one another
         for (@Parallel int x = 0; x < width; x++)
@@ -117,7 +119,7 @@ public class Renderer {
                 Float4 normalizedCoords = new Float4(normalizedX, normalizedY, 0, 0);
 
                 // Acquire direction to each pixel by rotating it around the camera yaw and pitch
-                Float4 rayDirection = Float4Ext.rotate(Float4.normalise(Float4.sub(normalizedCoords, relativeCameraPosition)), camera[3], camera[4]);
+                Float4 rayDirection = Float4Ext.rotate(Float4.normalise(Float4.sub(normalizedCoords, relativeCameraPosition)), camera.get(3), camera.get(4));
 
                 // Shoot ray into the scene to get the closest hit
                 Float4 hit = BodyOps.getClosestHit(bodyPositions, bodySizes, cameraPosition, rayDirection);
@@ -129,7 +131,7 @@ public class Renderer {
                     // If the hit object is the light source, then simply paint the light source's color
                     // This will give a flat white circle is a white sphere light
                     if (hitIndex == LIGHT_INDEX) {
-                        pixels[x + y * width] = Color.toInt(bodyColors.get(LIGHT_INDEX));
+                        pixels.set(x + y * width,  Color.toInt(bodyColors.get(LIGHT_INDEX)));
                     }
 
                     // If the hit object is not a light source, then compute the pixel color after calculating
@@ -142,34 +144,34 @@ public class Renderer {
                                 skybox, skyboxDimensions,
                                 shadowSampleSize, reflectionBounceLimit);
 
-                        pixels[x + y * width] = Color.toInt(pixelColor);
+                        pixels.set(x + y * width, Color.toInt(pixelColor));
                     }
                 }
 
                 // If the ray doesn't hit anny objects, then draw the background skybox
                 else {
-                    pixels[x + y * width] = Color.toInt(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection));
+                    pixels.set(x + y * width, Color.toInt(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection)));
                 }
             }
     }
 
-    public static void renderWithParallelStreams(int[] pixels, int[] dimensions, float[] camera, int[] rayTracingProperties,
+    public static void renderWithParallelStreams(IntArray pixels, IntArray dimensions, FloatArray camera, IntArray rayTracingProperties,
                               VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              VectorFloat4 skybox, int[] skyboxDimensions) {
+                              VectorFloat4 skybox, IntArray skyboxDimensions) {
 
         // Relatively to the viewport, the camera will be placed in the middle, with exactly one unit of distance to
         // the viewport calculated by the field of view (camera[5] = fov)
         // https://docs.microsoft.com/en-us/windows/win32/direct3d9/viewports-and-clipping
-        Float4 relativeCameraPosition = new Float4(0, 0, -1 / TornadoMath.tan(camera[5] * 0.5F * TO_RADIANS), 0);
-        Float4 cameraPosition = new Float4(camera[0], camera[1], camera[2], 0);
+        Float4 relativeCameraPosition = new Float4(0, 0, -1 / TornadoMath.tan(camera.get(5) * 0.5F * TO_RADIANS), 0);
+        Float4 cameraPosition = new Float4(camera.get(0), camera.get(1), camera.get(2), 0);
 
         // Get dimensions of the viewport
-        int width = dimensions[0];
-        int height = dimensions[1];
+        int width = dimensions.get(0);
+        int height = dimensions.get(1);
 
         // Get ray tracing properties
-        int shadowSampleSize = rayTracingProperties[0];
-        int reflectionBounceLimit = rayTracingProperties[1];
+        int shadowSampleSize = rayTracingProperties.get(0);
+        int reflectionBounceLimit = rayTracingProperties.get(1);
 
         // The main parallel loop - each pixel color can be calculated independently of one another
         IntStream.range(0, width).parallel().forEach(x -> {
@@ -178,7 +180,7 @@ public class Renderer {
                 Float4 normalizedCoords = new Float4(getNormalizedX(width, height, x), getNormalizedY(width, height, y), 0, 0);
 
                 // Acquire direction to each pixel by rotating it around the camera yaw and pitch
-                Float4 rayDirection = Float4Ext.rotate(Float4.normalise(Float4.sub(normalizedCoords, relativeCameraPosition)), camera[3], camera[4]);
+                Float4 rayDirection = Float4Ext.rotate(Float4.normalise(Float4.sub(normalizedCoords, relativeCameraPosition)), camera.get(3), camera.get(4));
 
                 // Shoot ray into the scene to get the closest hit
                 Float4 hit = BodyOps.getClosestHit(bodyPositions, bodySizes, cameraPosition, rayDirection);
@@ -190,7 +192,7 @@ public class Renderer {
                     // If the hit object is the light source, then simply paint the light source's color
                     // This will give a flat white circle is a white sphere light
                     if (hitIndex == LIGHT_INDEX) {
-                        pixels[x + y * width] = Color.toInt(bodyColors.get(LIGHT_INDEX));
+                        pixels.set(x + y * width, Color.toInt(bodyColors.get(LIGHT_INDEX)));
                     }
 
                     // If the hit object is not a light source, then compute the pixel color after calculating
@@ -203,13 +205,13 @@ public class Renderer {
                                 skybox, skyboxDimensions,
                                 shadowSampleSize, reflectionBounceLimit);
 
-                        pixels[x + y * width] = Color.toInt(pixelColor);
+                        pixels.set(x + y * width, Color.toInt(pixelColor));
                     }
                 }
 
                 // If the ray doesn't hit anny objects, then draw the background skybox
                 else {
-                    pixels[x + y * width] = Color.toInt(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection));
+                    pixels.set(x + y * width, Color.toInt(BodyOps.getSkyboxColor(skybox, skyboxDimensions, rayDirection)));
                 }
             });
         });

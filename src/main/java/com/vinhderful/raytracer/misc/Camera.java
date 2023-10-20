@@ -21,6 +21,7 @@ package com.vinhderful.raytracer.misc;
 import com.vinhderful.raytracer.Settings;
 import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
 import uk.ac.manchester.tornado.api.collections.types.Float3;
+import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
 
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
@@ -53,7 +54,7 @@ public class Camera {
     /**
      * The double buffer as input buffer for rendering
      */
-    private float[] buffer;
+    private FloatArray buffer;
 
     /**
      * Create a camera given a world to know where the plane height is,
@@ -79,7 +80,14 @@ public class Camera {
      * Allocate memory space and initialise the input buffer
      */
     private void allocateAndInitializeBuffer() {
-        buffer = new float[]{position.getX(), position.getY(), position.getZ(), yaw, pitch, fov};
+//        buffer = new float[]{position.getX(), position.getY(), position.getZ(), yaw, pitch, fov};
+        buffer = new FloatArray(6);
+        buffer.set(0,position.getX());
+        buffer.set(1, position.getY());
+        buffer.set(2,position.getZ());
+        buffer.set(3,yaw);
+        buffer.set(4,pitch);
+        buffer.set(5,fov);
     }
 
     /**
@@ -87,7 +95,7 @@ public class Camera {
      *
      * @return the pointer pointing to the input buffer array
      */
-    public float[] getBuffer() {
+    public FloatArray getBuffer() {
         return buffer;
     }
 
@@ -95,12 +103,12 @@ public class Camera {
      * Update the input buffer for rendering
      */
     public void updateBuffer() {
-        buffer[0] = position.getX();
-        buffer[1] = position.getY();
-        buffer[2] = position.getZ();
-        buffer[3] = yaw;
-        buffer[4] = pitch;
-        buffer[5] = fov;
+        buffer.set(0, position.getX());
+        buffer.set(1 , position.getY());
+        buffer.set(2 ,  position.getZ());
+        buffer.set(3, yaw);
+        buffer.set(4,  pitch);
+        buffer.set(5,  fov);
     }
 
     /**

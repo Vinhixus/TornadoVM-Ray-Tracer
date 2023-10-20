@@ -23,6 +23,7 @@ import com.vinhderful.raytracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
 
 import static com.vinhderful.raytracer.misc.World.LIGHT_INDEX;
 import static com.vinhderful.raytracer.misc.World.PLANE_INDEX;
@@ -57,7 +58,7 @@ public class RayTracer {
     public static Float4 getReflection(int hitIndex, Float4 hitPosition, Float4 rayDirection,
                                        VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
                                        Float4 lightPosition, float lightSize,
-                                       VectorFloat4 skybox, int[] skyboxDimensions,
+                                       VectorFloat4 skybox, IntArray skyboxDimensions,
                                        int shadowSampleSize, int reflectionBounceLimit) {
 
         // Initialise an empty reflection color, a contribution factor and shading factor
@@ -147,7 +148,7 @@ public class RayTracer {
      */
     public static Float4 getPixelColor(int hitIndex, Float4 hitPosition, Float4 rayOrigin, Float4 rayDirection,
                                        VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                                       VectorFloat4 skybox, int[] skyboxDimensions,
+                                       VectorFloat4 skybox, IntArray skyboxDimensions,
                                        int shadowSampleSize, int reflectionBounceLimit) {
 
         // Get the position and size of the light

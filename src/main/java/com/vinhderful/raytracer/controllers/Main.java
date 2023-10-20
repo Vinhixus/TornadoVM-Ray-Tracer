@@ -50,9 +50,12 @@ import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
+import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
+import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
 import uk.ac.manchester.tornado.api.enums.DataTransferMode;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
+import java.lang.foreign.ValueLayout;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
@@ -71,7 +74,7 @@ public class Main {
      * Pixel buffer containing ARGB values of pixel colors for renderer to write to
      * Size = width * height of canvas resolution
      **/
-    private static int[] OB_pixels;
+    private static IntArray OB_pixels;
 
     /**
      * INPUT BUFFER
@@ -85,7 +88,7 @@ public class Main {
      * camera[4]: pitch of rotation
      * camera[5]: field of view (FOV)
      **/
-    private static float[] IB_camera;
+    private static FloatArray IB_camera;
 
     /**
      * INPUT BUFFER
@@ -95,7 +98,7 @@ public class Main {
      * dimensions[0]: width
      * dimensions[1]: height
      **/
-    private static int[] IB_dimensions;
+    private static IntArray IB_dimensions;
 
     /**
      * INPUT BUFFER
@@ -122,7 +125,7 @@ public class Main {
      * Skybox represented by a vector of Float4 values containing R, G, B values as floats in the range of [0, 1]
      **/
     private static VectorFloat4 IB_skybox;
-    private static int[] IB_skyboxDimensions;
+    private static IntArray IB_skyboxDimensions;
 
     /**
      * INPUT BUFFER
@@ -132,7 +135,7 @@ public class Main {
      * rayTracingProperties[0]: Sample size of soft shadows
      * rayTracingProperties[1]: Bounce limit for reflection rays
      **/
-    private static int[] IB_rayTracingProperties;
+    private static IntArray IB_rayTracingProperties;
     /**
      * JavaFX GUI elements
      */
@@ -289,13 +292,17 @@ public class Main {
     private void allocateBuffers() {
 
         // Output buffer
-        OB_pixels = new int[width * height];
+        OB_pixels = new IntArray(width * height);
 
         // Input buffers
-        IB_dimensions = new int[]{width, height};
+        IB_dimensions = new IntArray(2);
+        IB_dimensions.set(0, width);
+        IB_dimensions.set(0, height);
         IB_camera = camera.getBuffer();
 
-        IB_rayTracingProperties = new int[]{shadowSampleSize, reflectionBounces};
+        IB_rayTracingProperties = new IntArray(2);
+        IB_rayTracingProperties.set(0,shadowSampleSize );
+        IB_rayTracingProperties.set(1,reflectionBounces);
 
         IB_bodyPositions = world.getBodyPositionsBuffer();
         IB_bodySizes = world.getBodySizesBuffer();
@@ -303,7 +310,9 @@ public class Main {
         IB_bodyReflectivities = world.getBodyReflectivitiesBuffer();
 
         IB_skybox = world.getSkyboxBuffer();
-        IB_skyboxDimensions = world.getSkyboxDimensionsBuffer();
+//        IB_skyboxDimensions = world.getSkyboxDimensionsBuffer();
+        IB_dimensions.set(0, world.getSkyboxDimensionsBuffer()[0]);
+        IB_dimensions.set(1, world.getSkyboxDimensionsBuffer()[1]);
     }
 
 
@@ -323,7 +332,7 @@ public class Main {
         ts.transferToHost(DataTransferMode.EVERY_EXECUTION, OB_pixels);
 
         // Define worker grid
-        WorkerGrid worker = new WorkerGrid2D(IB_dimensions[0], IB_dimensions[1]);
+        WorkerGrid worker = new WorkerGrid2D(IB_dimensions.get(0), IB_dimensions.get(1));
         worker.setLocalWork(16, 16, 1);
         grid = new GridScheduler();
         grid.setWorkerGrid("s0.t0", worker);
@@ -389,7 +398,12 @@ public class Main {
                 camera.updatePositionOnMovement(fwd, back, strafeL, strafeR, up, down);
 
                 // Set the pixels on the canvas when render is ready
-                pixelWriter.setPixels(0, 0, width, height, format, OB_pixels, 0, width);
+
+                int[] temp =  new int[OB_pixels.getSize()];
+
+                temp = OB_pixels.getSegment().toArray(ValueLayout.JAVA_INT);
+
+                pixelWriter.setPixels(0, 0, width, height, format, temp, 0, width);
 
                 // Render
                 render();
@@ -458,8 +472,8 @@ public class Main {
         camera.updateBuffer();
         world.updateBodyPositionBuffer();
 
-        IB_rayTracingProperties[0] = shadowSampleSize;
-        IB_rayTracingProperties[1] = reflectionBounces;
+        IB_rayTracingProperties.set(0, shadowSampleSize);
+        IB_rayTracingProperties.set(1, reflectionBounces);
 
         // Render to output buffer
         if (renderWithTornado) {

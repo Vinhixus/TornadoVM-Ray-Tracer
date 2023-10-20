@@ -34,6 +34,8 @@ import uk.ac.manchester.tornado.api.WorkerGrid2D;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
+import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
+import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
 import uk.ac.manchester.tornado.api.enums.DataTransferMode;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
@@ -59,20 +61,31 @@ public class Benchmark {
     private static final int REFLECTION_BOUNCES = 4;
 
     // Output and input buffers
-    private static int[] pixels;
-    private static float[] camera;
-    private static int[] dimensions;
-    private static int[] rayTracingProperties;
+    private static IntArray pixels;
+    private static FloatArray camera;
+    private static IntArray dimensions;
+    private static IntArray rayTracingProperties;
 
     /**
      * Initialise rendering environment
      */
     private static void setRenderingProperties() {
-        dimensions = new int[]{WIDTH, HEIGHT};
-        pixels = new int[WIDTH * HEIGHT];
+        dimensions = new IntArray(2);
+        pixels = new IntArray(WIDTH * HEIGHT);
+        rayTracingProperties = new IntArray(2);
 
-        camera = new float[]{0, 0, -4F, 0, 0, 60};
-        rayTracingProperties = new int[]{SHADOW_SAMPLE_SIZE, REFLECTION_BOUNCES};
+        rayTracingProperties.set(0,SHADOW_SAMPLE_SIZE);
+        rayTracingProperties.set(0,REFLECTION_BOUNCES);
+
+        dimensions.set(0, WIDTH);
+        dimensions.set(1, HEIGHT);
+
+
+        camera = new FloatArray(4);
+        camera.set(0,0);
+        camera.set(1,0);
+        camera.set(2,-4F);
+        camera.set(3,60);
     }
 
     /**
@@ -88,7 +101,10 @@ public class Benchmark {
         System.out.println("Building world...");
         World world = new World();
         VectorFloat4 skybox = world.getSkyboxBuffer();
-        int[] skyboxDimensions = world.getSkyboxDimensionsBuffer();
+//        int[] skyboxDimensions = world.getSkyboxDimensionsBuffer();
+        IntArray skyboxDimensions = new IntArray(2);
+        skyboxDimensions.set(0, world.getSkyboxDimensionsBuffer()[0]);
+        skyboxDimensions.set(1, world.getSkyboxDimensionsBuffer()[1]);
         VectorFloat4 bodyPositions = world.getBodyPositionsBuffer();
         VectorFloat bodySizes = world.getBodySizesBuffer();
         VectorFloat4 bodyColors = world.getBodyColorsBuffer();

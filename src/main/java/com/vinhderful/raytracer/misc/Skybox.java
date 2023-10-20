@@ -20,6 +20,7 @@ package com.vinhderful.raytracer.misc;
 
 import com.vinhderful.raytracer.utils.Color;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -85,4 +86,5 @@ public class Skybox {
     public int[] getDimensionsBuffer() {
         return new int[]{image.getWidth(), image.getHeight()};
     }
+
 }

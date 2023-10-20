@@ -22,6 +22,7 @@ import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
 import uk.ac.manchester.tornado.api.collections.types.Float4;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
 
 import static com.vinhderful.raytracer.misc.World.*;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.abs;
@@ -251,7 +252,7 @@ public class BodyOps {
      * @param direction        the direction from the sphere origin to the surface
      * @return the UV-mapped color of the skybox at in the specified direction
      */
-    public static Float4 getSkyboxColor(VectorFloat4 skybox, int[] skyBoxDimensions, Float4 direction) {
+    public static Float4 getSkyboxColor(VectorFloat4 skybox, IntArray skyBoxDimensions, Float4 direction) {
 
         // Convert unit vector to texture coordinates
         // https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
@@ -259,8 +260,8 @@ public class BodyOps {
         float v = 0.5F - TornadoMath.asin(direction.getY()) / floatPI();
 
         // Get color from the skybox VectorFloat4
-        int x = (int) (u * (skyBoxDimensions[0] - 1));
-        int y = (int) (v * (skyBoxDimensions[1] - 1));
-        return skybox.get(x + y * skyBoxDimensions[0]);
+        int x = (int) (u * (skyBoxDimensions.get(0) - 1));
+        int y = (int) (v * (skyBoxDimensions.get(1) - 1));
+        return skybox.get(x + y * skyBoxDimensions.get(0));
     }
 }
