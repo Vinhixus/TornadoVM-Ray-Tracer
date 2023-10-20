@@ -97,7 +97,9 @@ public class Renderer {
         // Relatively to the viewport, the camera will be placed in the middle, with exactly one unit of distance to
         // the viewport calculated by the field of view (camera[5] = fov)
         // https://docs.microsoft.com/en-us/windows/win32/direct3d9/viewports-and-clipping
-        Float4 relativeCameraPosition = new Float4(0, 0, -1 / TornadoMath.tan(camera.get(5) * 0.5F * TO_RADIANS), 0);
+        float relativeValue = -1 / TornadoMath.tan(camera.get(5) * 0.5F * TO_RADIANS);
+
+        Float4 relativeCameraPosition = new Float4(0, 0, relativeValue, 0);
         Float4 cameraPosition = new Float4(camera.get(0), camera.get(1), camera.get(2), 0);
 
         // Get dimensions of the viewport
