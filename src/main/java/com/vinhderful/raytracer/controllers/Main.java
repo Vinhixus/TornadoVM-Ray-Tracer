@@ -295,14 +295,10 @@ public class Main {
         OB_pixels = new IntArray(width * height);
 
         // Input buffers
-        IB_dimensions = new IntArray(2);
-        IB_dimensions.set(0, width);
-        IB_dimensions.set(0, height);
+        IB_dimensions = new IntArray(width, height);
         IB_camera = camera.getBuffer();
 
-        IB_rayTracingProperties = new IntArray(2);
-        IB_rayTracingProperties.set(0,shadowSampleSize );
-        IB_rayTracingProperties.set(1,reflectionBounces);
+        IB_rayTracingProperties = new IntArray(shadowSampleSize, reflectionBounces);
 
         IB_bodyPositions = world.getBodyPositionsBuffer();
         IB_bodySizes = world.getBodySizesBuffer();
@@ -310,9 +306,10 @@ public class Main {
         IB_bodyReflectivities = world.getBodyReflectivitiesBuffer();
 
         IB_skybox = world.getSkyboxBuffer();
-//        IB_skyboxDimensions = world.getSkyboxDimensionsBuffer();
-        IB_dimensions.set(0, world.getSkyboxDimensionsBuffer()[0]);
-        IB_dimensions.set(1, world.getSkyboxDimensionsBuffer()[1]);
+
+        IB_dimensions = new IntArray(world.getSkyboxDimensionsBuffer()[0],world.getSkyboxDimensionsBuffer()[1]);
+//        IB_skyboxDimensions.set(0, world.getSkyboxDimensionsBuffer()[0]);
+//        IB_skyboxDimensions.set(1, world.getSkyboxDimensionsBuffer()[1]);
     }
 
 
@@ -401,7 +398,11 @@ public class Main {
 
                 int[] temp =  new int[OB_pixels.getSize()];
 
-                temp = OB_pixels.getSegment().toArray(ValueLayout.JAVA_INT);
+                for (int i = 0; i < OB_pixels.getSize(); i++) {
+                    temp[i] = OB_pixels.get(i);
+                }
+
+//                temp = OB_pixels.getSegment().toArray(ValueLayout.JAVA_INT);
 
                 pixelWriter.setPixels(0, 0, width, height, format, temp, 0, width);
 

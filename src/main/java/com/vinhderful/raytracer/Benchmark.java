@@ -71,23 +71,10 @@ public class Benchmark {
      * Initialise rendering environment
      */
     private static void setRenderingProperties() {
-        dimensions = new IntArray(2);
+        dimensions = new IntArray(WIDTH, HEIGHT);
         pixels = new IntArray(WIDTH * HEIGHT);
-        rayTracingProperties = new IntArray(2);
-
-        rayTracingProperties.set(0, SHADOW_SAMPLE_SIZE);
-        rayTracingProperties.set(0, REFLECTION_BOUNCES);
-
-        dimensions.set(0, WIDTH);
-        dimensions.set(1, HEIGHT);
-
-        camera = new FloatArray(6);
-        camera.set(0, 0);
-        camera.set(1, 0);
-        camera.set(2, -4F);
-        camera.set(3, 0);
-        camera.set(4, 0);
-        camera.set(5, 60);
+        rayTracingProperties = new IntArray(SHADOW_SAMPLE_SIZE, REFLECTION_BOUNCES);
+        camera = new FloatArray(0, 0, -4F, 0, 0, 60);
     }
 
     /**
@@ -98,18 +85,13 @@ public class Benchmark {
      */
     public static void main(String[] args) throws Exception {
 
-        setRenderingProperties(
-
-        );
+        setRenderingProperties();
 
         System.out.println("-----------------------------------------");
         System.out.println("Building world...");
         World world = new World();
         VectorFloat4 skybox = world.getSkyboxBuffer();
-        //        int[] skyboxDimensions = world.getSkyboxDimensionsBuffer();
-        IntArray skyboxDimensions = new IntArray(2);
-        skyboxDimensions.set(0, world.getSkyboxDimensionsBuffer()[0]);
-        skyboxDimensions.set(1, world.getSkyboxDimensionsBuffer()[1]);
+        IntArray skyboxDimensions = new IntArray(world.getSkyboxDimensionsBuffer()[0], world.getSkyboxDimensionsBuffer()[1]);
         VectorFloat4 bodyPositions = world.getBodyPositionsBuffer();
         VectorFloat bodySizes = world.getBodySizesBuffer();
         VectorFloat4 bodyColors = world.getBodyColorsBuffer();
@@ -183,15 +165,11 @@ public class Benchmark {
         System.out.println("-----------------------------------------");
         System.out.println("Running [JAVA PARALLEL STREAMS]");
 
-        for (int i = 0; i < FRAMES_TO_GENERATE; i++)
-            Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties,
-                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    skybox, skyboxDimensions);
-
+        for (int i = 0; i < FRAMES_TO_GENERATE; i++) {
+            Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
+        }
         long startTime = System.nanoTime();
-                Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties,
-                        bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                        skybox, skyboxDimensions);
+        Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
         long endTime = System.nanoTime();
         double javaStreamsTime = (endTime - startTime) / 1000000.0;
         System.out.println("Duration: " + javaStreamsTime + " ms");
