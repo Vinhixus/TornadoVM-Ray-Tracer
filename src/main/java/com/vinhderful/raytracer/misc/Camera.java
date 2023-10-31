@@ -18,14 +18,15 @@
  */
 package com.vinhderful.raytracer.misc;
 
-import com.vinhderful.raytracer.Settings;
-import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
-import uk.ac.manchester.tornado.api.collections.types.Float3;
-import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
-
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
 import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.min;
+
+import com.vinhderful.raytracer.Settings;
+
+import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
+import uk.ac.manchester.tornado.api.collections.types.Float3;
+import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
 
 /**
  * Represents a scene camera with:
@@ -60,7 +61,8 @@ public class Camera {
      * Create a camera given a world to know where the plane height is,
      * camera will not be allowed to go under the plane
      *
-     * @param world the world containing the plane
+     * @param world
+     *     the world containing the plane
      */
     public Camera(World world) {
         position = Settings.INITIAL_CAMERA_POSITION;
@@ -97,11 +99,11 @@ public class Camera {
      */
     public void updateBuffer() {
         buffer.set(0, position.getX());
-        buffer.set(1 , position.getY());
-        buffer.set(2 ,  position.getZ());
+        buffer.set(1, position.getY());
+        buffer.set(2, position.getZ());
         buffer.set(3, yaw);
         buffer.set(4, pitch);
-        buffer.set(5,  fov);
+        buffer.set(5, fov);
     }
 
     /**
@@ -114,25 +116,29 @@ public class Camera {
         float _pitch = -pitch * TO_RADIANS;
 
         // Calculate forward pointing vector from yaw and pitch
-        Float3 fwdVector = Float3.normalise(new Float3(
-                TornadoMath.sin(_yaw) * TornadoMath.cos(_pitch),
-                        TornadoMath.sin(_pitch),
-                TornadoMath.cos(_yaw) * TornadoMath.cos(_pitch)));
+        Float3 fwdVector = Float3.normalise(new Float3(TornadoMath.sin(_yaw) * TornadoMath.cos(_pitch), TornadoMath.sin(_pitch), TornadoMath.cos(_yaw) * TornadoMath.cos(_pitch)));
 
         // Calculate left and right pointing vector from forward and up vectors
         Float3 leftVector = Float3.normalise(Float3.cross(fwdVector, upVector));
         Float3 rightVector = Float3.normalise(Float3.cross(upVector, fwdVector));
 
         // Depending on key pressed, update camera position
-        if (fwd) position = Float3.add(position, Float3.mult(fwdVector, moveSpeed));
-        if (back) position = Float3.sub(position, Float3.mult(fwdVector, moveSpeed));
-        if (strafeL) position = Float3.add(position, Float3.mult(leftVector, moveSpeed));
-        if (strafeR) position = Float3.add(position, Float3.mult(rightVector, moveSpeed));
-        if (up) position = Float3.add(position, Float3.mult(upVector, moveSpeed));
-        if (down) position = Float3.sub(position, Float3.mult(upVector, moveSpeed));
+        if (fwd)
+            position = Float3.add(position, Float3.mult(fwdVector, moveSpeed));
+        if (back)
+            position = Float3.sub(position, Float3.mult(fwdVector, moveSpeed));
+        if (strafeL)
+            position = Float3.add(position, Float3.mult(leftVector, moveSpeed));
+        if (strafeR)
+            position = Float3.add(position, Float3.mult(rightVector, moveSpeed));
+        if (up)
+            position = Float3.add(position, Float3.mult(upVector, moveSpeed));
+        if (down)
+            position = Float3.sub(position, Float3.mult(upVector, moveSpeed));
 
         // Limit camera to above plane
-        if (position.getY() < planeHeight) position.setY(planeHeight);
+        if (position.getY() < planeHeight)
+            position.setY(planeHeight);
     }
 
     /**
@@ -160,7 +166,8 @@ public class Camera {
     /**
      * Set the camera field of view to a given value
      *
-     * @param fov the desired fov value
+     * @param fov
+     *     the desired fov value
      */
     public void setFov(float fov) {
         this.fov = fov;

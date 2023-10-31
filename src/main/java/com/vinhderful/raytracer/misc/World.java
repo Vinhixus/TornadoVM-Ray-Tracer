@@ -18,22 +18,23 @@
  */
 package com.vinhderful.raytracer.misc;
 
-import com.vinhderful.raytracer.misc.bodies.Body;
-import com.vinhderful.raytracer.misc.bodies.Light;
-import com.vinhderful.raytracer.misc.bodies.Plane;
-import com.vinhderful.raytracer.misc.bodies.Sphere;
-import com.vinhderful.raytracer.utils.Color;
-import com.vinhderful.raytracer.utils.Float4Ext;
-import uk.ac.manchester.tornado.api.collections.types.Float4;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
-
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.vinhderful.raytracer.misc.bodies.Body;
+import com.vinhderful.raytracer.misc.bodies.Light;
+import com.vinhderful.raytracer.misc.bodies.Plane;
+import com.vinhderful.raytracer.misc.bodies.Sphere;
+import com.vinhderful.raytracer.utils.Color;
+import com.vinhderful.raytracer.utils.Float4Ext;
+
+import uk.ac.manchester.tornado.api.collections.types.Float4;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 /**
  * A world representing objects in the scene
@@ -91,7 +92,8 @@ public class World {
     /**
      * Instantiate a default world
      *
-     * @throws Exception is thrown if light is not found at index 0 or plane is not found at index 1
+     * @throws Exception
+     *     is thrown if light is not found at index 0 or plane is not found at index 1
      */
     public World() throws Exception {
 
@@ -122,8 +124,10 @@ public class World {
     /**
      * Helper function to generate a random float value between min and max
      *
-     * @param min the minimum boundary of the random float
-     * @param max the maximum boundary of the random float
+     * @param min
+     *     the minimum boundary of the random float
+     * @param max
+     *     the maximum boundary of the random float
      * @return a random float between min and max
      */
     private float randFloat(float min, float max) {
@@ -133,8 +137,10 @@ public class World {
     /**
      * Helper function to generate a random position given a minimum and maximum coordinate value
      *
-     * @param min the minimum coordinate value
-     * @param max the maximum coordinate value
+     * @param min
+     *     the minimum coordinate value
+     * @param max
+     *     the maximum coordinate value
      * @return a random position bounded by min and max
      */
     private Float4 getRandomPosition(float min, float max) {
@@ -154,12 +160,12 @@ public class World {
         System.out.println("-> Adding object to the scene...");
 
         // Light
-            light = new Light(new Float4(0, 0, 0, 0), 1.2F, Color.WHITE);
-            addBody(light);
+        light = new Light(new Float4(0, 0, 0, 0), 1.2F, Color.WHITE);
+        addBody(light);
 
-            // Plane
-            plane = new Plane(24F, 36F);
-            addBody(plane);
+        // Plane
+        plane = new Plane(24F, 36F);
+        addBody(plane);
 
         // Spheres
         addBody(new Sphere(new Float4(-8, -8, 0, 0), 1.75F, Color.WHITE, 16));
@@ -194,7 +200,8 @@ public class World {
                             overlaps = true;
                             break;
                         }
-                    if (!overlaps) break;
+                    if (!overlaps)
+                        break;
                 }
             }
 
@@ -232,8 +239,10 @@ public class World {
      * Toggle between enabled/disabled physics
      */
     public void togglePhysics() {
-        if (physicsEnabled) disablePhysics();
-        else enablePhysics();
+        if (physicsEnabled)
+            disablePhysics();
+        else
+            enablePhysics();
     }
 
     /**
@@ -247,10 +256,10 @@ public class World {
         bodyPositions = new VectorFloat4(numBodies);
         bodySizes = new VectorFloat(numBodies);
         bodyColors = new VectorFloat4(numBodies);
-       bodyReflectivities = new VectorFloat(numBodies);
+        bodyReflectivities = new VectorFloat(numBodies);
 
         for (int i = 0; i < numBodies; i++) {
-           Body body = bodies.get(i);
+            Body body = bodies.get(i);
 
             bodyPositions.set(i, body.getPosition());
             bodySizes.set(i, body.getSize());
@@ -349,7 +358,8 @@ public class World {
     /**
      * Add a body to the world
      *
-     * @param body the body to add
+     * @param body
+     *     the body to add
      */
     private void addBody(Body body) {
         bodies.add(body);

@@ -18,14 +18,15 @@
  */
 package com.vinhderful.raytracer.misc;
 
-import com.vinhderful.raytracer.utils.Color;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
-import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
+
+import javax.imageio.ImageIO;
+
+import com.vinhderful.raytracer.utils.Color;
+
+import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 
 /**
  * Represents a spherical skybox initialised by image
@@ -38,7 +39,8 @@ public class Skybox {
     /**
      * Read the given resource into a BufferedImage
      *
-     * @param resourceName the ray to the resource
+     * @param resourceName
+     *     the ray to the resource
      */
     public Skybox(String resourceName) {
 
@@ -85,7 +87,7 @@ public class Skybox {
      * @return the dimensions int array containing [0] = width, [1] = height
      */
     public int[] getDimensionsBuffer() {
-        return new int[]{image.getWidth(), image.getHeight()};
+        return new int[] { image.getWidth(), image.getHeight() };
     }
 
 }
