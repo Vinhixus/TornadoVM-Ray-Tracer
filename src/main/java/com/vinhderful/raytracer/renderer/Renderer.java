@@ -21,6 +21,8 @@ package com.vinhderful.raytracer.renderer;
 import static com.vinhderful.raytracer.misc.World.LIGHT_INDEX;
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
 
+import java.util.stream.IntStream;
+
 import com.vinhderful.raytracer.utils.BodyOps;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Float4Ext;
@@ -33,8 +35,6 @@ import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
 import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
 
-import java.util.stream.IntStream;
-
 /**
  * The Renderer class contains the main parallelized render method
  */
@@ -43,9 +43,12 @@ public class Renderer {
     /**
      * Calculate the OpenGL style x coordinate of the canvas, where (0, 0) is the middle of the screen
      *
-     * @param width  the width of the canvas
-     * @param height the height of the canvas
-     * @param x      the pixel's x coordinate
+     * @param width
+     *     the width of the canvas
+     * @param height
+     *     the height of the canvas
+     * @param x
+     *     the pixel's x coordinate
      * @return the normalized OpenGL-style x coordinate
      */
     public static float getNormalizedX(int width, int height, int x) {
@@ -58,9 +61,12 @@ public class Renderer {
     /**
      * Calculate the OpenGL style y coordinate of the canvas, where (0, 0) is the middle of the screen
      *
-     * @param width  the width of the canvas
-     * @param height the height of the canvas
-     * @param y      the pixel's y coordinate
+     * @param width
+     *     the width of the canvas
+     * @param height
+     *     the height of the canvas
+     * @param y
+     *     the pixel's y coordinate
      * @return the normalized OpenGL-style y coordinate
      */
     public static float getNormalizedY(int width, int height, int y) {
@@ -74,25 +80,34 @@ public class Renderer {
      * The main render function takes information from the INPUT BUFFERS, performs ray tracing and calculates an
      * INT_RGB value for each pixel writing to the OUTPUT BUFFER
      *
-     * @param pixels               OUTPUT BUFFER - int array of size width * height, where the calculated
-     *                             INT_RGB pixel colors are written
-     * @param dimensions           INPUT BUFFER - 2 element int array containing dimensions of the canvas
-     *                             0 - width; 1 - height
-     * @param camera               INPUT BUFFER - 6 element float array containing camera properties
-     *                             0, 1, 2 - x, y, z coordinates of position; 3, 4 - yaw, pitch; 5 - fov
-     * @param rayTracingProperties INPUT BUFFER - 2 element int array containing:
-     *                             0 - shadow sample size; 1 - reflection bounce limit
-     * @param bodyPositions        INPUT BUFFER - VectorFloat4 containing positions of the objects in the scene
-     * @param bodySizes            INPUT BUFFER - VectorFloat4 containing sizes of the objects in the scene
-     * @param bodyColors           INPUT BUFFER - VectorFloat4 containing colors of the objects in the scene
-     * @param bodyReflectivities   INPUT BUFFER - VectorFloat4 containing reflectivities of the objects in the scene
-     * @param skybox               INPUT BUFFER - VectorFloat4 representing the skybox colors
-     * @param skyboxDimensions     INPUT BUFFER - 2 element int array containing the dimensions of the skybox image
-     *                             0 - skybox image width; 1 - skybox image height
+     * @param pixels
+     *     OUTPUT BUFFER - int array of size width * height, where the calculated
+     *     INT_RGB pixel colors are written
+     * @param dimensions
+     *     INPUT BUFFER - 2 element int array containing dimensions of the canvas
+     *     0 - width; 1 - height
+     * @param camera
+     *     INPUT BUFFER - 6 element float array containing camera properties
+     *     0, 1, 2 - x, y, z coordinates of position; 3, 4 - yaw, pitch; 5 - fov
+     * @param rayTracingProperties
+     *     INPUT BUFFER - 2 element int array containing:
+     *     0 - shadow sample size; 1 - reflection bounce limit
+     * @param bodyPositions
+     *     INPUT BUFFER - VectorFloat4 containing positions of the objects in the scene
+     * @param bodySizes
+     *     INPUT BUFFER - VectorFloat4 containing sizes of the objects in the scene
+     * @param bodyColors
+     *     INPUT BUFFER - VectorFloat4 containing colors of the objects in the scene
+     * @param bodyReflectivities
+     *     INPUT BUFFER - VectorFloat4 containing reflectivities of the objects in the scene
+     * @param skybox
+     *     INPUT BUFFER - VectorFloat4 representing the skybox colors
+     * @param skyboxDimensions
+     *     INPUT BUFFER - 2 element int array containing the dimensions of the skybox image
+     *     0 - skybox image width; 1 - skybox image height
      */
-    public static void render(IntArray pixels, IntArray dimensions, FloatArray camera, IntArray rayTracingProperties,
-                              VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              VectorFloat4 skybox, IntArray skyboxDimensions) {
+    public static void render(IntArray pixels, IntArray dimensions, FloatArray camera, IntArray rayTracingProperties, VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors,
+            VectorFloat bodyReflectivities, VectorFloat4 skybox, IntArray skyboxDimensions) {
 
         // Relatively to the viewport, the camera will be placed in the middle, with exactly one unit of distance to
         // the viewport calculated by the field of view (camera[5] = fov)
@@ -133,18 +148,15 @@ public class Renderer {
                     // If the hit object is the light source, then simply paint the light source's color
                     // This will give a flat white circle is a white sphere light
                     if (hitIndex == LIGHT_INDEX) {
-                        pixels.set(x + y * width,  Color.toInt(bodyColors.get(LIGHT_INDEX)));
+                        //                        pixels.set(x + y * width,  Color.toInt(bodyColors.get(LIGHT_INDEX)));
                     }
 
                     // If the hit object is not a light source, then compute the pixel color after calculating
                     // shading reflections and shadows
                     else {
                         Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
-                        Float4 pixelColor = RayTracer.getPixelColor(
-                                hitIndex, hitPosition, cameraPosition, rayDirection,
-                                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                                skybox, skyboxDimensions,
-                                shadowSampleSize, reflectionBounceLimit);
+                        Float4 pixelColor = RayTracer.getPixelColor(hitIndex, hitPosition, cameraPosition, rayDirection, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox,
+                                skyboxDimensions, shadowSampleSize, reflectionBounceLimit);
 
                         pixels.set(x + y * width, Color.toInt(pixelColor));
                     }
@@ -157,9 +169,8 @@ public class Renderer {
             }
     }
 
-    public static void renderWithParallelStreams(IntArray pixels, IntArray dimensions, FloatArray camera, IntArray rayTracingProperties,
-                              VectorFloat4 bodyPositions, VectorFloat bodySizes, VectorFloat4 bodyColors, VectorFloat bodyReflectivities,
-                              VectorFloat4 skybox, IntArray skyboxDimensions) {
+    public static void renderWithParallelStreams(IntArray pixels, IntArray dimensions, FloatArray camera, IntArray rayTracingProperties, VectorFloat4 bodyPositions, VectorFloat bodySizes,
+            VectorFloat4 bodyColors, VectorFloat bodyReflectivities, VectorFloat4 skybox, IntArray skyboxDimensions) {
 
         // Relatively to the viewport, the camera will be placed in the middle, with exactly one unit of distance to
         // the viewport calculated by the field of view (camera[5] = fov)
@@ -201,11 +212,8 @@ public class Renderer {
                     // shading reflections and shadows
                     else {
                         Float4 hitPosition = new Float4(hit.getX(), hit.getY(), hit.getZ(), 0);
-                        Float4 pixelColor = RayTracer.getPixelColor(
-                                hitIndex, hitPosition, cameraPosition, rayDirection,
-                                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                                skybox, skyboxDimensions,
-                                shadowSampleSize, reflectionBounceLimit);
+                        Float4 pixelColor = RayTracer.getPixelColor(hitIndex, hitPosition, cameraPosition, rayDirection, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox,
+                                skyboxDimensions, shadowSampleSize, reflectionBounceLimit);
 
                         pixels.set(x + y * width, Color.toInt(pixelColor));
                     }

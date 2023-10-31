@@ -263,7 +263,7 @@ public class Main {
 
 
     /**
-     * Initialise canvas, dimensions, pixel writer, format, camera and ray tracing properties
+     * IInitialise canvas, dimensions, pixel writer, format, camera and ray tracing properties
      */
     private void setupRenderingEnvironment() {
 
@@ -307,9 +307,10 @@ public class Main {
 
         IB_skybox = world.getSkyboxBuffer();
 
-        IB_dimensions = new IntArray(world.getSkyboxDimensionsBuffer()[0],world.getSkyboxDimensionsBuffer()[1]);
-//        IB_skyboxDimensions.set(0, world.getSkyboxDimensionsBuffer()[0]);
-//        IB_skyboxDimensions.set(1, world.getSkyboxDimensionsBuffer()[1]);
+
+        IB_skyboxDimensions = new IntArray( world.getSkyboxDimensionsBuffer()[0],  world.getSkyboxDimensionsBuffer()[1]);
+
+
     }
 
 
@@ -402,7 +403,6 @@ public class Main {
                     temp[i] = OB_pixels.get(i);
                 }
 
-//                temp = OB_pixels.getSegment().toArray(ValueLayout.JAVA_INT);
 
                 pixelWriter.setPixels(0, 0, width, height, format, temp, 0, width);
 
