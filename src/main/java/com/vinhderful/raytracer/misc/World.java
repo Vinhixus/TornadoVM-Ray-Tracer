@@ -154,12 +154,12 @@ public class World {
         System.out.println("-> Adding object to the scene...");
 
         // Light
-        light = new Light(new Float4(0, 0, 0, 0), 1.2F, Color.WHITE);
-        addBody(light);
+            light = new Light(new Float4(0, 0, 0, 0), 1.2F, Color.WHITE);
+            addBody(light);
 
-        // Plane
-        plane = new Plane(24F, 36F);
-        addBody(plane);
+            // Plane
+            plane = new Plane(24F, 36F);
+            addBody(plane);
 
         // Spheres
         addBody(new Sphere(new Float4(-8, -8, 0, 0), 1.75F, Color.WHITE, 16));
@@ -247,10 +247,10 @@ public class World {
         bodyPositions = new VectorFloat4(numBodies);
         bodySizes = new VectorFloat(numBodies);
         bodyColors = new VectorFloat4(numBodies);
-        bodyReflectivities = new VectorFloat(numBodies);
+       bodyReflectivities = new VectorFloat(numBodies);
 
         for (int i = 0; i < numBodies; i++) {
-            Body body = bodies.get(i);
+           Body body = bodies.get(i);
 
             bodyPositions.set(i, body.getPosition());
             bodySizes.set(i, body.getSize());

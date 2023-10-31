@@ -62,11 +62,12 @@ public class Skybox {
         int width = image.getWidth();
         int height = image.getHeight();
 
-        buffer = new VectorFloat4(width * height);
-
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
+        buffer = new VectorFloat4(width * height); // 8192 , 4096
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 buffer.set(x + y * width, Color.toFloat4(image.getRGB(x, y)));
+            }
+        }
     }
 
     /**

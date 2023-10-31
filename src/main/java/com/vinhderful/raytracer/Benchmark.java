@@ -18,6 +18,7 @@
  */
 package com.vinhderful.raytracer;
 
+import java.lang.foreign.Arena;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -48,10 +49,10 @@ import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 @SuppressWarnings("PrimitiveArrayArgumentToVarargsMethod")
 public class Benchmark {
 
-    private static final boolean SKIP_SEQUENTIAL = Boolean.parseBoolean(System.getProperty("skip.sequential", "True"));
+    private static final boolean SKIP_SEQUENTIAL = Boolean.parseBoolean(System.getProperty("skip.sequential", "False"));
 
     // The number of frames to generate
-    private static final int FRAMES_TO_GENERATE = 100;
+    private static final int FRAMES_TO_GENERATE = 100 ;
 
     // Dimensions of the viewport
     private static final int WIDTH = 1280;
@@ -91,7 +92,7 @@ public class Benchmark {
         System.out.println("Building world...");
         World world = new World();
         VectorFloat4 skybox = world.getSkyboxBuffer();
-        IntArray skyboxDimensions = new IntArray(world.getSkyboxDimensionsBuffer()[0], world.getSkyboxDimensionsBuffer()[1]);
+       IntArray skyboxDimensions = new IntArray(world.getSkyboxDimensionsBuffer()[0], world.getSkyboxDimensionsBuffer()[1]);
         VectorFloat4 bodyPositions = world.getBodyPositionsBuffer();
         VectorFloat bodySizes = world.getBodySizesBuffer();
         VectorFloat4 bodyColors = world.getBodyColorsBuffer();
@@ -149,12 +150,12 @@ public class Benchmark {
             // ==============================================================
             System.out.println("-----------------------------------------");
             System.out.println("Running [JAVA SEQUENTIAL]");
-            for (int i = 0; i < FRAMES_TO_GENERATE; i++) {
+                for (int i = 0; i < FRAMES_TO_GENERATE; i++) {
+                    Renderer.render(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
+                }
+                long startTime = System.nanoTime();
                 Renderer.render(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
-            }
-            long startTime = System.nanoTime();
-            Renderer.render(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
-            long endTime = System.nanoTime();
+                long endTime = System.nanoTime();
             sequentialTime = (endTime - startTime) / 1000000.0;
             System.out.println("Duration: " + sequentialTime + " ms");
         }
