@@ -24,7 +24,6 @@ import com.vinhderful.raytracer.misc.World;
 import com.vinhderful.raytracer.renderer.Renderer;
 
 import uk.ac.manchester.tornado.api.GridScheduler;
-import uk.ac.manchester.tornado.api.ImmutableTaskGraph;
 import uk.ac.manchester.tornado.api.TaskGraph;
 import uk.ac.manchester.tornado.api.TornadoDriver;
 import uk.ac.manchester.tornado.api.TornadoExecutionPlan;
@@ -34,6 +33,8 @@ import uk.ac.manchester.tornado.api.WorkerGrid2D;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
 import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
 import uk.ac.manchester.tornado.api.common.TornadoDevice;
+import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
+import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
 import uk.ac.manchester.tornado.api.enums.DataTransferMode;
 import uk.ac.manchester.tornado.api.runtime.TornadoRuntime;
 
@@ -59,26 +60,26 @@ public class Benchmark {
     private static final int REFLECTION_BOUNCES = 4;
 
     // Output and input buffers
-    private static int[] pixels;
-    private static float[] camera;
-    private static int[] dimensions;
-    private static int[] rayTracingProperties;
+    private static IntArray pixels;
+    private static FloatArray camera;
+    private static IntArray dimensions;
+    private static IntArray rayTracingProperties;
 
     /**
      * Initialise rendering environment
      */
     private static void setRenderingProperties() {
-        dimensions = new int[]{WIDTH, HEIGHT};
-        pixels = new int[WIDTH * HEIGHT];
-
-        camera = new float[]{0, 0, -4F, 0, 0, 60};
-        rayTracingProperties = new int[]{SHADOW_SAMPLE_SIZE, REFLECTION_BOUNCES};
+        dimensions = new IntArray(WIDTH, HEIGHT);
+        pixels = new IntArray(WIDTH * HEIGHT);
+        rayTracingProperties = new IntArray(SHADOW_SAMPLE_SIZE, REFLECTION_BOUNCES);
+        camera = new FloatArray(0, 0, -4F, 0, 0, 60);
     }
 
     /**
      * Main program
      *
-     * @param args program arguments
+     * @param args
+     *     program arguments
      */
     public static void main(String[] args) throws Exception {
 
@@ -88,7 +89,7 @@ public class Benchmark {
         System.out.println("Building world...");
         World world = new World();
         VectorFloat4 skybox = world.getSkyboxBuffer();
-        int[] skyboxDimensions = world.getSkyboxDimensionsBuffer();
+        IntArray skyboxDimensions = new IntArray(world.getSkyboxDimensionsBuffer()[0], world.getSkyboxDimensionsBuffer()[1]);
         VectorFloat4 bodyPositions = world.getBodyPositionsBuffer();
         VectorFloat bodySizes = world.getBodySizesBuffer();
         VectorFloat4 bodyColors = world.getBodyColorsBuffer();
@@ -98,10 +99,7 @@ public class Benchmark {
         TaskGraph ts = new TaskGraph("s0");
         ts.transferToDevice(DataTransferMode.EVERY_EXECUTION, camera, rayTracingProperties, bodyPositions);
         ts.transferToDevice(DataTransferMode.FIRST_EXECUTION, dimensions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
-        ts.task("t0", Renderer::render, pixels,
-                dimensions, camera, rayTracingProperties,
-                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                skybox, skyboxDimensions);
+        ts.task("t0", Renderer::render, pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
         ts.transferToHost(DataTransferMode.EVERY_EXECUTION, pixels);
 
         // Set up worker grid
@@ -142,7 +140,6 @@ public class Benchmark {
             }
         }
 
-
         double sequentialTime = 0.0;
         if (!SKIP_SEQUENTIAL) {
             // ==============================================================
@@ -150,15 +147,11 @@ public class Benchmark {
             // ==============================================================
             System.out.println("-----------------------------------------");
             System.out.println("Running [JAVA SEQUENTIAL]");
-            for (int i = 0; i < FRAMES_TO_GENERATE; i++)
-                Renderer.render(pixels, dimensions, camera, rayTracingProperties,
-                        bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                        skybox, skyboxDimensions);
-
+            for (int i = 0; i < FRAMES_TO_GENERATE; i++) {
+                Renderer.render(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
+            }
             long startTime = System.nanoTime();
-            Renderer.render(pixels, dimensions, camera, rayTracingProperties,
-                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    skybox, skyboxDimensions);
+            Renderer.render(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
             long endTime = System.nanoTime();
             sequentialTime = (endTime - startTime) / 1000000.0;
             System.out.println("Duration: " + sequentialTime + " ms");
@@ -170,15 +163,12 @@ public class Benchmark {
         System.out.println("-----------------------------------------");
         System.out.println("Running [JAVA PARALLEL STREAMS]");
 
-        for (int i = 0; i < FRAMES_TO_GENERATE; i++)
-            Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties,
-                    bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                    skybox, skyboxDimensions);
+        for (int i = 0; i < FRAMES_TO_GENERATE; i++) {
+            Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
+        }
 
         long startTime = System.nanoTime();
-        Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties,
-                bodyPositions, bodySizes, bodyColors, bodyReflectivities,
-                skybox, skyboxDimensions);
+        Renderer.renderWithParallelStreams(pixels, dimensions, camera, rayTracingProperties, bodyPositions, bodySizes, bodyColors, bodyReflectivities, skybox, skyboxDimensions);
         long endTime = System.nanoTime();
         double javaStreamsTime = (endTime - startTime) / 1000000.0;
         System.out.println("Duration: " + javaStreamsTime + " ms");
@@ -195,9 +185,9 @@ public class Benchmark {
             System.out.println("-----------------------------------------");
             System.out.println("Running with TornadoVM for device: " + device);
 
-            for (int i = 0; i < FRAMES_TO_GENERATE; i++)
+            for (int i = 0; i < FRAMES_TO_GENERATE; i++) {
                 rayTracingPlan.execute();
-
+            }
             startTime = System.nanoTime();
             rayTracingPlan.execute();
             endTime = System.nanoTime();
