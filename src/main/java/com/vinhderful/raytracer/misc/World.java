@@ -31,10 +31,9 @@ import com.vinhderful.raytracer.misc.bodies.Plane;
 import com.vinhderful.raytracer.misc.bodies.Sphere;
 import com.vinhderful.raytracer.utils.Color;
 import com.vinhderful.raytracer.utils.Float4Ext;
-
-import uk.ac.manchester.tornado.api.collections.types.Float4;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.types.collections.VectorFloat;
+import uk.ac.manchester.tornado.api.types.collections.VectorFloat4;
+import uk.ac.manchester.tornado.api.types.vectors.Float4;
 
 /**
  * A world representing objects in the scene

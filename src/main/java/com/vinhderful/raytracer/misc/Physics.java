@@ -23,8 +23,7 @@ import static com.vinhderful.raytracer.misc.World.SPHERES_START_INDEX;
 import java.util.ArrayList;
 
 import com.vinhderful.raytracer.misc.bodies.Body;
-
-import uk.ac.manchester.tornado.api.collections.types.Float4;
+import uk.ac.manchester.tornado.api.types.vectors.Float4;
 
 /**
  * The physics class includes logic for gravity and collision detection using the Verlet Integration.

@@ -7,7 +7,7 @@ JFLAGS=".:${JAVAFX_SDK}/lib -Xms18G -Xmx18G --add-modules ALL-SYSTEM,javafx.cont
 if [ $# -eq 0 ]; then
 	echo "------------------------------------"
 	echo "Running TornadoVM Ray Tracer with GUI..."
-	tornado --module-path="${JFLAGS}" --classpath="${CLASSPATH}:${JARS}"  com.vinhderful.raytracer.App
+	tornado --module-path="${JFLAGS}" --printKernel --threadInfo --classpath="${CLASSPATH}:${JARS}"  com.vinhderful.raytracer.App
 elif [ "$1" == "benchmark" ]; then
 	echo "-----------------------------------------"
 	echo "Running TornadoVM Ray Tracer benchmark mode..."

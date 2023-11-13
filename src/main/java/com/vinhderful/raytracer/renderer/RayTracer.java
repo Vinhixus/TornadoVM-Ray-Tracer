@@ -25,15 +25,14 @@ import static com.vinhderful.raytracer.renderer.Shader.MAX_REFLECTIVITY;
 import static com.vinhderful.raytracer.renderer.Shader.getDiffuse;
 import static com.vinhderful.raytracer.renderer.Shader.getShadow;
 import static com.vinhderful.raytracer.renderer.Shader.getSpecular;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
+import static uk.ac.manchester.tornado.api.math.TornadoMath.max;
 
 import com.vinhderful.raytracer.utils.BodyOps;
 import com.vinhderful.raytracer.utils.Color;
-
-import uk.ac.manchester.tornado.api.collections.types.Float4;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat;
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
-import uk.ac.manchester.tornado.api.data.nativetypes.IntArray;
+import uk.ac.manchester.tornado.api.types.arrays.IntArray;
+import uk.ac.manchester.tornado.api.types.collections.VectorFloat;
+import uk.ac.manchester.tornado.api.types.collections.VectorFloat4;
+import uk.ac.manchester.tornado.api.types.vectors.Float4;
 
 /**
  * The Ray Tracer class contains algorithms that bounce rays around the scene to gather color, shading and reflection

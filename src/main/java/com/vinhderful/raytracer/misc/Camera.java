@@ -19,14 +19,13 @@
 package com.vinhderful.raytracer.misc;
 
 import static com.vinhderful.raytracer.utils.Angle.TO_RADIANS;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.max;
-import static uk.ac.manchester.tornado.api.collections.math.TornadoMath.min;
+import static uk.ac.manchester.tornado.api.math.TornadoMath.max;
+import static uk.ac.manchester.tornado.api.math.TornadoMath.min;
 
 import com.vinhderful.raytracer.Settings;
-
-import uk.ac.manchester.tornado.api.collections.math.TornadoMath;
-import uk.ac.manchester.tornado.api.collections.types.Float3;
-import uk.ac.manchester.tornado.api.data.nativetypes.FloatArray;
+import uk.ac.manchester.tornado.api.math.TornadoMath;
+import uk.ac.manchester.tornado.api.types.arrays.FloatArray;
+import uk.ac.manchester.tornado.api.types.vectors.Float3;
 
 /**
  * Represents a scene camera with:

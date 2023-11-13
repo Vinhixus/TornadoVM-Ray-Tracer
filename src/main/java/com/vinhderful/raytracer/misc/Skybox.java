@@ -25,8 +25,7 @@ import java.util.Objects;
 import javax.imageio.ImageIO;
 
 import com.vinhderful.raytracer.utils.Color;
-
-import uk.ac.manchester.tornado.api.collections.types.VectorFloat4;
+import uk.ac.manchester.tornado.api.types.collections.VectorFloat4;
 
 /**
  * Represents a spherical skybox initialised by image
