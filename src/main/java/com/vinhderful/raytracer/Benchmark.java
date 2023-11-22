@@ -69,10 +69,10 @@ public class Benchmark {
      * Initialise rendering environment
      */
     private static void setRenderingProperties() {
-        dimensions = new IntArray(WIDTH, HEIGHT);
+        dimensions = IntArray.fromElements(WIDTH, HEIGHT);
         pixels = new IntArray(WIDTH * HEIGHT);
-        rayTracingProperties = new IntArray(SHADOW_SAMPLE_SIZE, REFLECTION_BOUNCES);
-        camera = new FloatArray(0, 0, -4F, 0, 0, 60);
+        rayTracingProperties = IntArray.fromElements(SHADOW_SAMPLE_SIZE, REFLECTION_BOUNCES);
+        camera = FloatArray.fromElements(0, 0, -4F, 0, 0, 60);
     }
 
     /**
@@ -89,7 +89,7 @@ public class Benchmark {
         System.out.println("Building world...");
         World world = new World();
         VectorFloat4 skybox = world.getSkyboxBuffer();
-        IntArray skyboxDimensions = new IntArray(world.getSkyboxDimensionsBuffer()[0], world.getSkyboxDimensionsBuffer()[1]);
+        IntArray skyboxDimensions = IntArray.fromElements(world.getSkyboxDimensionsBuffer()[0], world.getSkyboxDimensionsBuffer()[1]);
         VectorFloat4 bodyPositions = world.getBodyPositionsBuffer();
         VectorFloat bodySizes = world.getBodySizesBuffer();
         VectorFloat4 bodyColors = world.getBodyColorsBuffer();

@@ -295,10 +295,10 @@ public class Main {
         OB_pixels = new IntArray(width * height);
 
         // Input buffers
-        IB_dimensions = new IntArray(width, height);
+        IB_dimensions = IntArray.fromElements(width, height);
         IB_camera = camera.getBuffer();
 
-        IB_rayTracingProperties = new IntArray(shadowSampleSize, reflectionBounces);
+        IB_rayTracingProperties = IntArray.fromElements(shadowSampleSize, reflectionBounces);
 
         IB_bodyPositions = world.getBodyPositionsBuffer();
         IB_bodySizes = world.getBodySizesBuffer();
@@ -308,7 +308,7 @@ public class Main {
         IB_skybox = world.getSkyboxBuffer();
 
 
-        IB_skyboxDimensions = new IntArray( world.getSkyboxDimensionsBuffer()[0],  world.getSkyboxDimensionsBuffer()[1]);
+        IB_skyboxDimensions = IntArray.fromElements( world.getSkyboxDimensionsBuffer()[0],  world.getSkyboxDimensionsBuffer()[1]);
 
 
     }

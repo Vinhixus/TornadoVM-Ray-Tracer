@@ -81,7 +81,7 @@ public class Camera {
      * Allocate memory space and initialise the input buffer
      */
     private void allocateAndInitializeBuffer() {
-        buffer = new FloatArray(position.getX(), position.getY(), position.getZ(), yaw, pitch, fov);
+        buffer = FloatArray.fromElements(position.getX(), position.getY(), position.getZ(), yaw, pitch, fov);
     }
 
     /**
