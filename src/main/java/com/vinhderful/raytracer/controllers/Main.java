@@ -41,7 +41,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import uk.ac.manchester.tornado.api.GridScheduler;
 import uk.ac.manchester.tornado.api.TaskGraph;
-import uk.ac.manchester.tornado.api.TornadoDriver;
+import uk.ac.manchester.tornado.api.TornadoBackend;
 import uk.ac.manchester.tornado.api.TornadoExecutionPlan;
 import uk.ac.manchester.tornado.api.TornadoRuntimeInterface;
 import uk.ac.manchester.tornado.api.WorkerGrid;
@@ -354,11 +354,11 @@ public class Main {
 
         // Get Tornado drivers
         TornadoRuntimeInterface runtimeCI = TornadoRuntime.getTornadoRuntime();
-        int numTornadoDrivers = runtimeCI.getNumDrivers();
+        int numBackends = runtimeCI.getNumBackends();
 
-        for (int i = 0; i < numTornadoDrivers; i++) {
+        for (int i = 0; i < numBackends; i++) {
 
-            TornadoDriver driver = runtimeCI.getDriver(i);
+            TornadoBackend driver = runtimeCI.getBackend(i);
             int numDevices = driver.getDeviceCount();
 
             // Add Tornado devices, perform initial mapping
