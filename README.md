@@ -25,19 +25,29 @@ git clone https://github.com/Vinhixus/TornadoVM-Ray-Tracer.git
 
 2. Install dependencies:
 
-- Install TornadoVM. The following example builds TornadoVM with OpenJDK 11 and OpenCL:
+- Install TornadoVM (via SDKMAN!)
+
+TornadoVM is distributed through our [**official website**](https://www.tornadovm.org/downloads) and **SDKMAN!**. Install a version that matches your OS, architecture, and accelerator backend.
+
+All TornadoVM SDKs are available on the [SDKMAN! TornadoVM page](https://sdkman.io/sdks/tornadovm/).
 
 ```bash
-git clone https://github.com/beehive-lab/TornadoVM.git 
-cd TornadoVM
-./scripts/tornadoVMInstaller.sh --jdk11 --opencl
-source source.sh
-cd ..
+sdk install tornadovm
 ```
 
-**If you cannot build TornadoVM with the installer, try
-the [manual installation](https://github.com/beehive-lab/TornadoVM/blob/master/assembly/src/docs/12_INSTALL_WITH_JDK11_PLUS.md)
-.**
+- Use JDK 21 or any JDK 22+ (e.g. JDK 25)
+
+TornadoVM-Ray-Tracer builds and runs with **JDK 21** or any **JDK 22 or newer**, as long as the installed TornadoVM distribution matches the JDK in use (TornadoVM ships separate `jdk21` and `jdk22plus` builds). The Maven build auto-detects the running JDK and selects the matching TornadoVM dependency:
+
+| JDK | Maven profile (auto-activated) | TornadoVM dependency |
+|-----|-------------------------------|----------------------|
+| 21.x | `jdk21` | `tornado-api` `*-jdk21` |
+| 22+  | `jdk22plus` | `tornado-api` `*-jdk22plus` |
+
+```bash
+sdk install java 21.0.2-open    # for JDK 21
+sdk install java 25.0.2-open    # for JDK 25 (any JDK 22+ works)
+```
 
 - Download the JavaFX SDK for your system from: [JavaFX downloads](https://gluonhq.com/products/javafx/). You will need
   the path of the JavaFX SDK for Step 3.
@@ -52,10 +62,6 @@ vim sources.env
 export TORNADO_RAY_TRACER_ROOT="${PWD}"
 export PATH="${PATH}:${TORNADO_RAY_TRACER_ROOT=}/bin"
 export JAVAFX_SDK=<path to JavaFX>/javafx-sdk-18/
-export TORNADO_ROOT=<path to TornadoVM>
-export PATH="${PATH}:${TORNADO_ROOT}/bin/bin/"
-export TORNADO_SDK=${TORNADO_ROOT}/bin/sdk
-export JAVA_HOME=${TORNADO_ROOT}/TornadoVM-OpenJDK11/jdk-11.0.13+8
 ```
 
 Load the environment:
@@ -68,6 +74,12 @@ source sources.env
 
 ```bash
 mvn clean install
+```
+
+The JDK profile is selected automatically from the JDK running Maven. To force a specific variant regardless of the running JDK:
+
+```bash
+mvn clean install -P jdk21,'!jdk22plus'   # force the JDK 21 variant
 ```
 
 5. Run TornadoVM-Ray-Tracer:

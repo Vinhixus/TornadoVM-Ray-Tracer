@@ -2,23 +2,33 @@
 
 JARS=$(echo ${TORNADO_RAY_TRACER_ROOT}/target/classes | tr ' ' ':')
 
-JFLAGS="--module-path .:${JAVAFX_SDK}/lib --add-modules ALL-SYSTEM,javafx.controls,javafx.graphics,javafx.fxml -Dprism.vsync=false"
+# Keep the JavaFX module path and the JVM flags in separate --module-path/--jvm arguments
+# (rather than smuggling both through a single --module-path string). On JDK 22-26, TornadoVM's
+# tornado launcher appends its own --patch-module jdk.internal.vm.ci=...jvmci-21.0.2.jar right
+# after building --module-path, with no separating space before whatever gets appended next -
+# so a combined string here gets glued onto that --patch-module value instead of extending the
+# module path, and javafx.graphics silently drops off it (FindException: Module javafx.graphics
+# not found). --jvm is appended at its own, separate point in the launcher, so it isn't affected.
+MODULE_PATH=".:${JAVAFX_SDK}/lib"
+# MethodInlineBailoutLimit: Graal's inlining walker gives up after 1000 exploration steps by
+# default; on JDK 25 the render kernel's call tree needs far more, leaving invokes un-inlined.
+JVM_FLAGS="-Xms18G -Xmx18G --add-modules ALL-SYSTEM,javafx.controls,javafx.graphics,javafx.fxml -Dprism.vsync=false -Dtornado.compiler.fullInlining=True -Djdk.graal.MethodInlineBailoutLimit=1000000"
 
 if [ $# -eq 0 ]; then
 	echo "------------------------------------"
 	echo "Running TornadoVM Ray Tracer with GUI..."
-	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} --debug --threadInfo com.vinhderful.raytracer.App
+	tornado --module-path="${MODULE_PATH}" --jvm="${JVM_FLAGS}" --threadInfo --printKernel --classpath="${CLASSPATH}:${JARS}"  com.vinhderful.raytracer.App
 elif [ "$1" == "benchmark" ]; then
 	echo "-----------------------------------------"
 	echo "Running TornadoVM Ray Tracer benchmark mode..."
-	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} com.vinhderful.raytracer.Benchmark
+	tornado --module-path="${MODULE_PATH}" --jvm="${JVM_FLAGS}" --classpath="${CLASSPATH}:${JARS}"  com.vinhderful.raytracer.Benchmark
 elif [ "$1" == "regression" ]; then
 	echo "-----------------------------------------"
 	echo "Running TornadoVM Ray Tracer benchmark mode..."
-	tornado ${JFLAGS} -classpath ${CLASSPATH}:${JARS} -Dskip.sequential=True com.vinhderful.raytracer.Benchmark 
+	tornado --module-path="${MODULE_PATH}" --jvm="${JVM_FLAGS} -Dskip.sequential=True" --classpath="${CLASSPATH}:${JARS}" com.vinhderful.raytracer.Benchmark
 else
 	echo "Please run:"
-	echo "tornadovm-ray-tracer               for the gui version or"
-	echo "tornadovm-ray-tracer benchmark     for the benchmark mode."
-	echo "tornadovm-ray-tracer regression    for regression tests (it skips sequential execution)"
+	echo "  tornadovm-ray-tracer               for the gui version or"
+	echo "  tornadovm-ray-tracer benchmark     for the benchmark mode."
+	echo "  tornadovm-ray-tracer regression    for regression tests (it skips sequential execution)"
 fi

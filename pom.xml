@@ -16,22 +16,22 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>18</version>
+            <version>21</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>18</version>
+            <version>21</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>18</version>
+            <version>21</version>
         </dependency>
         <dependency>
-            <groupId>tornado</groupId>
+            <groupId>io.github.beehive-lab</groupId>
             <artifactId>tornado-api</artifactId>
-            <version>0.14-dev</version>
+            <version>${tornadovm.version}</version>
         </dependency>
     </dependencies>
 
@@ -40,8 +40,74 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <!-- Published TornadoVM release. Maven Central coordinates are per-JDK; the
+             profiles below append the -jdk21 / -jdk22plus suffix matching the running JDK. -->
+        <tornadovm.base.version>7.2.0</tornadovm.base.version>
+        <!-- Defaults; one of the JDK profiles below always activates for JDK >= 21 and overrides these. -->
+        <jdk.version.suffix>-jdk22plus</jdk.version.suffix>
+        <tornadovm.version>${tornadovm.base.version}${jdk.version.suffix}</tornadovm.version>
+        <maven.compiler.release>22</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- ─── JDK 21 ───────────────────────────────────────────────────────────
+             Auto-activates for JDK 21.x builds; resolves the -jdk21 TornadoVM artifacts.
+        ─────────────────────────────────────────────────────────────────────── -->
+        <profile>
+            <id>jdk21</id>
+            <activation><jdk>[21,22)</jdk></activation>
+            <properties>
+                <maven.compiler.release>21</maven.compiler.release>
+                <jdk.version.suffix>-jdk21</jdk.version.suffix>
+                <tornadovm.version>${tornadovm.base.version}${jdk.version.suffix}</tornadovm.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <!-- The FFM API backing TornadoVM's native arrays is a preview API in
+                                 Java 21 (final since Java 22), so the -jdk21 TornadoVM jars are
+                                 compiled with enable-preview and consumers must compile with it too. -->
+                            <compilerArgs>
+                                <arg>--enable-preview</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- ─── JDK 22+ ──────────────────────────────────────────────────────────
+             Auto-activates for any JDK >= 22; resolves the -jdk22plus TornadoVM
+             artifacts. TornadoVM ships a single -jdk22plus SDK that runs unchanged
+             on 22, 23, 24, 25, 26, 27 and later. FFM/Panama is final from 22, so no
+             enable-preview flag is needed and the emitted class files are portable.
+        ─────────────────────────────────────────────────────────────────────── -->
+        <profile>
+            <id>jdk22plus</id>
+            <activation><jdk>[22,)</jdk></activation>
+            <properties>
+                <maven.compiler.release>22</maven.compiler.release>
+                <jdk.version.suffix>-jdk22plus</jdk.version.suffix>
+                <tornadovm.version>${tornadovm.base.version}${jdk.version.suffix}</tornadovm.version>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
